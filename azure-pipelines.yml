@@ -9,7 +9,7 @@ name: 0.1.$(DayOfYear)$(Rev:r)
 stages:
 - stage: Build
   pool:
-    vmImage: 'windows-latest'
+    vmImage: 'ubuntu-latest'
 
   jobs:
   - job: Build
@@ -31,55 +31,66 @@ stages:
         archiveFile: "$(System.DefaultWorkingDirectory)/build$(Build.BuildId).zip"
 
     - task: PublishBuildArtifacts@1
-      displayName: Publish web app
-      inputs:
-        PathtoPublish: 'Web'
-        ArtifactName: 'web'
-        publishLocation: 'Container'
-
-    - task: PublishBuildArtifacts@1
       displayName: "Publish web function artifacts"
       inputs:
         PathtoPublish: '$(System.DefaultWorkingDirectory)/build$(Build.BuildId).zip'
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: Release
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  pool:
-    vmImage: 'windows-latest'
-  jobs:
-  - deployment: WebApp
-    environment: 'azure'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'web'
-              downloadPath: '$(System.ArtifactsDirectory)'
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node 18'
 
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'drop'
-              downloadPath: '$(System.ArtifactsDirectory)'
+    - script: npm ci
+      displayName: 'Install web app dependencies'
 
-          - task: AzureFunctionApp@2 # Add this at the end of your file
-            inputs:
-              azureSubscription: 'azure'
-              appType: functionApp # default is functionApp
-              appName: 'VisioPdfTip'
-              package: $(System.ArtifactsDirectory)/drop/**/*.zip
-              deploymentMethod: 'auto' # 'auto' | 'zipDeploy' | 'runFromPackage'. Required. Deployment method. Default: auto.
+    - script: npm run build
+      displayName: 'Build web app'
 
-          - task: FtpUpload@2
-            displayName: 'Upload to UnmanagedVisio using FTP'
-            inputs:
-              serverEndpoint: 'UnmanagedVisio FTP'
-              rootDirectory: '$(System.ArtifactsDirectory)/web'
-              remoteDirectory: '/tools.unmanagedvisio.com/'
+    - task: PublishBuildArtifacts@1
+      displayName: Publish web app
+      inputs:
+        PathtoPublish: 'dist'
+        ArtifactName: 'dist'
+        publishLocation: 'Container'
+
+# - stage: Release
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   pool:
+#     vmImage: 'windows-latest'
+#   jobs:
+#   - deployment: WebApp
+#     environment: 'azure'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: DownloadBuildArtifacts@0
+#             inputs:
+#               buildType: 'current'
+#               downloadType: 'single'
+#               artifactName: 'web'
+#               downloadPath: '$(System.ArtifactsDirectory)'
+
+#           - task: DownloadBuildArtifacts@0
+#             inputs:
+#               buildType: 'current'
+#               downloadType: 'single'
+#               artifactName: 'drop'
+#               downloadPath: '$(System.ArtifactsDirectory)'
+
+#           - task: AzureFunctionApp@2 # Add this at the end of your file
+#             inputs:
+#               azureSubscription: 'azure'
+#               appType: functionApp # default is functionApp
+#               appName: 'VisioPdfTip'
+#               package: $(System.ArtifactsDirectory)/drop/**/*.zip
+#               deploymentMethod: 'auto' # 'auto' | 'zipDeploy' | 'runFromPackage'. Required. Deployment method. Default: auto.
+
+#           - task: FtpUpload@2
+#             displayName: 'Upload to UnmanagedVisio using FTP'
+#             inputs:
+#               serverEndpoint: 'UnmanagedVisio FTP'
+#               rootDirectory: '$(System.ArtifactsDirectory)/web'
+#               remoteDirectory: '/tools.unmanagedvisio.com/'
