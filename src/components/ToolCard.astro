@@ -1,0 +1,18 @@
+---
+const { href, imageSrc, title, body } = Astro.props;
+---
+
+<div class="card mb-3 col-md-6">
+  <div class="row g-0">
+    <div class="col-md-6">
+      <img src={imageSrc} class="img-fluid">
+    </div>
+    <div class="col-md-6">
+      <div class="card-body">
+        <h5 class="card-title">{title}</h5>
+        <p class="card-text me-auto">{body}</p>
+        <a href={href} class="btn btn-primary">Open</a>
+      </div>
+    </div>
+  </div>
+</div>

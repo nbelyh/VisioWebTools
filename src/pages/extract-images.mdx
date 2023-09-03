@@ -1,0 +1,21 @@
+---
+layout: ../layouts/Layout.astro
+title: "Extract Images"
+active: "/extract-images"
+---
+
+import { ExtractImages } from '../components/ExtractImages';
+
+# Visio Media Extraction Tool
+
+This tool allows you to extract images, embedded into Visio diagram, in their original state.
+It analyzes the Visio file and extracts all embedded images into a ZIP archive.
+Each image is prefixed with page and shape id, so it is possible to find the image in the Visio file.
+
+Simply drag and drop your Visio VSDX file and we will provide the extracted media files as a ZIP archive.
+
+We value your privacy. Your files are securely processed on our servers and are not stored after processing.
+
+Please report issues to our [GitHub Issue Tracker](https://github.com/nbelyh/visiopdftip-webapp/issues)
+
+<ExtractImages client:load />

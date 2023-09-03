@@ -1,0 +1,23 @@
+---
+import NavLink from './NavLink.astro';
+const { active } = Astro.props;
+---
+<nav class="navbar navbar-expand bg-body-secondary mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <img src="/logo.png" alt="Logo" width="32" height="32" class="d-inline-block">
+      Visio Web Tools
+    </a>
+    <button class="navbar-toggler me-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <NavLink active={active} href="/" text="Tools" />
+        <NavLink active={active} href="/support" text="Support" />
+        <NavLink active={active} href="/blog" text="Blog" />
+        <NavLink active={active} href="/about" text="About" />
+      </ul>
+    </div>
+  </div>
+</nav>

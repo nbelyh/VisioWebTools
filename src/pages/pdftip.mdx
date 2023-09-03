@@ -1,0 +1,22 @@
+---
+layout: ../layouts/Layout.astro
+title: "Visio PdfTip Web App"
+active: "/pdftip"
+---
+
+import { PdfTip } from '../components/PdfTip';
+
+Effortlessly add tooltips to your PDF files exported from Visio. The tool provides a simple solution
+for transferring 'Comments' from your Visio file shapes into your PDF. To get started, all you need to
+do is upload both your PDF and the original Visio file, and our servers handle the rest.
+
+We value your privacy. Your files are securely processed on our servers and are not stored
+post-processing.
+
+If you prefer an offline solution, we've got you covered. Purchase our Visio Add-In for offline
+processing from <a href="https://unmanagedvisio.com/products/visio-pdf-export-with-tooltips" target="_blank"><strong>our website</strong></a>.
+This nifty tool allows you to add tooltips to your PDF files without the need for an internet connection.
+
+Please report issues to our <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub Issue Tracker</a>
+
+<PdfTip client:load />

@@ -1,0 +1,7 @@
+---
+const { href, text, active } = Astro.props;
+---
+
+<li class="nav-item">
+  <a class={`nav-link${href == active ? " active" : ""}`} href={href}>{text}</a>
+</li>

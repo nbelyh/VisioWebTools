@@ -1,0 +1,24 @@
+---
+layout: ../layouts/Layout.astro
+title: "Visio Web Tools"
+active: "/"
+---
+
+import ToolCard from "../components/ToolCard.astro";
+
+<main class="container-fluid mt-5">
+  <h1>Tools</h1>
+  <div class="row gap-4">
+    <ToolCard
+      href="/extract-images"
+      title="Image Extraction Tool"
+      imageSrc="/extract-images.gif"
+      body="This tool allows you to extract images, embedded into Visio diagram, in their original format. It analyzes the Visio file and extracts all embedded images into a ZIP archive."
+    />
+    <ToolCard
+      href="/pdftip"
+      title="Visio PdfTip Tool"
+      body="Add tooltips to your PDF files exported from Visio."
+    />
+  </div>
+</main>
