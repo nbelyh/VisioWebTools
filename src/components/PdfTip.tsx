@@ -38,7 +38,7 @@ export const PdfTip = (props: {
 
     setProcessing(true);
     setError('');
-    fetch('https://visiopdftip.azurewebsites.net/api/AddTooltipsFunction', {
+    fetch('https://visiowebtools.azurewebsites.net/api/AddTooltipsFunction', {
       method: 'POST',
       body: formData
     }).then(response => {

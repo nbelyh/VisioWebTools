@@ -26,7 +26,7 @@ export const ExtractImages = (props: {
       setProcessing(true);
       setError('');
       // fetch('http://localhost:7071/api/ExtractImagesAzureFunction', {
-      fetch('https://visiopdftip.azurewebsites.net/api/ExtractImagesAzureFunction', {
+      fetch('https://visiowebtools.azurewebsites.net/api/ExtractImagesAzureFunction', {
         method: 'POST',
         body: formData
       }).then(response => {
