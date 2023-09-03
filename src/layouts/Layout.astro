@@ -1,7 +1,6 @@
 --- 
 const { frontmatter, title, active } = Astro.props;
 import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 ---
 
 <!DOCTYPE html>
@@ -14,6 +13,7 @@ import Footer from '../components/Footer.astro';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <link href="/global.css" rel="stylesheet">
 		<meta name="generator" content={Astro.generator} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
 		<title>{frontmatter?.title}</title>
 	</head>
 	<body>
