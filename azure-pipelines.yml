@@ -37,24 +37,6 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '18.x'
-      displayName: 'Install Node 18'
-
-    - script: npm ci
-      displayName: 'Install web app dependencies'
-
-    - script: npm run build
-      displayName: 'Build web app'
-
-    - task: PublishBuildArtifacts@1
-      displayName: Publish web app
-      inputs:
-        PathtoPublish: 'dist'
-        ArtifactName: 'dist'
-        publishLocation: 'Container'
-
 # - stage: Release
 #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 #   pool:
@@ -87,10 +69,3 @@ stages:
 #               appName: 'VisioPdfTip'
 #               package: $(System.ArtifactsDirectory)/drop/**/*.zip
 #               deploymentMethod: 'auto' # 'auto' | 'zipDeploy' | 'runFromPackage'. Required. Deployment method. Default: auto.
-
-#           - task: FtpUpload@2
-#             displayName: 'Upload to UnmanagedVisio using FTP'
-#             inputs:
-#               serverEndpoint: 'UnmanagedVisio FTP'
-#               rootDirectory: '$(System.ArtifactsDirectory)/web'
-#               remoteDirectory: '/tools.unmanagedvisio.com/'
