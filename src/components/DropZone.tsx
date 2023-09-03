@@ -70,7 +70,7 @@ export const DropZone = (props: {
   const dropZone: CSSProperties = {
     height: '150px',
     border: '2px dashed #6c757d',
-    background: '#f8f9fa',
+    // background: '#f8f9fa',
     marginBottom: '1.5rem',
     display: 'flex',
     justifyContent: 'center',
@@ -78,12 +78,12 @@ export const DropZone = (props: {
     flexDirection: 'column',
     textAlign: 'center',
     transition: 'background-color 0.3s',
-    backgroundColor: dragging ? '#e8e8e8' : undefined
+    // backgroundColor: dragging ? '#e8e8e8' : undefined
   }
 
   const dropzoneLink: CSSProperties = {
     padding: '10px',
-    background: '#f8f9fa',
+    // background: '#f8f9fa',
     border: '1px solid #6c757d',
     borderRadius: '3px',
     boxShadow: '10px 10px 5px grey',
@@ -98,12 +98,12 @@ export const DropZone = (props: {
   return (
     <div className="row">
       <div className="col-md-10">
-        <div style={dropZone} onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
+        <div style={dropZone} className="bg-light" onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
           {file
             ? <p><i style={{ color: 'green' }}>&#10004;</i> You have selected: <strong>{file.name}</strong></p>
             : <>
               <p>{props.label}</p>
-              <button className="btn btn-secondary mt-2" onClick={onUploadButtonClick}>Or click to upload</button>
+              <button className="btn btn-secondary mt-2" onClick={onUploadButtonClick}>Or click here pick a file</button>
             </>
           }
         </div>

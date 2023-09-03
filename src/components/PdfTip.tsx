@@ -58,7 +58,7 @@ export const PdfTip = (props: {
   }
 
   return (
-    <>
+    <div>
       {!!error &&
         <div className="row">
           <div className="col-md-10 alert alert-danger mt-3">
@@ -70,12 +70,12 @@ export const PdfTip = (props: {
 
       <div className="row">
         <DropZone accept="application/pdf" sampleFileName="Drawing1.pdf"
-          label="Please drop a PDF file (without tooltips) you have exported from Visio"
+          label="Drop a PDF file (without tooltips) that you have exported from Visio here"
           onChange={setPdf}
         />
 
         <DropZone accept="application/vnd.ms-visio.drawing" sampleFileName="Drawing1.vsdx"
-          label="Please drop the original Visio VSDX file to copy the tooltips from"
+          label="Drop the original Visio VSDX file to copy the tooltips from here"
           onChange={setVsdx}
         />
       </div>
@@ -93,17 +93,17 @@ export const PdfTip = (props: {
             onChange={e => setY(Number.parseInt(e.target.value))} />
         </div>
 
-        <div className="form-group col-lg-4 col-md-6">
+        <div className="form-group col-lg-2 col-md-6">
           <label htmlFor="color-picker">Tooltip color:</label>
-          <input type="color" id="color-picker" value={color} className="form-control"
+          <input type="color" id="color-picker" style={{ height: "2.25rem" }} value={color} className="form-control"
             onChange={e => setColor(e.target.value)}
           />
         </div>
 
-        <div className="form-group col-lg-4 col-md-6">
+        <div className="form-group col-lg-2 col-md-6">
           <label htmlFor="icon-picker">Tooltip Icon:</label>
           <select id="icon-picker" className="form-control" value={icon} onChange={e => setIcon(e.target.value)}>
-            {icons.map(icon => <option value={icon}>{icon}</option>)}
+            {icons.map(icon => <option key={icon} value={icon}>{icon}</option>)}
           </select>
         </div>
       </div>
@@ -115,6 +115,6 @@ export const PdfTip = (props: {
         </div>
       </div>
 
-      <button onClick={uploadFiles} className="btn btn-primary" disabled={processing || !pdf || !vsdx}>Generate PDF with tooltips</button>
-    </>);
+      <button onClick={uploadFiles} className="btn btn-primary" disabled={processing || !pdf || !vsdx}>Add comments to PDF!</button>
+    </div>);
 }

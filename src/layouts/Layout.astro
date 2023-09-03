@@ -1,6 +1,7 @@
 --- 
 const { frontmatter, title, active } = Astro.props;
-import Nav from '../components/Nav.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 ---
 
 <!DOCTYPE html>
@@ -16,7 +17,7 @@ import Nav from '../components/Nav.astro';
 		<title>{frontmatter?.title}</title>
 	</head>
 	<body>
-    <Nav active={frontmatter?.active} />
+    <Header active={frontmatter?.active} />
     <div class="container">
       <slot />
     </div>

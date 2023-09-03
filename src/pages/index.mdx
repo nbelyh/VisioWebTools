@@ -5,20 +5,31 @@ active: "/"
 ---
 
 import ToolCard from "../components/ToolCard.astro";
+import LinkButton from "../components/LinkButton.astro";
 
-<main class="container-fluid mt-5">
-  <h1>Tools</h1>
-  <div class="row gap-4">
-    <ToolCard
-      href="/extract-images"
-      title="Image Extraction Tool"
-      imageSrc="/extract-images.gif"
-      body="This tool allows you to extract images, embedded into Visio diagram, in their original format. It analyzes the Visio file and extracts all embedded images into a ZIP archive."
-    />
-    <ToolCard
-      href="/pdftip"
-      title="Visio PdfTip Tool"
-      body="Add tooltips to your PDF files exported from Visio."
-    />
-  </div>
+<main class="container-fluid">
+
+# Visio Web Tools
+
+Visio Web Tools is a collection of tools (mini-apps) for working with Visio files online.
+These tools can process Visio files directly online, without the need to install Visio on your computer.
+The collection is not that big, but it is growing. If you have any ideas for new tools, please let me know.
+
+The tools are brought to you and maintained by <a href="https://unmanagedvisio.com/"><strong>Unmanaged Visio</strong></a>
+
+<div class="row gap-4">
+  <ToolCard
+    href="/extract-images"
+    title="Image Extraction Tool"
+    imageSrc="/extract-images-flow.svg"
+    body="This tool allows you to extract images, embedded into Visio diagram, in their original format. It analyzes the Visio file and extracts all embedded images into a ZIP archive, keeping shape/page references."
+  />
+  <ToolCard
+    href="/pdftip"
+    title="Visio PdfTip Tool"
+    imageSrc="/pdftip-flow.svg"
+    body="Add tooltips (comments) to PDF files exported from Visio. This tool provides a simple solution for transferring 'Comments' from your Visio file shapes into PDF, and the tool will update the PDF."
+  />
+</div>
+
 </main>

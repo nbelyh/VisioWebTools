@@ -64,7 +64,7 @@ export const ExtractImages = (props: {
         <DropZone
           accept="application/vnd.ms-visio.drawing"
           sampleFileName="ImageSample.vsdx"
-          label="Please drop the Visio VSDX file to extract media (images) from"
+          label="Drop the Visio VSDX file to extract media (images) from here"
           onChange={onFileChange}
         />
       </div>
