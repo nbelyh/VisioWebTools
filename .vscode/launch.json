@@ -6,6 +6,12 @@
       "name": "Development server",
       "request": "launch",
       "type": "node-terminal"
+    },
+    {
+      "name": "Attach to .NET Functions",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:azureFunctions.pickProcess}"
     }
   ]
 }
