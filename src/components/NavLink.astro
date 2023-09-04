@@ -1,7 +1,8 @@
 ---
-const { href, text, active } = Astro.props;
+const { href, text } = Astro.props;
+const currentPath = Astro.url.pathname;
 ---
 
 <li class="nav-item">
-  <a class={`nav-link${href == active ? " active" : ""}`} href={href}>{text}</a>
+  <a class={`nav-link${href == currentPath ? " active" : ""}`} href={href}>{text}</a>
 </li>

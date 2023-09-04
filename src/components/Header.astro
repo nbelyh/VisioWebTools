@@ -1,6 +1,5 @@
 ---
 import NavLink from './NavLink.astro';
-const { active } = Astro.props;
 ---
 <nav class="navbar navbar-expand mb-4 bg-light">
   <div class="container">
@@ -13,9 +12,9 @@ const { active } = Astro.props;
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <NavLink active={active} href="/" text="Tools" />
-        <NavLink active={active} href="/support" text="Support" />
-        <NavLink active={active} href="/about" text="About" />
+        <NavLink href="/" text="Tools" />
+        <NavLink href="/support" text="Support" />
+        <NavLink href="/about" text="About" />
       </ul>
     </div>
   </div>

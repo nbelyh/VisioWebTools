@@ -1,5 +1,5 @@
 --- 
-const { frontmatter, title, active } = Astro.props;
+const { frontmatter } = Astro.props;
 import Header from '../components/Header.astro';
 ---
 
@@ -17,7 +17,7 @@ import Header from '../components/Header.astro';
 		<title>{frontmatter?.title}</title>
 	</head>
 	<body>
-    <Header active={frontmatter?.active} />
+    <Header />
     <div class="container">
       <slot />
     </div>
