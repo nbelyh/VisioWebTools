@@ -1,6 +1,6 @@
 ---
 const { href, text } = Astro.props;
-const currentPath = Astro.url.pathname;
+const active = Astro.url.pathname?.replace(/\/$/, "") == href?.replace(/\/$/, "");
 ---
 
 <style>
@@ -12,4 +12,5 @@ const currentPath = Astro.url.pathname;
   }
 </style>
 
-<a href={href} class:list={["nav-link", { active: currentPath == href} ]}>{text}</a>
+<a href={href} class:list={["nav-link", { active } ]}>{text}</a>
+
