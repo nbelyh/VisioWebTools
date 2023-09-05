@@ -27,9 +27,9 @@ export const PdfTip = (props: {
       return;
     }
 
-    // if (window.appInsights) {
-    // 	window.appInsights.trackEvent({ name: "Conversion"});
-    // }
+    if (typeof window.appInsights !== 'undefined') {
+    	window.appInsights.trackEvent({ name: "PdfTipClicked"});
+    }
 
     var formData = new FormData();
     formData.append('pdf', pdf);

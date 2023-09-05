@@ -15,9 +15,9 @@ export const ExtractImages = (props: {
 
   const onExtractImages = async () => {
 
-    // if (typeof window.appInsights !== 'undefined') {
-    //   window.appInsights.trackEvent({ name: "Conversion" });
-    // }
+    if (typeof window.appInsights !== 'undefined') {
+      window.appInsights.trackEvent({ name: "ExtractImagesClicked" });
+    }
 
     setError('');
 

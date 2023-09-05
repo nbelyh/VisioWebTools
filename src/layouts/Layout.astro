@@ -1,6 +1,7 @@
 --- 
 const { frontmatter } = Astro.props;
 import Header from '../components/Header.astro';
+import AppInsights from '../components/AppInsights.astro';
 ---
 
 <!DOCTYPE html>
@@ -26,5 +27,6 @@ import Header from '../components/Header.astro';
     <div class="max-w-7xl mx-auto px-4 prose my-10">
       <slot />
     </div>
+    <AppInsights />
 	</body>
 </html>
