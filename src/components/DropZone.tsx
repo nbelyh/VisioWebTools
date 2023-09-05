@@ -67,50 +67,24 @@ export const DropZone = (props: {
     }
   }
 
-  const dropZone: CSSProperties = {
-    height: '150px',
-    border: '2px dashed #6c757d',
-    // background: '#f8f9fa',
-    marginBottom: '1.5rem',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-    textAlign: 'center',
-    transition: 'background-color 0.3s',
-    // backgroundColor: dragging ? '#e8e8e8' : undefined
-  }
-
-  const dropzoneLink: CSSProperties = {
-    padding: '10px',
-    // background: '#f8f9fa',
-    border: '1px solid #6c757d',
-    borderRadius: '3px',
-    boxShadow: '10px 10px 5px grey',
-    cursor: 'move',
-    textDecoration: 'none',
-  }
-
-  const dropzoneDiv: CSSProperties = {
-    minHeight: '5em'
-  }
+  const className = `h-48 flex items-center justify-center border-dashed ${dragging ? 'bg-neutral-200' : 'bg-neutral-100'} border-neutral-300 border-2  text-center`;
 
   return (
-    <div className="row">
-      <div className="col-md-10">
-        <div style={dropZone} className="bg-light" onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
+    <div className="flex mb-4">
+      <div className="md:w-5/6">
+        <div className={className} onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
           {file
-            ? <p><i style={{ color: 'green' }}>&#10004;</i> You have selected: <strong>{file.name}</strong></p>
-            : <>
+            ? <p>&#10004; You have selected: <strong>{file.name}</strong></p>
+            : <div>
               <p>{props.label}</p>
-              <button className="btn btn-secondary mt-2" onClick={onUploadButtonClick}>Or click here pick a file</button>
-            </>
+              <button className="inline-flex items-center bg-neutral-200 hover:bg-neutral-300 text-neutral-900 px-4 py-2 rounded focus:outline-none" onClick={onUploadButtonClick}>Or click here pick a file...</button>
+            </div>
           }
         </div>
         <input ref={fileButtonRef} type="file" accept={props.accept} style={{ display: 'none' }} onChange={onFileChange} />
       </div>
-      <div className="col-md-2 mt-2" style={dropzoneDiv}>
-        <a href={props.sampleFileName} onDragStart={onDragStart} draggable="true" style={dropzoneLink}>&#128196;&nbsp;{props.sampleFileName}</a>
+      <div className="md:w-1/6 p-4">
+        <a href={props.sampleFileName} onDragStart={onDragStart} draggable="true" className="p-2 bg-neutral-100 border-2 border-neutral-300 no-underline shadow-xl rounded cursor-move">&#128196;&nbsp;{props.sampleFileName}</a>
       </div>
     </div>
   );

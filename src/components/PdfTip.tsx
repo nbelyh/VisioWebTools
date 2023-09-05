@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
+import { PrimaryButton } from './PrimaryButton';
 
 export const PdfTip = (props: {
 
@@ -17,7 +18,9 @@ export const PdfTip = (props: {
 
   const icons = ["NoIcon", "Comment", "Help", "Insert", "Key", "NewParagraph", "Note", "Paragraph"];
 
-  const uploadFiles = () => {
+  const uploadFiles = async () => {
+
+    setError('');
 
     if (!pdf || !vsdx) {
       setError('Please select both PDF and VSDX files');
@@ -37,84 +40,81 @@ export const PdfTip = (props: {
     formData.append('y', y.toString());
 
     setProcessing(true);
-    setError('');
-    fetch('https://visiowebtools.azurewebsites.net/api/AddTooltipsFunction', {
-      method: 'POST',
-      body: formData
-    }).then(response => {
-      return response.blob();
-    }).then(blob => {
+
+    try {
+      const response = await fetch('https://visiowebtools.azurewebsites.net/api/AddTooltipsFunction', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const blob = await response.blob();
       var url = window.URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.download = `Tooltips_${pdf.name}`
       a.target = "_blank";
       a.href = url;
       a.click();
-    }).catch(e => {
-      setError(e.message);
-    }).finally(() => {
+    } catch (e: any) {
+      setError(e?.message);
+    } finally {
       setProcessing(false);
-    });
+    }
   }
 
+  const inputClass = "mt-1 block w-full rounded";
+
   return (
-    <div>
-      {!!error &&
-        <div className="row">
-          <div className="col-md-10 alert alert-danger mt-3">
-            <strong>Ups! Something went wrong</strong>. Please make sure you have selected the exported PDF file and the original VSDX file,
-            or reload the page and try again: {error}. If it the problem persists, please report an issue to our
-            <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub</a>
-          </div>
-        </div>}
-
-      <div className="row">
-        <DropZone accept="application/pdf" sampleFileName="Drawing1.pdf"
-          label="Drop a PDF file (without tooltips) that you have exported from Visio here"
-          onChange={setPdf}
-        />
-
-        <DropZone accept="application/vnd.ms-visio.drawing" sampleFileName="Drawing1.vsdx"
-          label="Drop the original Visio VSDX file to copy the tooltips from here"
-          onChange={setVsdx}
-        />
-      </div>
-
-      <div className="row">
-        <div className="form-group col-lg-2 col-md-6">
-          <label htmlFor="tooltip-x">Tooltip X location:</label>
-          <input type="number" id="tooltip-x" value={x} className="form-control"
-            onChange={e => setX(Number.parseInt(e.target.value))} />
+    <>
+      {!!error && <div className="flex">
+        <div className="my-3 bg-red-100 p-4 w-5/6">
+          <strong>Ups! Something went wrong</strong>. Please make sure you have selected the exported PDF file and the original VSDX file,
+          or reload the page and try again: {error}. If it the problem persists, please report an issue to our <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub</a>
         </div>
+      </div>}
 
-        <div className="form-group col-lg-2 col-md-6">
-          <label htmlFor="tooltip-y">Tooltip Y location:</label>
-          <input type="number" id="tooltip-y" value={y} className="form-control"
-            onChange={e => setY(Number.parseInt(e.target.value))} />
-        </div>
+      <DropZone accept="application/pdf" sampleFileName="Drawing1.pdf"
+        label="Drop a PDF file (without tooltips) that you have exported from Visio here"
+        onChange={setPdf}
+      />
 
-        <div className="form-group col-lg-2 col-md-6">
-          <label htmlFor="color-picker">Tooltip color:</label>
-          <input type="color" id="color-picker" style={{ height: "2.25rem" }} value={color} className="form-control"
-            onChange={e => setColor(e.target.value)}
-          />
-        </div>
+      <DropZone accept="application/vnd.ms-visio.drawing" sampleFileName="Drawing1.vsdx"
+        label="Drop the original Visio VSDX file to copy the tooltips from here"
+        onChange={setVsdx}
+      />
 
-        <div className="form-group col-lg-2 col-md-6">
-          <label htmlFor="icon-picker">Tooltip Icon:</label>
-          <select id="icon-picker" className="form-control" value={icon} onChange={e => setIcon(e.target.value)}>
+      <div className="grid md:grid-cols-6 gap-4">
+        <label className="block">
+          <span className="text-neutral-700">Tooltip X location:</span>
+          <input className={inputClass} type="number" value={x} onChange={e => setX(Number.parseInt(e.target.value))} />
+        </label>
+
+        <label className="block">
+          <span className="text-neutral-700">Tooltip Y location:</span>
+          <input className={inputClass} type="number" value={y} onChange={e => setY(Number.parseInt(e.target.value))} />
+        </label>
+
+        <label className="block">
+          <span className="text-neutral-700">Tooltip Icon:</span>
+          <select className={inputClass} value={icon} onChange={e => setIcon(e.target.value)}>
             {icons.map(icon => <option key={icon} value={icon}>{icon}</option>)}
           </select>
-        </div>
+        </label>
+        <label className="block">
+          <span className="text-neutral-700">Tooltip color:</span>
+          <input className={inputClass + " " + "form-input h-10"} type="color" id="color-picker" value={color} onChange={e => setColor(e.target.value)} />
+        </label>
       </div>
 
-      <div className="row">
-        <div className="alert mt-3">
-          <strong>Note:</strong> Some options (such as tooltip color and icon type) may not work in all PDF
-          viewers. Check in <a href="https://get.adobe.com/reader/" target="_blank" rel="noopener noreferrer">Adobe PDF viewer</a>.
-        </div>
+      <div className="my-4 bg-slate-100 p-4 rounded">
+        <strong>Note:</strong> Some options (such as tooltip color and icon type) may not work in all PDF
+        viewers. Check in <a href="https://get.adobe.com/reader/" target="_blank" rel="noopener noreferrer">Adobe PDF viewer</a>.
       </div>
 
-      <button onClick={uploadFiles} className="btn btn-primary" disabled={processing || !pdf || !vsdx}>Add comments to PDF!</button>
-    </div>);
+      <PrimaryButton onClick={uploadFiles} disabled={processing || !pdf || !vsdx}>Add comments to PDF</PrimaryButton>
+    </>
+  );
 }

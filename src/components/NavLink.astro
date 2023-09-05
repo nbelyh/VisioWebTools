@@ -3,6 +3,13 @@ const { href, text } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
-<li class="nav-item">
-  <a class={`nav-link${href == currentPath ? " active" : ""}`} href={href}>{text}</a>
-</li>
+<style>
+  .nav-link {
+    @apply text-gray-500 hover:text-gray-700 px-4 py-2;
+  }
+  .nav-link.active {
+    @apply font-bold;
+  }
+</style>
+
+<a href={href} class:list={["nav-link", { active: currentPath == href} ]}>{text}</a>

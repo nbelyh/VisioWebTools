@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
+import { PrimaryButton } from './PrimaryButton';
 
 export const ExtractImages = (props: {
 }) => {
@@ -12,68 +13,65 @@ export const ExtractImages = (props: {
     setVsdx(file);
   }
 
-  const onExtractImages = () => {
+  const onExtractImages = async () => {
 
     // if (typeof window.appInsights !== 'undefined') {
     //   window.appInsights.trackEvent({ name: "Conversion" });
     // }
 
-    if (vsdx) {
+    setError('');
 
-      var formData = new FormData();
-      formData.append('vsdx', vsdx);
+    if (!vsdx) {
+      setError('Please select the VSDX file');
+      return;
+    }
 
-      setProcessing(true);
-      setError('');
-      // fetch('http://localhost:7071/api/ExtractImagesAzureFunction', {
-      fetch('https://visiowebtools.azurewebsites.net/api/ExtractImagesAzureFunction', {
+    var formData = new FormData();
+    formData.append('vsdx', vsdx);
+
+    setProcessing(true);
+    try {
+      const response = await fetch('https://visiowebtools.azurewebsites.net/api/ExtractImagesAzureFunction', {
         method: 'POST',
         body: formData
-      }).then(response => {
-        return response.blob();
-      }).then(blob => {
-        var url = window.URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        // a.download = "result.pdf"
-        a.target = "_blank";
-        a.href = url;
-        a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`;
-        a.click();
-      }).catch(e => {
-        setError(e.message);
-      }).finally(() => {
-        setProcessing(false);
       });
-    } else {
-      setError('Please select the VSDX file');
+
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      // a.download = "result.pdf"
+      a.target = "_blank";
+      a.href = url;
+      a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`;
+      a.click();
+    } catch (e: any) {
+      setError(e?.message);
+    } finally {
+      setProcessing(false);
     }
   }
 
   return (
     <>
-      {!!error && <div className="row">
-        <div className="col-md-10 alert alert-danger mt-3">
+      {!!error && <div className="flex">
+        <div className="my-3 bg-red-100 p-4 w-5/6">
           <strong>Ups! Something went wrong</strong>.
           Please make sure you have selected the VSDX (not VSD) file,
-          or reload the page and try again: {error}. If it the problem persists, please report an issue to our
-          <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub</a>
+          or reload the page and try again: {error}. If it the problem persists, please report an issue to our <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub</a>
         </div>
       </div>}
 
-      <div className="row">
-        <DropZone
-          accept="application/vnd.ms-visio.drawing"
-          sampleFileName="ImageSample.vsdx"
-          label="Drop the Visio VSDX file to extract media (images) from here"
-          onChange={onFileChange}
-        />
-      </div>
+      <DropZone
+        accept="application/vnd.ms-visio.drawing"
+        sampleFileName="ImageSample.vsdx"
+        label="Drop the Visio VSDX file to extract media (images) from here"
+        onChange={onFileChange}
+      />
 
-      <div className="row">
-        <div className='col-md-10' style={{ textAlign: 'center' }}>
-          {vsdx && <button className="btn btn-primary" disabled={processing} onClick={onExtractImages} >Extract Images</button>}
-        </div>
-      </div>
+      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>Extract Images</PrimaryButton>}
     </>
   );
 }

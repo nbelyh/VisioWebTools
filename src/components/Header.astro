@@ -1,21 +1,24 @@
 ---
 import NavLink from './NavLink.astro';
 ---
-<nav class="navbar navbar-expand mb-4 bg-light">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <img src="/logo.png" alt="Logo" width="32" height="32" class="d-inline-block me-2">
-      <span>Visio Web Tools</span>
-    </a>
-    <button class="navbar-toggler me-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <NavLink href="/" text="Tools" />
-        <NavLink href="/support" text="Support" />
-        <NavLink href="/about" text="About" />
-      </ul>
-    </div>
+
+<nav class="bg-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between">
+          <!-- Logo / Home Link -->
+          <div class="flex space-x-4">
+              <a href="/" class="flex items-center py-5 px-2 text-gray-700 hover:text-gray-900">
+                <img src="/logo.png" alt="Company Logo" class="h-8 w-8 mr-2">
+                <span class="font-bold text-xl invisible md:visible">Visio Web Tools</span>
+              </a>
+          </div>
+
+          <!-- Navigation Links -->
+          <div class="flex items-center space-x-1">
+            <NavLink href="/" text="Tools" />
+            <NavLink href="/support" text="Support" />
+            <NavLink href="/about" text="About" />
+          </div>
+      </div>
   </div>
 </nav>
