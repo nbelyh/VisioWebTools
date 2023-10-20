@@ -12,7 +12,7 @@ using System;
 using System.Globalization;
 using VisioMediaExtractor;
 
-namespace AddTooltips
+namespace VisioWebTools
 {
     public static class ExtractImagesAzureFunction
     {

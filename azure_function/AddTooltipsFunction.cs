@@ -11,7 +11,7 @@ using System.Drawing;
 using System;
 using System.Globalization;
 
-namespace AddTooltips
+namespace VisioWebTools
 {
     public static class AddTooltipsFunction
     {

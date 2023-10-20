@@ -12,7 +12,7 @@ using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using System.Xml;
 
-namespace AddTooltips
+namespace VisioWebTools
 {
     internal class PdfUpdater
     {

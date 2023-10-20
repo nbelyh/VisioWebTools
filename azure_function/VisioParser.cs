@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace AddTooltips
+namespace VisioWebTools
 {
     internal static class VisioParser
     {
