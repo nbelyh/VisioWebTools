@@ -14,16 +14,6 @@ namespace VisioWebTools
 {
     public class SplitPagesService
     {
-        public static XmlNamespaceManager CreateVisioXmlNamespaceManager()
-        {
-            var ns = new XmlNamespaceManager(new NameTable());
-            ns.AddNamespace("v", "http://schemas.microsoft.com/office/visio/2012/main");
-            ns.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
-            return ns;
-        }
-
-        public static readonly XmlNamespaceManager VisioNamespaceManager = CreateVisioXmlNamespaceManager();
-
         public static byte[] ReadAllBytesFromStream(Stream stream)
         {
             using (var ms = new MemoryStream())
@@ -73,17 +63,17 @@ namespace VisioWebTools
             {
                 using (var zip = new ZipArchive(output, ZipArchiveMode.Create))
                 {
-                    var pageInfos = GetPageInfos(stream);
+                    var info = GetPageInfos(stream);
 
-                    foreach (var pageInfo in pageInfos.Where(p => !p.Background))
+                    foreach (var pageInfo in info.PageInfos.Where(p => !p.Background))
                     {
                         using (var pageStream = new MemoryStream())
                         {
                             stream.Position = 0;
                             stream.CopyTo(pageStream);
 
-                            var pagesToKeep = GetRelatedPages(pageInfo.PageId, pageInfos);
-                            RemovePagesExcept(pageStream, pagesToKeep);
+                            var pagesToKeep = GetRelatedPages(pageInfo.PageId, info.PageInfos);
+                            RemovePagesExcept(pageStream, pagesToKeep, info);
 
                             var fileName = MakeSafeFileName(pageInfo.PageName);
                             var entry = zip.CreateEntry($"{fileName}.vsdx");
@@ -100,7 +90,7 @@ namespace VisioWebTools
             }
         }
 
-        public static void RemovePagesExcept(Stream stream, HashSet<string> pagesToKeep)
+        public static void RemovePagesExcept(Stream stream, HashSet<string> pagesToKeep, DocumentInfo info)
         {
             using (Package package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
             {
@@ -117,19 +107,36 @@ namespace VisioWebTools
 
                 var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
 
+                var mediaToRemoveUrls = new HashSet<Uri>();
                 for (var i = pageRels.Count - 1; i >= 0; --i)
                 {
                     var pageRel = pageRels.ElementAt(i);
                     Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
 
-                    var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioNamespaceManager);
+                    var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
                     var pageId = xmlPage.Attribute("ID").Value;
                     if (!pagesToKeep.Contains(pageId))
                     {
                         xmlPage.Remove();
                         package.DeletePart(pageUri);
                         pagesPart.DeleteRelationship(pageRel.Id);
+                        var pageInfo = info.PageInfos.Find(x => x.PageId == pageId);
+                        mediaToRemoveUrls.UnionWith(pageInfo.UsedMedia);
                     }
+                }
+
+                var mediaToKeepUrls = new HashSet<Uri>();
+                mediaToKeepUrls.UnionWith(info.UsedMedia);
+                foreach (var pageIdToKeep in pagesToKeep)
+                {
+                    var pageInfo = info.PageInfos.Find(x => x.PageId == pageIdToKeep);
+                    mediaToKeepUrls.UnionWith(pageInfo.UsedMedia);
+                }
+
+                foreach (var mediaToRemoveUrl in mediaToRemoveUrls)
+                {
+                    if (!mediaToKeepUrls.Contains(mediaToRemoveUrl))
+                        package.DeletePart(mediaToRemoveUrl);
                 }
 
                 pagesStream.SetLength(0);
@@ -148,10 +155,24 @@ namespace VisioWebTools
             public string PageName { get; set; }
             public bool Background { get; set; }
             public string BackPage { get; set; }
+
+            public HashSet<Uri> UsedMedia { get; set; }
         }
 
-        public static List<PageInfo> GetPageInfos(Stream stream)
+        public class DocumentInfo
         {
+            public HashSet<Uri> UsedMedia { get; set; }
+            public List<PageInfo> PageInfos { get; set; }
+        }
+
+        public static DocumentInfo GetPageInfos(Stream stream)
+        {
+            var result = new DocumentInfo
+            {
+              UsedMedia = new HashSet<Uri>(),
+              PageInfos = new List<PageInfo>()
+            };
+
             using (Package package = Package.Open(stream))
             {
                 var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
@@ -161,25 +182,73 @@ namespace VisioWebTools
                 var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").First();
                 Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
                 var pagesPart = package.GetPart(pagesUri);
-                
-                var pagesStream = pagesPart.GetStream();
+                var xmlPages = VisioParser.GetXMLFromPart(pagesPart);
 
-                var result = new List<PageInfo>();
-                var xmlPages = XDocument.Load(pagesStream).XPathSelectElements($"/v:Pages/v:Page", VisioNamespaceManager);
-                foreach (var xmlPage in xmlPages)
+                var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
+                foreach (var pageRel in pageRels)
                 {
+                    var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
                     var pageInfo = new PageInfo
                     {
                         PageId = xmlPage.Attribute("ID").Value,
                         PageName = xmlPage.Attribute("Name").Value,
                         Background = xmlPage.Attribute("Background")?.Value == "1",
-                        BackPage = xmlPage.Attribute("BackPage")?.Value
+                        BackPage = xmlPage.Attribute("BackPage")?.Value,
+                        UsedMedia = new HashSet<Uri>()
                     };
-                    result.Add(pageInfo);
+
+                    Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
+                    var pagePart = package.GetPart(pageUri);
+
+                    var imageRels = pagePart.GetRelationshipsByType("http://schemas.openxmlformats.org/officeDocument/2006/relationships/image").ToList();
+                    foreach (var imageRel in imageRels)
+                    {
+                        var mediaUri = PackUriHelper.ResolvePartUri(pagePart.Uri, imageRel.TargetUri);
+                        pageInfo.UsedMedia.Add(mediaUri);
+                    }
+
+                    var oleObjectRels = pagePart.GetRelationshipsByType("http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject").ToList();
+                    foreach (var oleObjectRel in oleObjectRels)
+                    {
+                        var mediaUri = PackUriHelper.ResolvePartUri(pagePart.Uri, oleObjectRel.TargetUri);
+                        pageInfo.UsedMedia.Add(mediaUri);
+                    }
+
+                    result.PageInfos.Add(pageInfo);
                 }
+
+                result.UsedMedia = GetMastersUsedMedia(package, documentPart);
 
                 return result;
             }
+        }
+
+        private static HashSet<Uri> GetMastersUsedMedia(Package package, PackagePart documentPart)
+        {
+            var usedMedia = new HashSet<Uri>();
+            var mastersRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/masters").FirstOrDefault();
+            if (mastersRel != null)
+            {
+                Uri mastersUri = PackUriHelper.ResolvePartUri(documentPart.Uri, mastersRel.TargetUri);
+                var mastersPart = package.GetPart(mastersUri);
+                var xmlMasters = VisioParser.GetXMLFromPart(mastersPart);
+
+                var masterRels = mastersPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/master").ToList();
+                foreach (var masterRel in masterRels)
+                {
+                    var xmlMaster = xmlMasters.XPathSelectElement($"/v:Masters/v:Master[v:Rel/@r:id='{masterRel.Id}']", VisioParser.NamespaceManager);
+                    Uri masterUri = PackUriHelper.ResolvePartUri(mastersPart.Uri, masterRel.TargetUri);
+                    var masterPart = package.GetPart(masterUri);
+
+                    var imageRels = masterPart.GetRelationshipsByType("http://schemas.openxmlformats.org/officeDocument/2006/relationships/image").ToList();
+                    foreach (var imageRel in imageRels)
+                    {
+                        var mediaUri = PackUriHelper.ResolvePartUri(masterPart.Uri, imageRel.TargetUri);
+                        usedMedia.Add(mediaUri);
+                    }
+                }
+            }
+            return usedMedia;
         }
     }
 
