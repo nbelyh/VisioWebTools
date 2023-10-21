@@ -16,3 +16,8 @@ Drag and drop your Visio VSDX file and we will provide the extracted media files
 
 ![img](https://webtools.unmanagedvisio.com/extract-images-flow.svg)
 
+## SplitPages WebApp
+
+Split your multi-page visio file into pages. Each page becomes a separate file.
+
+![img](https://webtools.unmanagedvisio.com/splitpages-flow.svg)
