@@ -31,8 +31,8 @@ export const SplitPages = (props: {
 
     setProcessing(true);
     try {
-      // const response = await fetch('https://visiowebtools.azurewebsites.net/api/SplitPagesAzureFunction', {
-      const response = await fetch('http://localhost:7071/api/SplitPagesAzureFunction', {
+      const response = await fetch('https://visiowebtools.azurewebsites.net/api/SplitPagesAzureFunction', {
+      // const response = await fetch('http://localhost:7071/api/SplitPagesAzureFunction', {
         method: 'POST',
         body: formData
       });
