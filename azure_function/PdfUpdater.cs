@@ -18,13 +18,13 @@ namespace VisioWebTools
     {
         public static byte[] Process(Stream pdfStream, Stream vsdxStream, PdfOptions options)
         {
-            using (Package visioPackage = Package.Open(vsdxStream))
+            using (Package package = Package.Open(vsdxStream))
             {
-                var documentPart = VisioParser.GetPackageParts(visioPackage, "http://schemas.microsoft.com/visio/2010/relationships/document").First();
+                var documentPart = VisioParser.GetPackageParts(package, "http://schemas.microsoft.com/visio/2010/relationships/document").First();
 
-                var pagesPart = VisioParser.GetPackageParts(visioPackage, documentPart, "http://schemas.microsoft.com/visio/2010/relationships/pages").First();
+                var pagesPart = VisioParser.GetPackageParts(package, documentPart, "http://schemas.microsoft.com/visio/2010/relationships/pages").First();
 
-                var pageParts = VisioParser.GetPackageParts(visioPackage, pagesPart, "http://schemas.microsoft.com/visio/2010/relationships/page");
+                var pageParts = VisioParser.GetPackageParts(package, pagesPart, "http://schemas.microsoft.com/visio/2010/relationships/page");
 
                 var visioPages = pageParts.Select(pagePart => VisioParser.GetXMLFromPart(pagePart)).ToList();
 
@@ -41,16 +41,13 @@ namespace VisioWebTools
                     var pdfPage = pdfDoc.Pages[i];
                     var visioPage = visioPages[i];
 
-                    var ns = new XmlNamespaceManager(new NameTable());
-                    ns.AddNamespace("v", "http://schemas.microsoft.com/office/visio/2012/main");
-
-                    var shapes = visioPage.XPathSelectElements("/v:PageContents/v:Shapes/v:Shape", ns).ToList();
+                    var shapes = visioPage.XPathSelectElements("/v:PageContents/v:Shapes/v:Shape", VisioParser.NamespaceManager).ToList();
 
                     foreach (var shape in shapes)
                     {
                         string GetCellValue(string name)
                         {
-                            var cell = shape.XPathSelectElement($"v:Cell[@N='{name}']", ns);
+                            var cell = shape.XPathSelectElement($"v:Cell[@N='{name}']", VisioParser.NamespaceManager);
                             return cell?.Attribute("V")?.Value;
                         }
 

@@ -4,11 +4,22 @@ using System.IO.Packaging;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Xml;
 
 namespace VisioWebTools
 {
     internal static class VisioParser
     {
+        private static XmlNamespaceManager CreateVisioXmlNamespaceManager()
+        {
+            var ns = new XmlNamespaceManager(new NameTable());
+            ns.AddNamespace("v", "http://schemas.microsoft.com/office/visio/2012/main");
+            ns.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+            return ns;
+        }
+
+        public static readonly XmlNamespaceManager NamespaceManager = CreateVisioXmlNamespaceManager();
+
         public static IEnumerable<PackagePart> GetPackageParts(Package filePackage,
             string relationship)
         {

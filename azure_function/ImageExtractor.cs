@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.IO.Compression;
+using VisioWebTools;
 
 namespace VisioMediaExtractor
 {
@@ -21,13 +22,6 @@ namespace VisioMediaExtractor
       }
     }
 
-    public static XDocument GetXMLFromPart(PackagePart packagePart)
-    {
-      var partStream = packagePart.GetStream();
-      var partXml = XDocument.Load(partStream);
-      return partXml;
-    }
-
     public static byte[] ExtractMediaFromVisio(Stream stream)
     {
       using (var output = new MemoryStream())
@@ -36,41 +30,37 @@ namespace VisioMediaExtractor
         {
           XNamespace nsRel = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
-          var ns = new XmlNamespaceManager(new NameTable());
-          ns.AddNamespace("v", "http://schemas.microsoft.com/office/visio/2012/main");
-          ns.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
-
-          using (Package visioPackage = Package.Open(stream))
+          using (Package package = Package.Open(stream))
           {
-            var documentRel = visioPackage.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
+            var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
             Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
-            var documentPart = visioPackage.GetPart(docUri);
+            var documentPart = package.GetPart(docUri);
 
             var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").First();
             Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
-            var pagesPart = visioPackage.GetPart(pagesUri);
+            var pagesPart = package.GetPart(pagesUri);
 
-            var xmlPages = GetXMLFromPart(pagesPart);
+            var xmlPages = VisioParser.GetXMLFromPart(pagesPart);
             var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
             foreach (var pageRel in pageRels)
             {
               Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
-              var pagePart = visioPackage.GetPart(pageUri);
+              var pagePart = package.GetPart(pageUri);
 
               var imageRels = pagePart.GetRelationshipsByType("http://schemas.openxmlformats.org/officeDocument/2006/relationships/image").ToList();
 
-              var xmlPage = GetXMLFromPart(pagePart);
+              var xmlPage = VisioParser.GetXMLFromPart(pagePart);
 
-              var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape[@Type='Foreign']", ns).ToList();
+              var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape[@Type='Foreign']", VisioParser.NamespaceManager).ToList();
               foreach (var xmlShape in xmlShapes)
               {
-                var pageId = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", ns).Attribute("ID").Value;
+                var pageId = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager).Attribute("ID").Value;
                 var shapeId = xmlShape.Attribute("ID").Value;
 
-                var imageRelId = xmlShape.XPathSelectElement("./v:ForeignData/v:Rel", ns).Attribute(nsRel + "id").Value;
+                var imageRelId = xmlShape.XPathSelectElement("./v:ForeignData/v:Rel", VisioParser.NamespaceManager).Attribute(nsRel + "id").Value;
 
                 var imageRel = imageRels.First(r => r.Id == imageRelId);
-                var imagePart = visioPackage.GetPart(PackUriHelper.ResolvePartUri(pagePart.Uri, imageRel.TargetUri));
+                var imagePart = package.GetPart(PackUriHelper.ResolvePartUri(pagePart.Uri, imageRel.TargetUri));
                 var uri = imagePart.Uri;
 
                 var fileBytes = ReadAllBytesFromStream(imagePart.GetStream());
