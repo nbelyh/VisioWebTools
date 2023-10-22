@@ -1,4 +1,3 @@
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -7,17 +6,12 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Drawing;
-using System;
-using System.Globalization;
-using VisioMediaExtractor;
+using VisioWebTools;
 
-namespace VisioWebTools
+namespace VisioWebToolsAzureFunctions
 {
     public static class ExtractImagesAzureFunction
     {
-
-
         [FunctionName("ExtractImagesAzureFunction")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestMessage req, ILogger log)

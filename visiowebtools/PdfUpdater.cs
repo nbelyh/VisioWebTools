@@ -10,11 +10,10 @@ using System.Globalization;
 using PdfSharpCore.Pdf.Annotations;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
-using System.Xml;
 
 namespace VisioWebTools
 {
-    internal class PdfUpdater
+    public class PdfUpdater
     {
         public static byte[] Process(Stream pdfStream, Stream vsdxStream, PdfOptions options)
         {

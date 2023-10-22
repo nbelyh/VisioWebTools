@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\azure_function\AzureFunction.csproj" />
+    <ProjectReference Include="..\visiowebtools\VisioWebTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,26 +2,15 @@ using System;
 using System.IO;
 using System.IO.Packaging;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.IO.Compression;
-using VisioWebTools;
 
-namespace VisioMediaExtractor
+namespace VisioWebTools
 {
 
-  class ImageExtractor
+  public class ImageExtractor
   {
-    public static byte[] ReadAllBytesFromStream(Stream stream)
-    {
-      using (var ms = new MemoryStream())
-      {
-        stream.CopyTo(ms);
-        return ms.ToArray();
-      }
-    }
-
     public static byte[] ExtractMediaFromVisio(Stream stream)
     {
       using (var output = new MemoryStream())
@@ -63,7 +52,7 @@ namespace VisioMediaExtractor
                 var imagePart = package.GetPart(PackUriHelper.ResolvePartUri(pagePart.Uri, imageRel.TargetUri));
                 var uri = imagePart.Uri;
 
-                var fileBytes = ReadAllBytesFromStream(imagePart.GetStream());
+                var fileBytes = VisioParser.ReadAllBytesFromStream(imagePart.GetStream());
                 var imageName = Path.GetFileName(uri.ToString());
                 var fileName = $"pageid_{pageId}_shapeid_{shapeId}_{imageName}";
 

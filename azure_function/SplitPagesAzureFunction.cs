@@ -6,8 +6,9 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using VisioWebTools;
 
-namespace VisioWebTools
+namespace VisioWebToolsAzureFunctions
 {
     public static class SplitPagesAzureFunction
     {

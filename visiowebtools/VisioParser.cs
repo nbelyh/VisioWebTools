@@ -10,6 +10,15 @@ namespace VisioWebTools
 {
     internal static class VisioParser
     {
+        public static byte[] ReadAllBytesFromStream(Stream stream)
+        {
+            using (var ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                return ms.ToArray();
+            }
+        }
+
         private static XmlNamespaceManager CreateVisioXmlNamespaceManager()
         {
             var ns = new XmlNamespaceManager(new NameTable());
@@ -25,7 +34,7 @@ namespace VisioWebTools
         {
             var packageRels = filePackage.GetRelationshipsByType(relationship);
             foreach (var packageRel in packageRels)
-            { 
+            {
                 Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), packageRel.TargetUri);
                 yield return filePackage.GetPart(docUri);
             }

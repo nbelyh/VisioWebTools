@@ -14,16 +14,6 @@ namespace VisioWebTools
 {
     public class SplitPagesService
     {
-        public static byte[] ReadAllBytesFromStream(Stream stream)
-        {
-            using (var ms = new MemoryStream())
-            {
-                stream.Position = 0;
-                stream.CopyTo(ms);
-                return ms.ToArray();
-            }
-        }
-
         public static string MakeSafeFileName(string unsafeFileName)
         {
             char[] invalidChars = Path.GetInvalidFileNameChars();
@@ -79,7 +69,7 @@ namespace VisioWebTools
                             var entry = zip.CreateEntry($"{fileName}.vsdx");
                             using (var entryStream = entry.Open())
                             {
-                                var fileBytes = ReadAllBytesFromStream(pageStream);
+                                var fileBytes = VisioParser.ReadAllBytesFromStream(pageStream);
                                 entryStream.Write(fileBytes, 0, fileBytes.Length);
                             }
                         }

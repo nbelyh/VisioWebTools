@@ -10,13 +10,12 @@ using System.Text;
 using System.Drawing;
 using System;
 using System.Globalization;
+using VisioWebTools;
 
-namespace VisioWebTools
+namespace VisioWebToolsAzureFunctions
 {
     public static class AddTooltipsFunction
     {
-
-
         [FunctionName("AddTooltipsFunction")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestMessage req, ILogger log)
