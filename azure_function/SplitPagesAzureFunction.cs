@@ -34,9 +34,9 @@ namespace VisioWebToolsAzureFunctions
                 return new BadRequestObjectResult("File(s) not received");
             }
 
-            var vsdxStream = await vsdx.ReadAsStreamAsync();
+            var vsdxBytes = await vsdx.ReadAsByteArrayAsync();
 
-            var output = SplitPagesService.SplitFile(vsdxStream);
+            var output = SplitPagesService.SplitPages(vsdxBytes);
 
             return new FileContentResult(output, "application/zip")
             {

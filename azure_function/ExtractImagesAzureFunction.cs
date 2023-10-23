@@ -35,9 +35,9 @@ namespace VisioWebToolsAzureFunctions
             }
 
             // Example process: Concatenate the contents of the files.
-            var vsdxStream = await vsdx.ReadAsStreamAsync();
+            var vsdxBytes = await vsdx.ReadAsByteArrayAsync();
 
-            var output = ImageExtractor.ExtractMediaFromVisio(vsdxStream);
+            var output = ExtractMediaService.ExtractMedia(vsdxBytes);
 
             return new FileContentResult(output, "application/zip")
             {

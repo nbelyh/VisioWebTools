@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
+import { FileProcessor } from '../services/FileProcessor';
+import { WasmNotification } from './WasmNotification';
+import { useWasm } from '../services/useWasm';
 
 export const SplitPages = (props: {
 }) => {
@@ -12,6 +15,8 @@ export const SplitPages = (props: {
   const onFileChange = (file?: File) => {
     setVsdx(file);
   }
+
+  const { wasm, loading } = useWasm();
 
   const onExtractImages = async () => {
 
@@ -26,21 +31,9 @@ export const SplitPages = (props: {
       return;
     }
 
-    var formData = new FormData();
-    formData.append('vsdx', vsdx);
-
     setProcessing(true);
     try {
-      const response = await fetch('https://visiowebtools.azurewebsites.net/api/SplitPagesAzureFunction', {
-      // const response = await fetch('http://localhost:7071/api/SplitPagesAzureFunction', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-      const blob = await response.blob();
+      const blob = await FileProcessor.doProcessing(wasm, vsdx, 'SplitPages');
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       // a.download = "result.pdf"
@@ -57,6 +50,7 @@ export const SplitPages = (props: {
 
   return (
     <>
+      <WasmNotification loading={loading} wasm={wasm} />
       {!!error && <div className="flex">
         <div className="my-3 bg-red-100 p-4 w-5/6">
           <strong>Ups! Something went wrong</strong>.
@@ -72,7 +66,7 @@ export const SplitPages = (props: {
         onChange={onFileChange}
       />
 
-      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>Split Pages</PrimaryButton>}
+      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{wasm ? `Split Pages` : `Split Pages (using our server)`}</PrimaryButton>}
     </>
   );
 }

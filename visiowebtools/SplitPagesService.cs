@@ -47,8 +47,9 @@ namespace VisioWebTools
             return result;
         }
 
-        public static byte[] SplitFile(Stream stream)
+        public static byte[] SplitPages(byte[] vsdx)
         {
+            using (var stream = new MemoryStream(vsdx))
             using (var output = new MemoryStream())
             {
                 using (var zip = new ZipArchive(output, ZipArchiveMode.Create))
@@ -69,8 +70,8 @@ namespace VisioWebTools
                             var entry = zip.CreateEntry($"{fileName}.vsdx");
                             using (var entryStream = entry.Open())
                             {
-                                var fileBytes = VisioParser.ReadAllBytesFromStream(pageStream);
-                                entryStream.Write(fileBytes, 0, fileBytes.Length);
+                                pageStream.Position = 0;
+                                pageStream.WriteTo(entryStream);
                             }
                         }
                     }
