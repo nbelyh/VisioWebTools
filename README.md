@@ -1,7 +1,8 @@
 
 # Visio Web Tools
 
-Collection of tools to work with Visio files (online)
+Collection of tools to work with Visio files (in the browser)
+The C# code is compiled into web assembly using the new .NET7, and uses that from javascript to preform the tasks.
 
 ## PdfTip WebApp
 
