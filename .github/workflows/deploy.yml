@@ -1,5 +1,5 @@
 
-name: Deploy to GitHub Pages
+name: VisioWebTools
 
 on:
   # Trigger the workflow every time you push to the `master` branch
@@ -20,7 +20,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout your repository using git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.x
+      - name: Install wasm workload
+        run: dotnet workload install wasm-tools
+      - name: Install dependencies
+        run: dotnet restore visiowebtools-wasm
+      - name: Dotnet Build
+        run: dotnet publish --configuration Release visiowebtools-wasm
+      - name: Copy AppBundle to public
+        run: cp -r visiowebtools-wasm/bin/Release/net7.0/browser-wasm/AppBundle public
       - name: Install, build, and upload your site
         uses: withastro/action@v0
         # with:
