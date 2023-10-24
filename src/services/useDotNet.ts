@@ -8,7 +8,7 @@ export const useDotNet = (url: string) => {
 
   const load = async (currentUrl: string): Promise<any> => {
 
-    throw new Error('Not implemented');
+    // throw new Error('Not implemented');
 
     const module = await import(/* @vite-ignore */ currentUrl);
 
