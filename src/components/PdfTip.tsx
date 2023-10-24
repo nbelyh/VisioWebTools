@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
+import { ErrorNotification } from './ErrorNotification';
 
 export const PdfTip = (props: {
 
@@ -69,12 +70,7 @@ export const PdfTip = (props: {
 
   return (
     <>
-      {!!error && <div className="flex">
-        <div className="my-3 bg-red-100 p-4 w-5/6">
-          <strong>Ups! Something went wrong</strong>. Please make sure you have selected the exported PDF file and the original VSDX file,
-          or reload the page and try again: {error}. If it the problem persists, please report an issue to our <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub</a>
-        </div>
-      </div>}
+      <ErrorNotification error={error} />
 
       <DropZone accept="application/pdf" sampleFileName="Drawing1.pdf"
         label="Drop a PDF file (without tooltips) that you have exported from Visio here"

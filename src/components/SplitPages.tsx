@@ -4,6 +4,7 @@ import { PrimaryButton } from './PrimaryButton';
 import { FileProcessor } from '../services/FileProcessor';
 import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
+import { ErrorNotification } from './ErrorNotification';
 
 export const SplitPages = (props: {
 }) => {
@@ -51,14 +52,7 @@ export const SplitPages = (props: {
   return (
     <>
       <WasmNotification loading={loading} wasm={dotnet} />
-      {!!error && <div className="flex">
-        <div className="my-3 bg-red-100 p-4 w-5/6">
-          <strong>Ups! Something went wrong</strong>.
-          Please make sure you have selected the VSDX (not VSD) file,
-          or reload the page and try again: {error}. If it the problem persists, please report an issue to our <a href="https://github.com/nbelyh/visiopdftip-webapp/issues" target="_blank">GitHub</a>
-        </div>
-      </div>}
-
+      <ErrorNotification error={error} />
       <DropZone
         accept="application/vnd.ms-visio.drawing"
         sampleFileName="SplitPages.vsdx"
