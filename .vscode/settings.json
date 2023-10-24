@@ -2,7 +2,7 @@
   "yaml.schemas": {
     "https://json.schemastore.org/github-workflow.json": "file:///c%3A/Projects/VisioWebTools/.github/workflows/deploy.yml"
   },
-  "azureFunctions.deploySubpath": "azure_function/bin/Release/net6.0/publish",
+  "azureFunctions.deploySubpath": "azure_function/bin/Release/net7.0/publish",
   "azureFunctions.projectLanguage": "C#",
   "azureFunctions.projectRuntime": "~4",
   "debug.internalConsoleOptions": "neverOpen",

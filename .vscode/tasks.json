@@ -71,7 +71,7 @@
       "type": "func",
       "dependsOn": "build (functions)",
       "options": {
-        "cwd": "${workspaceFolder}/azure_function/bin/Debug/net6.0"
+        "cwd": "${workspaceFolder}/azure_function/bin/Debug/net7.0"
       },
       "command": "host start",
       "isBackground": true,

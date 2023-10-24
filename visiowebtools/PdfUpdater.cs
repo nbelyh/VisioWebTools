@@ -15,9 +15,8 @@ namespace VisioWebTools
 {
     public class PdfUpdater
     {
-        public static byte[] Process(byte[] pdf, byte[] vsdx, PdfOptions options)
+        public static byte[] Process(Stream pdfStream, Stream vsdxStream, PdfOptions options)
         {
-            using (var vsdxStream = new MemoryStream(vsdx))
             using (Package package = Package.Open(vsdxStream))
             {
                 var documentPart = VisioParser.GetPackageParts(package, "http://schemas.microsoft.com/visio/2010/relationships/document").First();
@@ -28,13 +27,12 @@ namespace VisioWebTools
 
                 var visioPages = pageParts.Select(pagePart => VisioParser.GetXMLFromPart(pagePart)).ToList();
 
-                return AddCommentsToPdf(visioPages, pdf, options);
+                return AddCommentsToPdf(visioPages, pdfStream, options);
             }
         }
 
-        private static byte[] AddCommentsToPdf(List<XDocument> visioPages, byte[] pdf, PdfOptions options)
+        private static byte[] AddCommentsToPdf(List<XDocument> visioPages, Stream pdfDocStream, PdfOptions options)
         {
-            using (var pdfDocStream = new MemoryStream(pdf))
             using (var pdfDoc = PdfReader.Open(pdfDocStream))
             {
                 for (var i = 0; i < pdfDoc.PageCount; ++i)

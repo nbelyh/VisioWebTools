@@ -1,81 +1,74 @@
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Drawing;
-using System;
 using System.Globalization;
+using System.Text;
+using HttpMultipartParser;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 using VisioWebTools;
 
 namespace VisioWebToolsAzureFunctions
 {
-    public static class AddTooltipsFunction
+    public class AddTooltipsFunction
     {
-        [FunctionName("AddTooltipsFunction")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestMessage req, ILogger log)
+        private readonly ILogger<AddTooltipsFunction> log;
+        public AddTooltipsFunction(ILogger<AddTooltipsFunction> log)
+        {
+            this.log = log;            
+        }
+
+        [Function("AddTooltipsFunction")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData  req)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            var provider = new MultipartMemoryStreamProvider();
-            await req.Content.ReadAsMultipartAsync(provider);
+            var parser = await MultipartFormDataParser.ParseAsync(req.Body);
 
-            HttpContent GetParam(string name)
-            {
-                return provider.Contents.FirstOrDefault(f => f.Headers.ContentDisposition.Name.Trim('"') == name);
-            }
-
-            var pdf = GetParam("pdf");
-            var vsdx = GetParam("vsdx");
+            var vsdx = parser.Files.FirstOrDefault(f => f.Name == "vsdx");
+            var pdf = parser.Files.FirstOrDefault(f => f.Name == "pdf");
 
             var options = new PdfOptions();
 
-            var paramX = GetParam("x");
+            var paramX = parser.GetParameterValue("x");
             if (paramX != null)
             {
-                options.HorizontalLocation = Convert.ToInt32(await paramX.ReadAsStringAsync(), CultureInfo.InvariantCulture);
+                options.HorizontalLocation = Convert.ToInt32(paramX, CultureInfo.InvariantCulture);
             }
 
-            var paramY = GetParam("y");
+            var paramY = parser.GetParameterValue("y");
             if (paramY != null)
             {
-                options.VerticalLocation = Convert.ToInt32(await paramY.ReadAsStringAsync(), CultureInfo.InvariantCulture);
+                options.VerticalLocation = Convert.ToInt32(paramY, CultureInfo.InvariantCulture);
             }
 
-            var paramIcon = GetParam("icon");
+            var paramIcon = parser.GetParameterValue("icon");
             if (paramIcon != null)
             {
-                options.Icon = await paramIcon.ReadAsStringAsync();
+                options.Icon = paramIcon;
             }
 
-            var paramColor = GetParam("color");
+            var paramColor = parser.GetParameterValue("color");
             if (paramColor != null)
             {
-                options.Color = ColorTranslator.FromHtml(await paramColor.ReadAsStringAsync());
+                options.Color = ColorTranslator.FromHtml(paramColor);
             }
 
             if (pdf == null || vsdx == null)
             {
-                return new BadRequestObjectResult("File(s) not received");
+                var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
+                errorResponse.WriteString("File(s) not received");
+                return errorResponse;
             }
 
-            // Example process: Concatenate the contents of the files.
-            var pdfStream = await pdf.ReadAsByteArrayAsync();
-            var vsdxStream = await vsdx.ReadAsByteArrayAsync();
+            var output = PdfUpdater.Process(pdf.Data, vsdx.Data, options);
 
-            var pdfOutput = PdfUpdater.Process(pdfStream, vsdxStream, options);
-
-            return new FileContentResult(pdfOutput, "application/pdf")
-            {
-                FileDownloadName = "result.pdf",
-            };
+            var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
+            response.Headers.Add("Content-Disposition", "attachment; filename=result.pdf");
+            response.Headers.Add("Content-Type", "application/pdf");
+            response.WriteBytes(output);
+            return response;
         }
     }
 }

@@ -11,13 +11,19 @@ public partial class FileProcessor
     [JSExport]
     internal static byte[] SplitPages(byte[] vsdx)
     {
-        return SplitPagesService.SplitPages(vsdx);
+        using (var stream = new MemoryStream(vsdx))
+        {
+            return SplitPagesService.SplitPages(stream);
+        }
     }
 
     [JSExport]
     internal static byte[] ExtractImages(byte[] vsdx)
     {
-        return ExtractMediaService.ExtractMedia(vsdx);
+        using (var stream = new MemoryStream(vsdx))
+        {
+            return ExtractMediaService.ExtractMedia(stream);
+        }
     }
 
     [JSExport]
@@ -30,6 +36,11 @@ public partial class FileProcessor
             HorizontalLocation = x,
             VerticalLocation = y
         };
-        return PdfUpdater.Process(pdf, vsdx, options);
+
+        using (var pdfStream = new MemoryStream(pdf))
+        using (var vsdxStream = new MemoryStream(vsdx))
+        {
+            return PdfUpdater.Process(pdfStream, vsdxStream, options);
+        }
     }
 }

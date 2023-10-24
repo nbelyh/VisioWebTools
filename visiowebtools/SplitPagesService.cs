@@ -47,9 +47,8 @@ namespace VisioWebTools
             return result;
         }
 
-        public static byte[] SplitPages(byte[] vsdx)
+        public static byte[] SplitPages(Stream stream)
         {
-            using (var stream = new MemoryStream(vsdx))
             using (var output = new MemoryStream())
             {
                 using (var zip = new ZipArchive(output, ZipArchiveMode.Create))

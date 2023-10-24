@@ -11,9 +11,8 @@ namespace VisioWebTools
 
     public class ExtractMediaService
     {
-        public static byte[] ExtractMedia(byte[] vsdx)
+        public static byte[] ExtractMedia(Stream stream)
         {
-            using (var stream = new MemoryStream(vsdx))
             using (var output = new MemoryStream())
             {
                 using (var zip = new ZipArchive(output, ZipArchiveMode.Create))
