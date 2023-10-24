@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
 import { ErrorNotification } from './ErrorNotification';
+import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
+import { WasmNotification } from './WasmNotification';
+import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 
 export const PdfTip = (props: {
 
@@ -17,6 +20,19 @@ export const PdfTip = (props: {
   const [color, setColor] = useState('#ffffe0');
   const [icon, setIcon] = useState('Note');
 
+  const { dotnet, loading } = useDotNetFixedUrl();
+
+  const doProcessing = async (pdf: File, vsdx: File, color: string, icon: string, x: number, y: number) => {
+    if (dotnet) {
+      var pdfBytes = new Uint8Array(await pdf.arrayBuffer());
+      var vsdxBytes = new Uint8Array(await vsdx.arrayBuffer());
+      const output: Uint8Array = dotnet.FileProcessor.AddTooltips(pdfBytes, vsdxBytes, color, icon, x, y);
+      return new Blob([output], { type: 'application/pdf' });
+    } else {
+      return await AzureFunctionBackend.invoke({ pdf, vsdx, color, icon, x, y }, 'AddTooltipsFunction');
+    }
+  }
+
   const icons = ["NoIcon", "Comment", "Help", "Insert", "Key", "NewParagraph", "Note", "Paragraph"];
 
   const uploadFiles = async () => {
@@ -29,30 +45,15 @@ export const PdfTip = (props: {
     }
 
     if (typeof window.appInsights !== 'undefined') {
-    	window.appInsights.trackEvent({ name: "PdfTipClicked"});
+      window.appInsights.trackEvent({ name: "PdfTipClicked" });
     }
-
-    var formData = new FormData();
-    formData.append('pdf', pdf);
-    formData.append('vsdx', vsdx);
-    formData.append('color', color);
-    formData.append('icon', icon);
-    formData.append('x', x.toString());
-    formData.append('y', y.toString());
 
     setProcessing(true);
 
     try {
-      const response = await fetch('https://visiowebtools.azurewebsites.net/api/AddTooltipsFunction', {
-        method: 'POST',
-        body: formData
-      });
 
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
+      const blob = await doProcessing(pdf, vsdx, color, icon, x, y);
 
-      const blob = await response.blob();
       var url = window.URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.download = `Tooltips_${pdf.name}`
@@ -60,7 +61,7 @@ export const PdfTip = (props: {
       a.href = url;
       a.click();
     } catch (e: any) {
-      setError(e?.message);
+      setError(`${e}`);
     } finally {
       setProcessing(false);
     }
@@ -70,6 +71,7 @@ export const PdfTip = (props: {
 
   return (
     <>
+      <WasmNotification loading={loading} wasm={dotnet} />
       <ErrorNotification error={error} />
 
       <DropZone accept="application/pdf" sampleFileName="Drawing1.pdf"
@@ -105,12 +107,12 @@ export const PdfTip = (props: {
         </label>
       </div>
 
-      <div className="my-4 bg-slate-100 p-4 rounded">
-        <strong>Note:</strong> Some options (such as tooltip color and icon type) may not work in all PDF
-        viewers. Check in <a href="https://get.adobe.com/reader/" target="_blank" rel="noopener noreferrer">Adobe PDF viewer</a>.
+      <div className="my-4 bg-slate-100 p-4 rounded w-5/6">
+        <strong>Note:</strong> Some of these options (such as color and icon type) may not work in all PDF viewers. 
+        Check in the <a href="https://get.adobe.com/reader/" target="_blank" rel="noopener noreferrer">Adobe PDF viewer</a>.
       </div>
 
-      <PrimaryButton onClick={uploadFiles} disabled={processing || !pdf || !vsdx}>Add comments to PDF</PrimaryButton>
+      {pdf && vsdx && <PrimaryButton onClick={uploadFiles} disabled={processing}>{dotnet ? `Add comments to PDF` : `Add comments to PDF (using our server)`}</PrimaryButton>}
     </>
   );
 }

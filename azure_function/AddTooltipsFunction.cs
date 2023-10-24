@@ -67,8 +67,8 @@ namespace VisioWebToolsAzureFunctions
             }
 
             // Example process: Concatenate the contents of the files.
-            var pdfStream = await pdf.ReadAsStreamAsync();
-            var vsdxStream = await vsdx.ReadAsStreamAsync();
+            var pdfStream = await pdf.ReadAsByteArrayAsync();
+            var vsdxStream = await vsdx.ReadAsByteArrayAsync();
 
             var pdfOutput = PdfUpdater.Process(pdfStream, vsdxStream, options);
 

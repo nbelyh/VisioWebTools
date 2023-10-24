@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
-import { FileProcessor } from '../services/FileProcessor';
+import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
@@ -19,6 +19,16 @@ export const SplitPages = (props: {
 
   const { dotnet, loading } = useDotNetFixedUrl();
 
+  const doProcessing = async (vsdx: File) => {
+    if (dotnet) {
+      var ab = new Uint8Array(await vsdx.arrayBuffer());
+      const output: Uint8Array = dotnet.FileProcessor.ExtractImages(ab);
+      return new Blob([output], { type: 'application/zip' });
+    } else {
+      return await AzureFunctionBackend.invoke({ vsdx }, 'SplitPagesAzureFunction');
+    }
+  }
+
   const onExtractImages = async () => {
 
     if (typeof window.appInsights !== 'undefined') {
@@ -34,7 +44,7 @@ export const SplitPages = (props: {
 
     setProcessing(true);
     try {
-      const blob = await FileProcessor.doProcessing(dotnet, vsdx, 'SplitPages');
+      const blob = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       // a.download = "result.pdf"
@@ -43,7 +53,7 @@ export const SplitPages = (props: {
       a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_pages.zip`;
       a.click();
     } catch (e: any) {
-      setError(e?.message);
+      setError(`${e}`);
     } finally {
       setProcessing(false);
     }

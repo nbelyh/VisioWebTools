@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
-import { FileProcessor } from '../services/FileProcessor';
+import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
@@ -18,6 +18,17 @@ export const ExtractImages = (props: {
   }
   const { dotnet, loading } = useDotNetFixedUrl();
 
+  const doProcessing = async (input: File) => {
+    if (dotnet) {
+      var ab = new Uint8Array(await input.arrayBuffer());
+      const data: Uint8Array = dotnet.FileProcessor.ExtractImages(ab);
+      const blob = new Blob([data], { type: 'application/zip' });
+      return blob;
+    } else {
+      return await AzureFunctionBackend.invoke({ vsdx: input }, 'ExtractImagesAzureFunction');
+    }
+  }
+
   const onExtractImages = async () => {
 
     if (typeof window.appInsights !== 'undefined') {
@@ -31,12 +42,9 @@ export const ExtractImages = (props: {
       return;
     }
 
-    var formData = new FormData();
-    formData.append('vsdx', vsdx);
-
     setProcessing(true);
     try {
-      const out = await FileProcessor.doProcessing(dotnet, vsdx, 'ExtractImages');
+      const out = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(out);
       const a = document.createElement('a');
       // a.download = "result.pdf"
@@ -45,7 +53,7 @@ export const ExtractImages = (props: {
       a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`;
       a.click();
     } catch (e: any) {
-      setError(e?.message);
+      setError(`${e}`);
     } finally {
       setProcessing(false);
     }
