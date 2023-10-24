@@ -3,7 +3,7 @@ import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
 import { FileProcessor } from '../services/FileProcessor';
 import { WasmNotification } from './WasmNotification';
-import { useWasm } from '../services/useWasm';
+import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 
 export const SplitPages = (props: {
 }) => {
@@ -16,7 +16,7 @@ export const SplitPages = (props: {
     setVsdx(file);
   }
 
-  const { wasm, loading } = useWasm();
+  const { dotnet, loading } = useDotNetFixedUrl();
 
   const onExtractImages = async () => {
 
@@ -33,7 +33,7 @@ export const SplitPages = (props: {
 
     setProcessing(true);
     try {
-      const blob = await FileProcessor.doProcessing(wasm, vsdx, 'SplitPages');
+      const blob = await FileProcessor.doProcessing(dotnet, vsdx, 'SplitPages');
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       // a.download = "result.pdf"
@@ -50,7 +50,7 @@ export const SplitPages = (props: {
 
   return (
     <>
-      <WasmNotification loading={loading} wasm={wasm} />
+      <WasmNotification loading={loading} wasm={dotnet} />
       {!!error && <div className="flex">
         <div className="my-3 bg-red-100 p-4 w-5/6">
           <strong>Ups! Something went wrong</strong>.
@@ -66,7 +66,7 @@ export const SplitPages = (props: {
         onChange={onFileChange}
       />
 
-      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{wasm ? `Split Pages` : `Split Pages (using our server)`}</PrimaryButton>}
+      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{dotnet ? `Split Pages` : `Split Pages (using our server)`}</PrimaryButton>}
     </>
   );
 }

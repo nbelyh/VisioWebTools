@@ -3,7 +3,7 @@ import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
 import { FileProcessor } from '../services/FileProcessor';
 import { WasmNotification } from './WasmNotification';
-import { useWasm } from '../services/useWasm';
+import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 
 export const ExtractImages = (props: {
 }) => {
@@ -15,7 +15,7 @@ export const ExtractImages = (props: {
   const onFileChange = (file?: File) => {
     setVsdx(file);
   }
-  const { wasm, loading } = useWasm();
+  const { dotnet, loading } = useDotNetFixedUrl();
 
   const onExtractImages = async () => {
 
@@ -35,7 +35,7 @@ export const ExtractImages = (props: {
 
     setProcessing(true);
     try {
-      const out = await FileProcessor.doProcessing(wasm, vsdx, 'ExtractImages');
+      const out = await FileProcessor.doProcessing(dotnet, vsdx, 'ExtractImages');
       const url = window.URL.createObjectURL(out);
       const a = document.createElement('a');
       // a.download = "result.pdf"
@@ -52,7 +52,7 @@ export const ExtractImages = (props: {
 
   return (
     <>
-      <WasmNotification loading={loading} wasm={wasm} />
+      <WasmNotification loading={loading} wasm={dotnet} />
       {!!error && <div className="flex">
         <div className="my-3 bg-red-100 p-4 w-5/6">
           <strong>Ups! Something went wrong</strong>.
@@ -68,7 +68,7 @@ export const ExtractImages = (props: {
         onChange={onFileChange}
       />
 
-      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{wasm ? `Extract Images` : `Extract Image (using our server)`}</PrimaryButton>}
+      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{dotnet ? `Extract Images` : `Extract Image (using our server)`}</PrimaryButton>}
     </>
   );
 }
