@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 using System.Drawing;
 using VisioWebTools;
+using System.Runtime.Versioning;
 
 // Create a "Main" method. This is required by the tooling.
 return;
@@ -9,6 +10,7 @@ public partial class FileProcessor
 {
     // Make the method accessible from JS
     [JSExport]
+    [SupportedOSPlatform("browser")]
     internal static byte[] SplitPages(byte[] vsdx)
     {
         using (var stream = new MemoryStream(vsdx))
@@ -18,6 +20,7 @@ public partial class FileProcessor
     }
 
     [JSExport]
+    [SupportedOSPlatform("browser")]
     internal static byte[] ExtractImages(byte[] vsdx)
     {
         using (var stream = new MemoryStream(vsdx))
@@ -27,6 +30,7 @@ public partial class FileProcessor
     }
 
     [JSExport]
+    [SupportedOSPlatform("browser")]
     internal static byte[] AddTooltips(byte[] pdf, byte[] vsdx, string color, string icon, int x, int y)
     {
         var options = new PdfOptions
