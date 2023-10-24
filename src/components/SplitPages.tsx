@@ -22,14 +22,14 @@ export const SplitPages = (props: {
   const doProcessing = async (vsdx: File) => {
     if (dotnet) {
       var ab = new Uint8Array(await vsdx.arrayBuffer());
-      const output: Uint8Array = dotnet.FileProcessor.ExtractImages(ab);
+      const output: Uint8Array = dotnet.FileProcessor.SplitPages(ab);
       return new Blob([output], { type: 'application/zip' });
     } else {
       return await AzureFunctionBackend.invoke({ vsdx }, 'SplitPagesAzureFunction');
     }
   }
 
-  const onExtractImages = async () => {
+  const onSplitPages = async () => {
 
     if (typeof window.appInsights !== 'undefined') {
       window.appInsights.trackEvent({ name: "SplitPagesClicked" });
@@ -70,7 +70,7 @@ export const SplitPages = (props: {
         onChange={onFileChange}
       />
 
-      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{dotnet ? `Split Pages` : `Split Pages (using our server)`}</PrimaryButton>}
+      {vsdx && <PrimaryButton disabled={processing} onClick={onSplitPages}>{dotnet ? `Split Pages` : `Split Pages (using our server)`}</PrimaryButton>}
     </>
   );
 }
