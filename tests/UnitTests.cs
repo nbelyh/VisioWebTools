@@ -9,7 +9,7 @@ public class SplitFileTest
     [TestMethod]
     public void SplitPagesSampleFile()
     {
-        using var input = File.OpenRead(@"..\..\..\..\public\samples\SplitPages.vsdx");
+        using var input = File.OpenRead(@"../../../../public/samples/SplitPages.vsdx");
         var bytes = VisioWebTools.SplitPagesService.SplitPages(input);
 
         using var zip = new System.IO.Compression.ZipArchive(new MemoryStream(bytes));
@@ -20,7 +20,7 @@ public class SplitFileTest
     [TestMethod]
     public void ExtractImageSampleFile()
     {
-        using var input = File.OpenRead(@"..\..\..\..\public\samples\ImageSample.vsdx");
+        using var input = File.OpenRead(@"../../../../public/samples/ImageSample.vsdx");
         var bytes = VisioWebTools.ExtractMediaService.ExtractMedia(input);
 
         using var zip = new System.IO.Compression.ZipArchive(new MemoryStream(bytes));
@@ -31,8 +31,8 @@ public class SplitFileTest
     [TestMethod]
     public void AddTooltips()
     {
-        using var vsdx = File.OpenRead(@"..\..\..\..\public\samples\Drawing1.vsdx");
-        using var pdf = File.OpenRead(@"..\..\..\..\public\samples\Drawing1.pdf");
+        using var vsdx = File.OpenRead(@"../../../../public/samples/Drawing1.vsdx");
+        using var pdf = File.OpenRead(@"../../../../public/samples/Drawing1.pdf");
         var bytes = VisioWebTools.PdfUpdater.Process(pdf, vsdx, new VisioWebTools.PdfOptions { });
 
         Assert.IsNotNull(bytes);
