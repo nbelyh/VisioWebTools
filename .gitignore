@@ -21,4 +21,6 @@ pnpm-debug.log*
 .DS_Store
 bin
 obj
+.vs
+TestResults
 public/AppBundle
