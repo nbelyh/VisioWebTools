@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisioWebTools", "visiowebto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunction", "azure_function\AzureFunction.csproj", "{5D816D63-128A-4E65-9E39-2AF22C4FFA33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wasm", "visiowebtools-wasm\wasm.csproj", "{4772F651-FC04-4C1E-BE7A-634E787A22FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{BB04656D-5277-4296-A431-1CA232CBE40B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB04656D-5277-4296-A431-1CA232CBE40B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB04656D-5277-4296-A431-1CA232CBE40B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB04656D-5277-4296-A431-1CA232CBE40B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB04656D-5277-4296-A431-1CA232CBE40B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

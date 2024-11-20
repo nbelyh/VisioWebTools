@@ -40,7 +40,7 @@ jobs:
       - name: Build
         run: dotnet publish --configuration Release visiowebtools-wasm
       - name: Copy AppBundle to public
-        run: cp -r visiowebtools-wasm/bin/Release/net7.0/browser-wasm/AppBundle public
+        run: cp -r visiowebtools-wasm/bin/Release/net8.0/browser-wasm/AppBundle public
       - name: Install, build, and upload your site
         uses: withastro/action@v0
         # with:
