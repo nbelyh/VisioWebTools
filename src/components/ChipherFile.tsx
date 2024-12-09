@@ -61,7 +61,7 @@ export const ChipherFile = (props: {
   const [enableChipherShapeText, setEnableChipherShapeText] = useState(true);
   const [enableChipherPageNames, setEnableChipherPageNames] = useState(true);
   const [enableChipherPropertyValues, setEnableChipherPropertyValues] = useState(true);
-  const [enableChipherPropertyNames, setEnableChipherPropertyNames] = useState(true);
+  const [enableChipherPropertyNames, setEnableChipherPropertyNames] = useState(false);
 
   return (
     <>
@@ -97,7 +97,7 @@ export const ChipherFile = (props: {
 
       <hr className="my-4" />
 
-      <PrimaryButton disabled={!vsdx || processing || loading} onClick={onChipherFile}>{dotnet ? `Chipher` : `Chipher (using our server)`}</PrimaryButton>
+      <PrimaryButton disabled={!vsdx || processing || loading} onClick={onChipherFile}>Chipher</PrimaryButton>
     </>
   );
 }

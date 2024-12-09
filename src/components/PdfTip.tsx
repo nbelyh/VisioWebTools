@@ -107,7 +107,7 @@ export const PdfTip = (props: {
       
       <hr className="my-4" />
 
-      <PrimaryButton onClick={uploadFiles} disabled={!pdf || !vsdx || processing || loading}>{dotnet ? `Add comments to PDF` : `Add comments to PDF (using our server)`}</PrimaryButton>
+      <PrimaryButton onClick={uploadFiles} disabled={!pdf || !vsdx || processing || loading}>Add comments to PDF</PrimaryButton>
     </>
   );
 }
