@@ -9,8 +9,8 @@ export const WasmNotification = (props: {
   return props.wasm
     ? <div className="flex">
       <div className="my-3 bg-green-100 p-4 w-5/6">
-        <strong>We will be using web assembly to process files, your browser supports it!</strong>
-        <div>Your files will not leave your browser, all the processing will be done locally on your machine in this browser.</div>
+        <strong>We will be using web assembly to process files</strong>
+        <div>Your files will not leave your browser, all the processing will be done <strong>locally</strong> on your machine in this browser.</div>
       </div>
     </div>
     : <div className="flex">

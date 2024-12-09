@@ -47,4 +47,11 @@ public partial class FileProcessor
             return PdfUpdater.Process(pdfStream, vsdxStream, options);
         }
     }
+
+    [JSExport]
+    [SupportedOSPlatform("browser")]
+    internal static byte[] ChipherFile(byte[] vsdx)
+    {
+        return ChipherFileService.Process(vsdx);
+    }
 }

@@ -38,4 +38,15 @@ public class SplitFileTest
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 1000);
     }
+
+
+
+    [TestMethod]
+    public void ChipherFile()
+    {
+        var input = File.ReadAllBytes(@"../../../../public/samples/chipher.vsdx");
+        var bytes = VisioWebTools.ChipherFileService.Process(input);
+        Assert.IsNotNull(bytes);
+        Assert.IsTrue(bytes.Length > 100);
+    }
 }
