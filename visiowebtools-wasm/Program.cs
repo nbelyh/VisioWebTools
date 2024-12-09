@@ -54,14 +54,16 @@ public partial class FileProcessor
         byte[] vsdx, 
         bool enableChipherShapeText, 
         bool enableChipherPageNames, 
-        bool enableChipherShapeData
+        bool enableChipherPropertyValues,
+        bool enableChipherPropertyNames
         )
     {
         var options = new ChipherOptions
         {
             EnableChipherShapeText = enableChipherShapeText,
             EnableChipherPageNames = enableChipherPageNames,
-            EnableChipherShapeData = enableChipherShapeData
+            EnableChipherPropertyValues = enableChipherPropertyValues,
+            EnableChipherPropertyNames = enableChipherPropertyNames
         };
 
         return ChipherFileService.Process(vsdx, options);

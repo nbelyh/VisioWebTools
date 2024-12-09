@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
 import { ErrorNotification } from './ErrorNotification';
-import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 
 export const PdfTip = (props: {
@@ -19,7 +18,7 @@ export const PdfTip = (props: {
   const [color, setColor] = useState('#ffffe0');
   const [icon, setIcon] = useState('Note');
 
-  const { dotnet, loading } = useDotNetFixedUrl();
+  const { dotnet, loading, loadError } = useDotNetFixedUrl();
 
   const doProcessing = async (pdf: File, vsdx: File, color: string, icon: string, x: number, y: number) => {
     var pdfBytes = new Uint8Array(await pdf.arrayBuffer());
@@ -66,8 +65,7 @@ export const PdfTip = (props: {
 
   return (
     <>
-      <WasmNotification loading={loading} wasm={dotnet} />
-      <ErrorNotification error={error} />
+      <ErrorNotification error={error || loadError} />
 
       <DropZone accept="application/pdf" sampleFileName="Drawing1.pdf"
         label="Drop a PDF file (without tooltips) that you have exported from Visio here"
@@ -103,11 +101,13 @@ export const PdfTip = (props: {
       </div>
 
       <div className="my-4 bg-slate-100 p-4 rounded w-5/6">
-        <strong>Note:</strong> Some of these options (such as color and icon type) may not work in all PDF viewers. 
-        Check in the <a href="https://get.adobe.com/reader/" target="_blank" rel="noopener noreferrer">Adobe PDF viewer</a>.
+        <strong>Note:</strong> Some options (such as color and icon type) may not work in all PDF viewers. 
+        Try the <a href="https://get.adobe.com/reader/" target="_blank" rel="noopener noreferrer">Adobe PDF viewer</a>.
       </div>
+      
+      <hr className="my-4" />
 
-      {pdf && vsdx && <PrimaryButton onClick={uploadFiles} disabled={processing}>{dotnet ? `Add comments to PDF` : `Add comments to PDF (using our server)`}</PrimaryButton>}
+      <PrimaryButton onClick={uploadFiles} disabled={!pdf || !vsdx || processing || loading}>{dotnet ? `Add comments to PDF` : `Add comments to PDF (using our server)`}</PrimaryButton>
     </>
   );
 }

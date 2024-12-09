@@ -4,6 +4,7 @@ export const useDotNet = (url: string) => {
 
   const dotnetUrl = useRef('');
   const [dotnet, setDotNet] = useState<any>(null);
+  const [loadError, setLoadError] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const load = async (currentUrl: string): Promise<any> => {
@@ -25,11 +26,13 @@ export const useDotNet = (url: string) => {
   useEffect(() => {
     if (dotnetUrl.current !== url) { // safeguard to prevent double-loading
       setLoading(true);
+      setLoadError(undefined)
       dotnetUrl.current = url;
       load(url)
         .then(exports => setDotNet(exports))
+        .catch(e => setLoadError(e))
         .finally(() => setLoading(false))
     }
   }, [url]);
-  return { dotnet, loading };
+  return { dotnet, loading, loadError };
 }

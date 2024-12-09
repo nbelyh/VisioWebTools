@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
-import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 
@@ -15,7 +14,7 @@ export const ExtractImages = (props: {
   const onFileChange = (file?: File) => {
     setVsdx(file);
   }
-  const { dotnet, loading } = useDotNetFixedUrl();
+  const { dotnet, loadError, loading } = useDotNetFixedUrl();
 
   const doProcessing = async (input: File) => {
     var ab = new Uint8Array(await input.arrayBuffer());
@@ -56,8 +55,7 @@ export const ExtractImages = (props: {
 
   return (
     <>
-      <WasmNotification loading={loading} wasm={dotnet} />
-      <ErrorNotification error={error} />
+      <ErrorNotification error={error || loadError} />
       <DropZone
         accept="application/vnd.ms-visio.drawing"
         sampleFileName="ImageSample.vsdx"
@@ -65,7 +63,9 @@ export const ExtractImages = (props: {
         onChange={onFileChange}
       />
 
-      {vsdx && <PrimaryButton disabled={processing} onClick={onExtractImages}>{dotnet ? `Extract Images` : `Extract Image (using our server)`}</PrimaryButton>}
+      <hr className="my-4" />
+
+      <PrimaryButton disabled={!vsdx || processing || loading} onClick={onExtractImages}>Extract Images</PrimaryButton>
     </>
   );
 }

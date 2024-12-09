@@ -9,7 +9,8 @@ namespace VisioWebTools
     /// </summary>
     public class RandomStringService
     {
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
+        private readonly Dictionary<string, string> _wordCache = [];
 
         /// <summary>
         /// Generates a pseudo-readable random string that matches the length and number of spaces of the input string.
@@ -21,6 +22,9 @@ namespace VisioWebTools
         {
             if (string.IsNullOrEmpty(input)) 
                 return input;
+
+            if (_wordCache.TryGetValue(input, out string cachedValue))
+                return cachedValue;
 
             int spaceCount = 0;
             int totalLength = input.Length;
@@ -82,7 +86,9 @@ namespace VisioWebTools
             // Step 7: Apply original casing to the new characters
             ApplyOriginalCasing(input, finalChars);
 
-            return new string(finalChars.ToArray());
+            var result = new string(finalChars.ToArray());
+            _wordCache[input] = result;
+            return result;
         }
 
         /// <summary>

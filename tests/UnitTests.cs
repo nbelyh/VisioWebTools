@@ -44,8 +44,17 @@ public class SplitFileTest
     [TestMethod]
     public void ChipherFile()
     {
-        var input = File.ReadAllBytes(@"../../../../public/samples/chipher.vsdx");
-        var bytes = VisioWebTools.ChipherFileService.Process(input);
+        var input = File.ReadAllBytes(@"../../../../public/samples/Chipher.vsdx");
+
+        var chipherOptions = new VisioWebTools.ChipherOptions
+        {
+            EnableChipherShapeText = true,
+            EnableChipherPageNames = true,
+            EnableChipherPropertyValues = true,
+            EnableChipherPropertyNames = true
+        };
+
+        var bytes = VisioWebTools.ChipherFileService.Process(input, chipherOptions);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
     }

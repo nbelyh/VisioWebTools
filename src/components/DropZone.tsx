@@ -74,10 +74,13 @@ export const DropZone = (props: {
       <div className="md:w-5/6">
         <div className={className} onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
           {file
-            ? <p>&#10004; You have selected: <strong>{file.name}</strong></p>
+            ? <div>
+                <p>&#10004; You have selected: <strong>{file.name}</strong></p>
+                <input type="button" value="Reset" onClick={() => setFile()} className="inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none" />
+              </div>
             : <div>
               <p>{props.label}</p>
-              <button className="inline-flex items-center bg-neutral-200 hover:bg-neutral-300 text-neutral-900 px-4 py-2 rounded focus:outline-none" onClick={onUploadButtonClick}>Or click here pick a file...</button>
+              <button className="inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none" onClick={onUploadButtonClick}>Or click here pick a file...</button>
             </div>
           }
         </div>

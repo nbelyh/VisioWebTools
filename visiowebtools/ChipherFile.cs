@@ -2,10 +2,12 @@ using System;
 using System.IO;
 using System.IO.Packaging;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using SixLabors.ImageSharp;
 
 namespace VisioWebTools
 {
@@ -13,7 +15,8 @@ namespace VisioWebTools
     {
         public bool EnableChipherShapeText { get; set; }
         public bool EnableChipherPageNames { get; set; }
-        public bool EnableChipherShapeData { get; set; }
+        public bool EnableChipherPropertyValues { get; set; }
+        public bool EnableChipherPropertyNames { get; set; }
     }
 
     public class ChipherFileService
@@ -37,6 +40,48 @@ namespace VisioWebTools
                             text.Value = randomStringService.GenerateReadableRandomString(text.Value);
                     }
                 }
+
+
+                if (options.EnableChipherPropertyValues)
+                {
+                    var xmlRow = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
+                    foreach (var xmlProp in xmlRow)
+                    {
+                        var xmlType = xmlProp.XPathSelectElement("v:Cell[@N='Type']", VisioParser.NamespaceManager);
+                        var typeValue = xmlType?.Attribute("V")?.Value ?? "0";
+                        if (!int.TryParse(typeValue, out int type))
+                            type = 0;
+
+                        // string
+                        if (type == 0) 
+                        {
+                            var xmlValue = xmlProp.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
+                            var attributeValue = xmlValue?.Attribute("V");
+                            if (attributeValue != null)
+                                attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
+                        }
+
+                        // enum
+                        if (type == 1)
+                        {
+                            var xmlFormat = xmlProp.XPathSelectElement("v:Cell[@N='Format']", VisioParser.NamespaceManager);
+                            if (xmlFormat != null)
+                            {
+                                var attributeFormat = xmlFormat.Attribute("V")?.Value;
+                                if (!string.IsNullOrEmpty(attributeFormat))
+                                {
+                                    var items = attributeFormat.Split(';');
+                                    if (items.Length > 0)
+                                    {
+                                        var newItems = items.Select(x => randomStringService.GenerateReadableRandomString(x)).ToArray();
+                                        xmlFormat.Attribute("V").Value = string.Join(";", newItems);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
             pageStream.SetLength(0);
             using (var writer = new XmlTextWriter(pageStream, new UTF8Encoding(false)))
