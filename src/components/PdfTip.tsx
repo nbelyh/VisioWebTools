@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
 import { ErrorNotification } from './ErrorNotification';
-import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 
@@ -23,14 +22,10 @@ export const PdfTip = (props: {
   const { dotnet, loading } = useDotNetFixedUrl();
 
   const doProcessing = async (pdf: File, vsdx: File, color: string, icon: string, x: number, y: number) => {
-    if (dotnet) {
-      var pdfBytes = new Uint8Array(await pdf.arrayBuffer());
-      var vsdxBytes = new Uint8Array(await vsdx.arrayBuffer());
-      const output: Uint8Array = dotnet.FileProcessor.AddTooltips(pdfBytes, vsdxBytes, color, icon, x, y);
-      return new Blob([output], { type: 'application/pdf' });
-    } else {
-      return await AzureFunctionBackend.invoke({ pdf, vsdx, color, icon, x, y }, 'AddTooltipsFunction');
-    }
+    var pdfBytes = new Uint8Array(await pdf.arrayBuffer());
+    var vsdxBytes = new Uint8Array(await vsdx.arrayBuffer());
+    const output: Uint8Array = dotnet.FileProcessor.AddTooltips(pdfBytes, vsdxBytes, color, icon, x, y);
+    return new Blob([output], { type: 'application/pdf' });
   }
 
   const icons = ["NoIcon", "Comment", "Help", "Insert", "Key", "NewParagraph", "Note", "Paragraph"];

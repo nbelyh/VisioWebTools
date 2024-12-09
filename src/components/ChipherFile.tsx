@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { DropZone } from './DropZone';
 import { PrimaryButton } from './PrimaryButton';
-import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { WasmNotification } from './WasmNotification';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
@@ -20,13 +19,9 @@ export const ChipherFile = (props: {
   const { dotnet, loading } = useDotNetFixedUrl();
 
   const doProcessing = async (vsdx: File) => {
-    if (dotnet) {
-      var ab = new Uint8Array(await vsdx.arrayBuffer());
-      const output: Uint8Array = dotnet.FileProcessor.ChipherFile(ab);
-      return new Blob([output], { type: 'application/vnd.ms-visio.drawing' });
-    } else {
-      return await AzureFunctionBackend.invoke({ vsdx }, 'ChipherFileAzureFunction');
-    }
+    var ab = new Uint8Array(await vsdx.arrayBuffer());
+    const output: Uint8Array = dotnet.FileProcessor.ChipherFile(ab);
+    return new Blob([output], { type: 'application/vnd.ms-visio.drawing' });
   }
 
   const onChipherFile = async () => {
