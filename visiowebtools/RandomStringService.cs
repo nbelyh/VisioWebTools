@@ -19,7 +19,8 @@ namespace VisioWebTools
         /// <returns>A pseudo-readable random string with the same length and number of spaces as the input.</returns>
         public string GenerateReadableRandomString(string input)
         {
-            if (input == null) throw new ArgumentNullException(nameof(input));
+            if (string.IsNullOrEmpty(input)) 
+                return input;
 
             int spaceCount = 0;
             int totalLength = input.Length;

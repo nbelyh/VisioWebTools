@@ -50,8 +50,20 @@ public partial class FileProcessor
 
     [JSExport]
     [SupportedOSPlatform("browser")]
-    internal static byte[] ChipherFile(byte[] vsdx)
+    internal static byte[] ChipherFile(
+        byte[] vsdx, 
+        bool enableChipherShapeText, 
+        bool enableChipherPageNames, 
+        bool enableChipherShapeData
+        )
     {
-        return ChipherFileService.Process(vsdx);
+        var options = new ChipherOptions
+        {
+            EnableChipherShapeText = enableChipherShapeText,
+            EnableChipherPageNames = enableChipherPageNames,
+            EnableChipherShapeData = enableChipherShapeData
+        };
+
+        return ChipherFileService.Process(vsdx, options);
     }
 }

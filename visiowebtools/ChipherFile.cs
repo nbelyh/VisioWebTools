@@ -9,11 +9,18 @@ using System.Xml.XPath;
 
 namespace VisioWebTools
 {
+    public class ChipherOptions
+    {
+        public bool EnableChipherShapeText { get; set; }
+        public bool EnableChipherPageNames { get; set; }
+        public bool EnableChipherShapeData { get; set; }
+    }
+
     public class ChipherFileService
     {
         static readonly RandomStringService randomStringService = new();
 
-        public static void ProcessPage(PackagePart pagePart)
+        public static void ProcessPage(PackagePart pagePart, ChipherOptions options)
         {
             var pageStream = pagePart.GetStream(FileMode.Open, FileAccess.ReadWrite);
             var xmlPage = XDocument.Load(pageStream);
@@ -21,15 +28,13 @@ namespace VisioWebTools
             var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
             foreach (var xmlShape in xmlShapes)
             {
-                var xmlText = xmlShape.XPathSelectElements("v:Text", VisioParser.NamespaceManager).ToList();
-                foreach (var node in xmlText.Nodes())
+                if (options.EnableChipherShapeText)
                 {
-                    var text = node as XText;
-                    if (text != null)
+                    var xmlText = xmlShape.XPathSelectElements("v:Text", VisioParser.NamespaceManager).ToList();
+                    foreach (var node in xmlText.Nodes())
                     {
-                        text.Value = string.IsNullOrEmpty(text.Value)
-                            ? text.Value
-                            : randomStringService.GenerateReadableRandomString(text.Value);
+                        if (node is XText text)
+                            text.Value = randomStringService.GenerateReadableRandomString(text.Value);
                     }
                 }
             }
@@ -40,7 +45,7 @@ namespace VisioWebTools
             }
         }
 
-        public static void ProcessPages(Stream stream)
+        public static void ProcessPages(Stream stream, ChipherOptions options)
         {
             using (Package package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
             {
@@ -58,17 +63,21 @@ namespace VisioWebTools
                 var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
                 foreach (var pageRel in pageRels)
                 {
-                    // var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
-                    // var pageInfo = new PageInfo
-                    // {
-                    //     PageId = xmlPage.Attribute("ID").Value,
-                    //     PageName = xmlPage.Attribute("Name").Value,
-                    // };
+                    if (options.EnableChipherPageNames)
+                    {
+                        var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
+                        var attributeName = xmlPage.Attribute("Name");
+                        if (attributeName != null)
+                            attributeName.Value = randomStringService.GenerateReadableRandomString(attributeName.Value);
+                        var attributeNameU = xmlPage.Attribute("NameU");
+                        if (attributeNameU != null)
+                            attributeNameU.Value = randomStringService.GenerateReadableRandomString(attributeNameU.Value);
+                    }
 
                     Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
                     var pagePart = package.GetPart(pageUri);
 
-                    ProcessPage(pagePart);
+                    ProcessPage(pagePart, options);
                 }
 
                 pagesStream.SetLength(0);
@@ -80,11 +89,11 @@ namespace VisioWebTools
             }
         }
 
-        public static byte[] Process(byte[] input)
+        public static byte[] Process(byte[] input, ChipherOptions options)
         {
             using (var stream = new MemoryStream(input))
             {
-                ProcessPages(stream);
+                ProcessPages(stream, options);
                 stream.Flush();
                 return stream.ToArray();
             }
