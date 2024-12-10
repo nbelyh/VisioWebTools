@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace VisioWebTools
@@ -12,17 +13,26 @@ namespace VisioWebTools
         private readonly Random _random = new();
         private readonly Dictionary<string, string> _wordCache = [];
 
+        public string GenerateReadableRandomString(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return input;
+
+            var result = string.Join('\n', input.Split('\n').Select(GenerateReadableRandomLine));
+            return result;
+        }
+
         /// <summary>
         /// Generates a pseudo-readable random string that matches the length and number of spaces of the input string.
         /// The spaces are placed at random positions, and the character casing matches the original string.
         /// </summary>
         /// <param name="input">The original string to base the random string on.</param>
         /// <returns>A pseudo-readable random string with the same length and number of spaces as the input.</returns>
-        public string GenerateReadableRandomString(string input)
+        public string GenerateReadableRandomLine(string input)
         {
-            if (string.IsNullOrEmpty(input)) 
+            if (string.IsNullOrWhiteSpace(input))
                 return input;
-
+                
             if (_wordCache.TryGetValue(input, out string cachedValue))
                 return cachedValue;
 

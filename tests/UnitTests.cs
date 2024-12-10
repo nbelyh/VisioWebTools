@@ -57,5 +57,6 @@ public class SplitFileTest
         var bytes = VisioWebTools.ChipherFileService.Process(input, chipherOptions);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
+        // File.WriteAllBytes(@"../../../../public/samples/Chipher1.vsdx", bytes);
     }
 }
