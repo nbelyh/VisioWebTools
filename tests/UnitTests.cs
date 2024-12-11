@@ -71,12 +71,13 @@ public class SplitFileTest
             EnableCipherShapeFields = true,
             EnableCipherPageNames = true,
             EnableCipherPropertyValues = true,
-            EnableCipherPropertyLabels = true
+            EnableCipherPropertyLabels = true,
+            EnableCipherMasters = true
         };
 
         var bytes = CipherFileService.Process(input, options);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
-        // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
+        File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
     }
 }

@@ -24,7 +24,8 @@ export const CipherFile = (props: {
       enableCipherShapeFields,
       enableCipherPageNames,
       enableCipherPropertyValues,
-      enableCipherPropertyLabels
+      enableCipherPropertyLabels,
+      enableCipherMasters
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -70,6 +71,7 @@ export const CipherFile = (props: {
   const [enableCipherPageNames, setEnableCipherPageNames] = useState(true);
   const [enableCipherPropertyValues, setEnableCipherPropertyValues] = useState(true);
   const [enableCipherPropertyLabels, setEnableCipherPropertyLabels] = useState(false);
+  const [enableCipherMasters, setEnableCipherMasters] = useState(false);
 
   return (
     <>
@@ -89,7 +91,7 @@ export const CipherFile = (props: {
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableCipherShapeFields" checked={enableCipherShapeFields} onChange={(e) => setEnableCipherShapeFields(e.target.checked)} />
-          <label htmlFor="enableCipherShapeFields">Cipher Shape Fields</label>
+          <label htmlFor="enableCipherShapeFields">Cipher Shape Text Fields</label>
         </div>
 
         <div className="flex items-center">
@@ -100,6 +102,11 @@ export const CipherFile = (props: {
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyValues" checked={enableCipherPropertyValues} onChange={(e) => setEnableCipherPropertyValues(e.target.checked)} />
           <label htmlFor="enableCipherPropertyValues">Cipher Property Values</label>
+        </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherMasters" checked={enableCipherMasters} onChange={(e) => setEnableCipherMasters(e.target.checked)} />
+          <label htmlFor="enableCipherMasters">Cipher Masters</label>
         </div>
 
         <div className="flex items-center">
