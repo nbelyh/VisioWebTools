@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisioWebTools", "visiowebtools\VisioWebTools.csproj", "{3966EAFA-2DA3-4AC8-88AD-D8FB98EA007B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunction", "azure_function\AzureFunction.csproj", "{5D816D63-128A-4E65-9E39-2AF22C4FFA33}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wasm", "visiowebtools-wasm\wasm.csproj", "{4772F651-FC04-4C1E-BE7A-634E787A22FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{BB04656D-5277-4296-A431-1CA232CBE40B}"
@@ -19,6 +21,10 @@ Global
 		{3966EAFA-2DA3-4AC8-88AD-D8FB98EA007B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3966EAFA-2DA3-4AC8-88AD-D8FB98EA007B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3966EAFA-2DA3-4AC8-88AD-D8FB98EA007B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D816D63-128A-4E65-9E39-2AF22C4FFA33}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4772F651-FC04-4C1E-BE7A-634E787A22FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
