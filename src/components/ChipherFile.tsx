@@ -21,9 +21,10 @@ export const ChipherFile = (props: {
     var ab = new Uint8Array(await vsdx.arrayBuffer());
     const output: Uint8Array = dotnet.FileProcessor.ChipherFile(ab,
       enableChipherShapeText,
+      enableChipherShapeFields,
       enableChipherPageNames,
       enableChipherPropertyValues,
-      enableChipherPropertyNames
+      enableChipherPropertyLabels
     );
 
     return new Blob([output], { type: 'application/vnd.ms-visio.drawing' });
@@ -59,9 +60,10 @@ export const ChipherFile = (props: {
   }
 
   const [enableChipherShapeText, setEnableChipherShapeText] = useState(true);
+  const [enableChipherShapeFields, setEnableChipherShapeFields] = useState(true);
   const [enableChipherPageNames, setEnableChipherPageNames] = useState(true);
   const [enableChipherPropertyValues, setEnableChipherPropertyValues] = useState(true);
-  const [enableChipherPropertyNames, setEnableChipherPropertyNames] = useState(false);
+  const [enableChipherPropertyLabels, setEnableChipherPropertyLabels] = useState(false);
 
   return (
     <>
@@ -80,6 +82,11 @@ export const ChipherFile = (props: {
         </div>
 
         <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableChipherShapeFields" checked={enableChipherShapeFields} onChange={(e) => setEnableChipherShapeFields(e.target.checked)} />
+          <label htmlFor="enableChipherShapeFields">Chipher Shape Fields</label>
+        </div>
+
+        <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableChipherPageNames" checked={enableChipherPageNames} onChange={(e) => setEnableChipherPageNames(e.target.checked)} />
           <label htmlFor="enableChipherPageNames">Chipher Page Names</label>
         </div>
@@ -90,8 +97,8 @@ export const ChipherFile = (props: {
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableChipherPropertyNames" checked={enableChipherPropertyNames} onChange={(e) => setEnableChipherPropertyNames(e.target.checked)} />
-          <label htmlFor="enableChipherPropertyNames">Chipher Property Names</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="enableChipherPropertyLabels" checked={enableChipherPropertyLabels} onChange={(e) => setEnableChipherPropertyLabels(e.target.checked)} />
+          <label htmlFor="enableChipherPropertyLabels">Chipher Property Labels</label>
         </div>
       </div>
 

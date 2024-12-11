@@ -49,14 +49,15 @@ public class SplitFileTest
         var chipherOptions = new VisioWebTools.ChipherOptions
         {
             EnableChipherShapeText = true,
+            EnableChipherShapeFields = true,
             EnableChipherPageNames = true,
             EnableChipherPropertyValues = true,
-            EnableChipherPropertyNames = true
+            EnableChipherPropertyLabels = true
         };
 
         var bytes = VisioWebTools.ChipherFileService.Process(input, chipherOptions);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
-        // File.WriteAllBytes(@"../../../../public/samples/Chipher1.vsdx", bytes);
+        // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
     }
 }

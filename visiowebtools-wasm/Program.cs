@@ -53,17 +53,19 @@ public partial class FileProcessor
     internal static byte[] ChipherFile(
         byte[] vsdx, 
         bool enableChipherShapeText, 
+        bool enableChipherShapeFields,
         bool enableChipherPageNames, 
         bool enableChipherPropertyValues,
-        bool enableChipherPropertyNames
+        bool enableChipherPropertyLabels
         )
     {
         var options = new ChipherOptions
         {
             EnableChipherShapeText = enableChipherShapeText,
+            EnableChipherShapeFields = enableChipherShapeFields,
             EnableChipherPageNames = enableChipherPageNames,
             EnableChipherPropertyValues = enableChipherPropertyValues,
-            EnableChipherPropertyNames = enableChipherPropertyNames
+            EnableChipherPropertyLabels = enableChipherPropertyLabels
         };
 
         return ChipherFileService.Process(vsdx, options);

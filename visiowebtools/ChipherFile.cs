@@ -14,9 +14,10 @@ namespace VisioWebTools
     public class ChipherOptions
     {
         public bool EnableChipherShapeText { get; set; }
+        public bool EnableChipherShapeFields { get; set; }
         public bool EnableChipherPageNames { get; set; }
         public bool EnableChipherPropertyValues { get; set; }
-        public bool EnableChipherPropertyNames { get; set; }
+        public bool EnableChipherPropertyLabels { get; set; }
     }
 
     public class ChipherFileService
@@ -32,39 +33,88 @@ namespace VisioWebTools
             foreach (var xmlShape in xmlShapes)
             {
                 if (options.EnableChipherShapeText)
-                {
-                    var xmlText = xmlShape.XPathSelectElements("v:Text", VisioParser.NamespaceManager).ToList();
-                    foreach (var node in xmlText.Nodes())
-                    {
-                        if (node is XText text)
-                            text.Value = randomStringService.GenerateReadableRandomString(text.Value);
-                    }
-                }
+                    ChipherShapeText(xmlShape);
 
+                if (options.EnableChipherShapeFields)
+                    ChipherShapeFields(xmlShape);
 
                 if (options.EnableChipherPropertyValues)
-                {
-                    var xmlRow = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
-                    foreach (var xmlProp in xmlRow)
-                    {
-                        var xmlType = xmlProp.XPathSelectElement("v:Cell[@N='Type']", VisioParser.NamespaceManager);
-                        var typeValue = xmlType?.Attribute("V")?.Value ?? "0";
-                        if (!int.TryParse(typeValue, out int type))
-                            type = 0;
+                    ChipherPropertyValues(xmlShape);
 
-                        // string
-                        if (type == 0) 
+                if (options.EnableChipherPropertyLabels)
+                    ChipherPropertyLabels(xmlShape);
+            }
+
+            pageStream.SetLength(0);
+            using (var writer = new XmlTextWriter(pageStream, new UTF8Encoding(false)))
+            {
+                xmlPage.Save(writer);
+            }
+        }
+
+        private static void ChipherShapeText(XElement xmlShape)
+        {
+            var xmlText = xmlShape.XPathSelectElements("v:Text", VisioParser.NamespaceManager).ToList();
+            foreach (var node in xmlText.Nodes())
+            {
+                if (node is XText text)
+                    text.Value = randomStringService.GenerateReadableRandomString(text.Value);
+            }
+        }
+
+        private static void ChipherShapeFields(XElement xmlShape)
+        {
+            var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
+            foreach (var xmlRow in xmlRows)
+            {
+                var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
+                var attributeValue = xmlValue?.Attribute("V");
+                if (attributeValue != null)
+                    attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
+            }
+        }
+
+        private static void ChipherPropertyLabels(XElement xmlShape)
+        {
+            var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
+            foreach (var xmlRow in xmlRows)
+            {
+                var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Label']", VisioParser.NamespaceManager);
+                var attributeValue = xmlValue?.Attribute("V");
+                if (attributeValue != null)
+                {
+                    attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
+                }
+            }
+        }
+
+        private static void ChipherPropertyValues(XElement xmlShape)
+        {
+            var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
+            foreach (var xmlRow in xmlRows)
+            {
+                var xmlType = xmlRow.XPathSelectElement("v:Cell[@N='Type']", VisioParser.NamespaceManager);
+                var typeValue = xmlType?.Attribute("V")?.Value ?? "0";
+                if (!int.TryParse(typeValue, out int type))
+                    type = 0;
+
+                switch (type)
+                {
+                    case 0:  /* String */
                         {
-                            var xmlValue = xmlProp.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
+                            var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                             var attributeValue = xmlValue?.Attribute("V");
                             if (attributeValue != null)
+                            {
                                 attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
+                            }
+                            break;
                         }
 
-                        // enum
-                        if (type == 1)
+                    case 1:  /* Fixed List */
+                    case 4:  /* Variable List */
                         {
-                            var xmlFormat = xmlProp.XPathSelectElement("v:Cell[@N='Format']", VisioParser.NamespaceManager);
+                            var xmlFormat = xmlRow.XPathSelectElement("v:Cell[@N='Format']", VisioParser.NamespaceManager);
                             if (xmlFormat != null)
                             {
                                 var attributeFormat = xmlFormat.Attribute("V")?.Value;
@@ -78,15 +128,9 @@ namespace VisioWebTools
                                     }
                                 }
                             }
+                            break;
                         }
-                    }
                 }
-
-            }
-            pageStream.SetLength(0);
-            using (var writer = new XmlTextWriter(pageStream, new UTF8Encoding(false)))
-            {
-                xmlPage.Save(writer);
             }
         }
 
