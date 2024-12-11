@@ -30,7 +30,7 @@ export const TranslateFile = (props: {
     if (dotnet) {
       var ab = new Uint8Array(await vsdx.arrayBuffer());
       const output: Uint8Array = dotnet.FileProcessor.TranslateFile(ab, optionsJson)
-      return new Blob([output], { type: 'application/vnd.ms-visio.drawing' });
+      return new Blob([output], { type: 'text/json' });
     } else {
       return await AzureFunctionBackend.invoke({ vsdx, optionsJson }, 'TranslateFileAzureFunction');
     }
@@ -56,7 +56,7 @@ export const TranslateFile = (props: {
       const a = document.createElement('a');
       a.target = "_blank";
       a.href = url;
-      a.download = vsdx.name;
+      a.download = vsdx.name.replace('.vsdx', '.json');
       a.click();
     } catch (e: any) {
       setError(`${e}`);
