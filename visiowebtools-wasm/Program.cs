@@ -2,6 +2,7 @@
 using System.Drawing;
 using VisioWebTools;
 using System.Runtime.Versioning;
+using System.Text.Json;
 
 // Create a "Main" method. This is required by the tooling.
 return;
@@ -50,24 +51,9 @@ public partial class FileProcessor
 
     [JSExport]
     [SupportedOSPlatform("browser")]
-    internal static byte[] ChipherFile(
-        byte[] vsdx, 
-        bool enableChipherShapeText, 
-        bool enableChipherShapeFields,
-        bool enableChipherPageNames, 
-        bool enableChipherPropertyValues,
-        bool enableChipherPropertyLabels
-        )
+    internal static byte[] ChipherFile(byte[] vsdx, string optionsJson)
     {
-        var options = new ChipherOptions
-        {
-            EnableChipherShapeText = enableChipherShapeText,
-            EnableChipherShapeFields = enableChipherShapeFields,
-            EnableChipherPageNames = enableChipherPageNames,
-            EnableChipherPropertyValues = enableChipherPropertyValues,
-            EnableChipherPropertyLabels = enableChipherPropertyLabels
-        };
-
+        var options = JsonSerializer.Deserialize(optionsJson, ChipherOptionsJsonContext.Default.ChipherOptions);
         return ChipherFileService.Process(vsdx, options);
     }
 }

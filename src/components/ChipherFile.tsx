@@ -18,14 +18,15 @@ export const ChipherFile = (props: {
   const { dotnet, loading, loadError } = useDotNetFixedUrl();
 
   const doProcessing = async (vsdx: File) => {
-    var ab = new Uint8Array(await vsdx.arrayBuffer());
-    const output: Uint8Array = dotnet.FileProcessor.ChipherFile(ab,
+    var options = {
       enableChipherShapeText,
       enableChipherShapeFields,
       enableChipherPageNames,
       enableChipherPropertyValues,
       enableChipherPropertyLabels
-    );
+    };
+    var ab = new Uint8Array(await vsdx.arrayBuffer());
+    const output: Uint8Array = dotnet.FileProcessor.ChipherFile(ab, JSON.stringify(options))
 
     return new Blob([output], { type: 'application/vnd.ms-visio.drawing' });
   }
