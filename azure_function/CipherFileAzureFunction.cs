@@ -8,15 +8,15 @@ using System.Text.Json;
 
 namespace VisioWebToolsAzureFunctions
 {
-    public class ChipherFileAzureFunction
+    public class CipherFileAzureFunction
     {
-        private readonly ILogger<ChipherFileAzureFunction> log;
-        public ChipherFileAzureFunction(ILogger<ChipherFileAzureFunction> log)
+        private readonly ILogger<CipherFileAzureFunction> log;
+        public CipherFileAzureFunction(ILogger<CipherFileAzureFunction> log)
         {
             this.log = log;
         }
 
-        [Function("ChipherFileAzureFunction")]
+        [Function("CipherFileAzureFunction")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData req)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -34,14 +34,14 @@ namespace VisioWebToolsAzureFunctions
             }
 
             var optionsJson = parser.GetParameterValue("optionsJson");
-            var options = JsonSerializer.Deserialize(optionsJson, ChipherOptionsJsonContext.Default.ChipherOptions);
+            var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Default.CipherOptions);
 
             using (var memoryStream = new MemoryStream())
             {
                 await vsdx.Data.CopyToAsync(memoryStream);
                 var vsdxData = memoryStream.ToArray();
 
-                var output = ChipherFileService.Process(vsdxData, options);
+                var output = CipherFileService.Process(vsdxData, options);
 
                 var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
                 response.Headers.Add("Content-Disposition", $"attachment; filename={vsdx.FileName}");

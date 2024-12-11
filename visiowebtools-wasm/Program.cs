@@ -51,9 +51,17 @@ public partial class FileProcessor
 
     [JSExport]
     [SupportedOSPlatform("browser")]
-    internal static byte[] ChipherFile(byte[] vsdx, string optionsJson)
+    internal static byte[] CipherFile(byte[] vsdx, string optionsJson)
     {
-        var options = JsonSerializer.Deserialize(optionsJson, ChipherOptionsJsonContext.Default.ChipherOptions);
-        return ChipherFileService.Process(vsdx, options);
+        var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Default.CipherOptions);
+        return CipherFileService.Process(vsdx, options);
+    }
+
+    [JSExport]
+    [SupportedOSPlatform("browser")]
+    internal static byte[] TranslateFile(byte[] vsdx, string optionsJson)
+    {
+        var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Default.TranslateOptions);
+        return TranslateFileService.Process(vsdx, options);
     }
 }

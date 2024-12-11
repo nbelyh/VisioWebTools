@@ -1,0 +1,18 @@
+---
+layout: ../layouts/Layout.astro
+title: "Split Pages"
+---
+
+import { CipherFile } from '../components/CipherFile';
+
+# Cipher File Tool
+
+This tool allows you to cipher the content of the Visio diagram. 
+It analyzes the Visio file and ciphers all text and shape content, according to the selected ciphering options.
+You can then save the ciphered file to a new location.
+
+Your files will not leave your browser, all the processing will be done locally on your machine in this browser using web assemtly
+
+Please report issues to our [GitHub Issue Tracker](https://github.com/nbelyh/VisioWebTools/issues)
+
+<CipherFile client:load />

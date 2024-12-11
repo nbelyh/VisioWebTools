@@ -11,20 +11,11 @@ using SixLabors.ImageSharp;
 
 namespace VisioWebTools
 {
-    public class ChipherOptions
-    {
-        public bool EnableChipherShapeText { get; set; }
-        public bool EnableChipherShapeFields { get; set; }
-        public bool EnableChipherPageNames { get; set; }
-        public bool EnableChipherPropertyValues { get; set; }
-        public bool EnableChipherPropertyLabels { get; set; }
-    }
-
-    public class ChipherFileService
+    public class CipherFileService
     {
         static readonly RandomStringService randomStringService = new();
 
-        public static void ProcessPage(PackagePart pagePart, ChipherOptions options)
+        public static void ProcessPage(PackagePart pagePart, CipherOptions options)
         {
             var pageStream = pagePart.GetStream(FileMode.Open, FileAccess.ReadWrite);
             var xmlPage = XDocument.Load(pageStream);
@@ -32,17 +23,17 @@ namespace VisioWebTools
             var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
             foreach (var xmlShape in xmlShapes)
             {
-                if (options.EnableChipherShapeText)
-                    ChipherShapeText(xmlShape);
+                if (options.EnableCipherShapeText)
+                    CipherShapeText(xmlShape);
 
-                if (options.EnableChipherShapeFields)
-                    ChipherShapeFields(xmlShape);
+                if (options.EnableCipherShapeFields)
+                    CipherShapeFields(xmlShape);
 
-                if (options.EnableChipherPropertyValues)
-                    ChipherPropertyValues(xmlShape);
+                if (options.EnableCipherPropertyValues)
+                    CipherPropertyValues(xmlShape);
 
-                if (options.EnableChipherPropertyLabels)
-                    ChipherPropertyLabels(xmlShape);
+                if (options.EnableCipherPropertyLabels)
+                    CipherPropertyLabels(xmlShape);
             }
 
             pageStream.SetLength(0);
@@ -52,7 +43,7 @@ namespace VisioWebTools
             }
         }
 
-        private static void ChipherShapeText(XElement xmlShape)
+        private static void CipherShapeText(XElement xmlShape)
         {
             var xmlText = xmlShape.XPathSelectElements("v:Text", VisioParser.NamespaceManager).ToList();
             foreach (var node in xmlText.Nodes())
@@ -62,7 +53,7 @@ namespace VisioWebTools
             }
         }
 
-        private static void ChipherShapeFields(XElement xmlShape)
+        private static void CipherShapeFields(XElement xmlShape)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
@@ -74,7 +65,7 @@ namespace VisioWebTools
             }
         }
 
-        private static void ChipherPropertyLabels(XElement xmlShape)
+        private static void CipherPropertyLabels(XElement xmlShape)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
@@ -88,7 +79,7 @@ namespace VisioWebTools
             }
         }
 
-        private static void ChipherPropertyValues(XElement xmlShape)
+        private static void CipherPropertyValues(XElement xmlShape)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
@@ -134,7 +125,7 @@ namespace VisioWebTools
             }
         }
 
-        public static void ProcessPages(Stream stream, ChipherOptions options)
+        public static void ProcessPages(Stream stream, CipherOptions options)
         {
             using (Package package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
             {
@@ -152,7 +143,7 @@ namespace VisioWebTools
                 var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
                 foreach (var pageRel in pageRels)
                 {
-                    if (options.EnableChipherPageNames)
+                    if (options.EnableCipherPageNames)
                     {
                         var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
                         var attributeName = xmlPage.Attribute("Name");
@@ -178,7 +169,7 @@ namespace VisioWebTools
             }
         }
 
-        public static byte[] Process(byte[] input, ChipherOptions options)
+        public static byte[] Process(byte[] input, CipherOptions options)
         {
             using (var stream = new MemoryStream(input))
             {
