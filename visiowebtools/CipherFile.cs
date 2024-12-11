@@ -132,7 +132,10 @@ namespace VisioWebTools
 
         public static void ProcessPages(Package package, PackagePart documentPart, CipherOptions options)
         {
-            var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").First();
+            var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").FirstOrDefault();
+            if (pagesRel == null)
+                return;
+
             Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
             var pagesPart = package.GetPart(pagesUri);
 
@@ -184,7 +187,10 @@ namespace VisioWebTools
 
         public static void ProcessMasters(Package package, PackagePart documentPart, CipherOptions options)
         {
-            var mastersRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/masters").First();
+            var mastersRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/masters").FirstOrDefault();
+            if (mastersRel == null)
+                return;
+
             Uri mastersUri = PackUriHelper.ResolvePartUri(documentPart.Uri, mastersRel.TargetUri);
             var mastersPart = package.GetPart(mastersUri);
 
@@ -222,7 +228,10 @@ namespace VisioWebTools
         {
             using (Package package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
             {
-                var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
+                var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").FirstOrDefault();
+                if (documentRel == null)
+                    return;
+
                 Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
                 var documentPart = package.GetPart(docUri);
 

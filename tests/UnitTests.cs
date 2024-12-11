@@ -78,6 +78,6 @@ public class SplitFileTest
         var bytes = CipherFileService.Process(input, options);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
-        File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
+        // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
     }
 }
