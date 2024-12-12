@@ -43,7 +43,7 @@ public class SplitFileTest
     [TestMethod]
     public void TranslateFile()
     {
-        var input = File.ReadAllBytes(@"C:\Projects\VisioWebTools\public\Translate.vsdx");
+        var input = File.ReadAllBytes(@"../../../../public/samples/Translate.vsdx");
 
         var options = new TranslateOptions
         {
