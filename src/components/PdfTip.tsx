@@ -72,12 +72,12 @@ export const PdfTip = (props: {
     <>
       <ErrorNotification error={error || loadError} />
 
-      <DropZone accept="application/pdf" sampleFileName="ExportedPdf-DropMe.pdf"
+      <DropZone accept="application/pdf" sampleFileName="DropMe.pdf"
         label="Drop a PDF file (without tooltips) that you have exported from Visio here"
         onChange={setPdf}
       />
 
-      <DropZone accept="application/vnd.ms-visio.drawing" sampleFileName="VisioSource-DropMe.vsdx"
+      <DropZone accept="application/vnd.ms-visio.drawing" sampleFileName="DropMe.vsdx"
         label="Drop the original Visio VSDX file to copy the tooltips from here"
         onChange={setVsdx}
       />
