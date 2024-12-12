@@ -13,23 +13,35 @@ namespace VisioWebTools
         public int IX { get; set; }
     }
 
+    public class TextResult 
+    {
+        public string PlainText { get; set; }
+        public string FormattedText { get; set; }
+    }
+
     public class TranslateService
     {
-        public static string GetShapeText(XElement xmlText)
+        public static TextResult GetShapeText(XElement xmlText)
         {
-            var sb = new StringBuilder();
+            var plainText = new StringBuilder();
+            var formattedText = new StringBuilder();
             foreach (var node in xmlText.Nodes())
             {
                 if (node is XText text)
                 {
-                    sb.Append(text.Value);
+                    plainText.Append(text.Value);
+                    formattedText.Append(text.Value);
                 }
                 else if (node is XElement el)
                 {
-                    sb.Append($"{{{el.Name.LocalName}{el.Attribute("IX")?.Value}}}");
+                    formattedText.Append($"{{{el.Name.LocalName}{el.Attribute("IX")?.Value}}}");
                 }
             }
-            return sb.ToString();
+            return new TextResult
+            {
+                PlainText = plainText.ToString(),
+                FormattedText = formattedText.ToString()
+            };
         }
 
         public static List<ParsedItem> ParseShapeText(string input)

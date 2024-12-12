@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace VisioWebTools
 {
@@ -12,6 +13,11 @@ namespace VisioWebTools
     {
         private readonly Random _random = new();
         private readonly Dictionary<string, string> _wordCache = [];
+
+        public static bool ShouldBeIgnored(string input)
+        {
+            return Regex.IsMatch(input, @"^[\s\d\n\r]*$");
+        }
 
         public string GenerateReadableRandomString(string input)
         {
@@ -31,6 +37,9 @@ namespace VisioWebTools
         public string GenerateReadableRandomLine(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
+                return input;
+
+            if (ShouldBeIgnored(input))
                 return input;
                 
             if (_wordCache.TryGetValue(input, out string cachedValue))

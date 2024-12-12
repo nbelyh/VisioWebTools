@@ -15,7 +15,6 @@ namespace VisioWebTools
     }
 
     [JsonSerializable(typeof(DocumentInfo))]
-    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
     public partial class DocumentInfoJsonContext : JsonSerializerContext
     {
     }

@@ -43,7 +43,7 @@ public class SplitFileTest
     [TestMethod]
     public void TranslateFile()
     {
-        var input = File.ReadAllBytes(@"../../../../public/samples/Translate.vsdx");
+        var input = File.ReadAllBytes(@"C:\Projects\VisioWebTools\public\translate-flow.vsdx");
 
         var options = new TranslateOptions
         {
@@ -57,7 +57,7 @@ public class SplitFileTest
         var bytes = TranslateFileService.Process(input, options);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
-        // File.WriteAllBytes(@"../../../../public/samples/_.json", bytes);
+        File.WriteAllBytes(@"../../../../public/samples/_.json", bytes);
     }
 
     [TestMethod]
