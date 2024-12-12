@@ -3,6 +3,8 @@ namespace azure_function_test;
 using System.IO;
 using VisioWebTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text;
+using System.Threading.Tasks;
 
 [TestClass]
 public class SplitFileTest
@@ -54,10 +56,16 @@ public class SplitFileTest
             EnableTranslatePropertyLabels = true
         };
 
-        var bytes = TranslateFileService.Process(input, options);
+        var json = TranslateFileService.GetTranslationJson(input, options);
+
+        // var translated = await OpenAIChatService.Translate(json, "German");
+
+        var bytes = TranslateFileService.ApplyTranslationJson(input, options, json);
+
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
-        // File.WriteAllBytes(@"../../../../public/samples/_.json", bytes);
+
+        // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
     }
 
     [TestMethod]

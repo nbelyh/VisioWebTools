@@ -18,4 +18,16 @@ namespace VisioWebTools
     public partial class DocumentInfoJsonContext : JsonSerializerContext
     {
     }
+
+    [JsonSerializable(typeof(ChatResponse))]
+    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
+    public partial class ChatResponseJsonContext : JsonSerializerContext
+    {
+    }
+
+    [JsonSerializable(typeof(ChatRequest))]
+    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
+    public partial class ChatRequestJsonContext : JsonSerializerContext
+    {
+    }
 }

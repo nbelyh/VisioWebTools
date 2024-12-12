@@ -72,23 +72,23 @@ namespace VisioWebTools
             return result;
         }
 
-        public static XElement BuildXElement(List<ParsedItem> items)
+        public static void BuildXElements(XElement root, string input)
         {
-            XElement root = new("Root");
+            var items = ParseShapeText(input);
 
+            XNamespace ns = "http://schemas.microsoft.com/office/visio/2012/main";
+            root.RemoveAll();
             foreach (var item in items)
             {
                 if (item.IsTag)
                 {
-                    root.Add(new XElement(item.Content, new XAttribute("IX", item.IX)));
+                    root.Add(new XElement(ns + item.Content, new XAttribute("IX", item.IX)));
                 }
                 else
                 {
                     root.Add(new XText(item.Content));
                 }
             }
-
-            return root;
         }
     }
 }

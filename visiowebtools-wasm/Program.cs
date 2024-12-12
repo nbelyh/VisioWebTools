@@ -59,9 +59,27 @@ public partial class FileProcessor
 
     [JSExport]
     [SupportedOSPlatform("browser")]
-    internal static byte[] TranslateFile(byte[] vsdx, string optionsJson)
+    internal static string GetTranslationJson(byte[] vsdx, string optionsJson)
     {
         var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Default.TranslateOptions);
-        return TranslateFileService.Process(vsdx, options);
+        var translations = TranslateFileService.GetTranslationJson(vsdx, options);
+        return translations;
+    }
+
+    [JSExport]
+    [SupportedOSPlatform("browser")]
+    internal static byte[] ApplyTranslationJson(byte[] vsdx, string optionsJson, string json)
+    {
+        var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Default.TranslateOptions);
+        var bytes = TranslateFileService.ApplyTranslationJson(vsdx, options, json);
+        return bytes;
+    }
+
+    [JSExport]
+    [SupportedOSPlatform("browser")]
+    internal static async Task<string> Translate(string json, string language, string? apiKey = null)
+    {
+        var translated = await OpenAIChatService.Translate(json, language, apiKey);
+        return translated;
     }
 }

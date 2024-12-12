@@ -87,7 +87,9 @@ export const DropZone = (props: {
         <input ref={fileButtonRef} type="file" accept={props.accept} style={{ display: 'none' }} onChange={onFileChange} />
       </div>
       <div className="md:w-1/6 p-4">
-        <a href={props.sampleFileName} onDragStart={onDragStart} draggable="true" className="p-2 bg-neutral-100 border-2 border-neutral-300 no-underline shadow-xl rounded cursor-move">&#128196;&nbsp;{props.sampleFileName}</a>
+        <a href={`samples/${props.sampleFileName}`} onDragStart={onDragStart} draggable="true" className="p-3 bg-neutral-100 border-2 border-neutral-300 no-underline shadow-xl rounded cursor-move">
+          &#128196;&nbsp;<span className='underline cursor-pointer' title='Click to download, drag to the area on the left to use'>{props.sampleFileName}</span>
+        </a>
       </div>
     </div>
   );

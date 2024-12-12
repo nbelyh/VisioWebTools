@@ -4,6 +4,7 @@ import { PrimaryButton } from './PrimaryButton';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
+import { Languages } from './Languages';
 
 export const TranslateFile = (props: {
 }) => {
@@ -29,8 +30,10 @@ export const TranslateFile = (props: {
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
       var ab = new Uint8Array(await vsdx.arrayBuffer());
-      const output: Uint8Array = dotnet.FileProcessor.TranslateFile(ab, optionsJson)
-      return new Blob([output], { type: 'text/json' });
+      const original = dotnet.FileProcessor.GetTranslationJson(ab, optionsJson);
+      const translated = await dotnet.FileProcessor.Translate(original, targetLanguage);
+      const result = dotnet.FileProcessor.ApplyTranslationJson(ab, optionsJson, translated);
+      return new Blob([result], { type: 'application/vnd.ms-visio.drawing' });
     } else {
       return await AzureFunctionBackend.invoke({ vsdx, optionsJson }, 'TranslateFileAzureFunction');
     }
@@ -56,7 +59,7 @@ export const TranslateFile = (props: {
       const a = document.createElement('a');
       a.target = "_blank";
       a.href = url;
-      a.download = vsdx.name.replace('.vsdx', '.json');
+      a.download = vsdx.name;
       a.click();
     } catch (e: any) {
       setError(`${e}`);
@@ -66,10 +69,12 @@ export const TranslateFile = (props: {
   }
 
   const [enableTranslateShapeText, setEnableTranslateShapeText] = useState(true);
-  const [enableTranslateShapeFields, setEnableTranslateShapeFields] = useState(true);
-  const [enableTranslatePageNames, setEnableTranslatePageNames] = useState(true);
-  const [enableTranslatePropertyValues, setEnableTranslatePropertyValues] = useState(true);
+  const [enableTranslateShapeFields, setEnableTranslateShapeFields] = useState(false);
+  const [enableTranslatePageNames, setEnableTranslatePageNames] = useState(false);
+  const [enableTranslatePropertyValues, setEnableTranslatePropertyValues] = useState(false);
   const [enableTranslatePropertyLabels, setEnableTranslatePropertyLabels] = useState(false);
+
+  const [targetLanguage, setTargetLanguage] = useState('German');
 
   return (
     <>
@@ -77,11 +82,19 @@ export const TranslateFile = (props: {
       <DropZone
         accept="application/vnd.ms-visio.drawing"
         sampleFileName="TranslateMe.vsdx"
-        label="Drop the Visio VSDX file to split pages here"
+        label="Drop the Visio VSDX file to translate here"
         onChange={onFileChange}
       />
 
       <div className='mb-4'>
+
+        <div className="flex items-center mb-2">
+          <label htmlFor="targetLanguage">Target Language</label>
+          <select id="targetLanguage" className="ml-2" value={targetLanguage} onChange={(e) => setTargetLanguage(e.target.value)}>
+            {Languages.map(l => <option key={l}>{l}</option>)}
+          </select>
+        </div>
+
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateText" checked={enableTranslateShapeText} onChange={(e) => setEnableTranslateShapeText(e.target.checked)} />
           <label htmlFor="enableTranslateText">Translate Shape Text</label>

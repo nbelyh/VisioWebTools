@@ -4,24 +4,31 @@ using System.IO;
 using System.IO.Packaging;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Text.Unicode;
-using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace VisioWebTools
 {
+    public enum TranslationDirection
+    {
+        Get,
+        Set
+    }
+
     /// <summary>
     /// Service for generating random readable strings with specific constraints.
     /// </summary>
     public static class TranslateFileService
     {
-        public static void ProcessPage(PackagePart pagePart, TranslateOptions options, PageInfo pageInfo)
+        public static void ProcessPage(PackagePart pagePart, TranslateOptions options, PageInfo pageInfo, TranslationDirection direction)
         {
-            var pageStream = pagePart.GetStream(FileMode.Open, FileAccess.ReadWrite);
+            var fileAccess = direction == TranslationDirection.Get ? FileAccess.Read : FileAccess.ReadWrite;
+            var pageStream = pagePart.GetStream(FileMode.Open, fileAccess);
             var xmlPage = XDocument.Load(pageStream);
 
             var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
@@ -31,49 +38,59 @@ namespace VisioWebTools
 
                 pageInfo.Shapes ??= [];
                 if (!pageInfo.Shapes.TryGetValue(shapeId, out var shapeInfo))
-                {
                     shapeInfo = new ShapeInfo();
-                }
 
                 var initialized = false;
                 if (options.EnableTranslateShapeText)
-                    initialized = ProcessShapeText(xmlShape, shapeInfo) || initialized;
+                    initialized = ProcessShapeText(xmlShape, shapeInfo, direction) || initialized;
 
                 if (options.EnableTranslateShapeFields)
-                    initialized = TranslateShapeFields(xmlShape, shapeInfo) || initialized;
+                    initialized = TranslateShapeFields(xmlShape, shapeInfo, direction) || initialized;
 
                 if (options.EnableTranslatePropertyValues)
-                    initialized = TranslatePropertyValues(xmlShape, shapeInfo) || initialized;
+                    initialized = TranslatePropertyValues(xmlShape, shapeInfo, direction) || initialized;
 
                 if (options.EnableTranslatePropertyLabels)
-                    initialized = TranslatePropertyLabels(xmlShape, shapeInfo) || initialized;
+                    initialized = TranslatePropertyLabels(xmlShape, shapeInfo, direction) || initialized;
 
                 if (initialized && !pageInfo.Shapes.ContainsKey(shapeId))
                     pageInfo.Shapes.Add(shapeId, shapeInfo);
             }
 
-            // pageStream.SetLength(0);
-            // using (var writer = new XmlTextWriter(pageStream, new UTF8Encoding(false)))
-            // {
-            //     xmlPage.Save(writer);
-            // }
+            if (direction == TranslationDirection.Set)
+            {
+                pageStream.SetLength(0);
+                using (var writer = new XmlTextWriter(pageStream, new UTF8Encoding(false)))
+                {
+                    xmlPage.Save(writer);
+                }
+            }
         }
 
         public static bool ShouldBeIgnored(string input)
         {
-            return Regex.IsMatch(input, @"^[\s\d\n\r]*$");
+            return !string.IsNullOrEmpty(input) && Regex.IsMatch(input, @"^[\s\d\n\r]*$");
         }
 
-        private static bool ProcessShapeText(XElement xmlShape, ShapeInfo shapeInfo)
+        private static bool ProcessShapeText(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlText = xmlShape.XPathSelectElement("v:Text", VisioParser.NamespaceManager);
             if (xmlText == null)
                 return false;
 
             var text = TranslateService.GetShapeText(xmlText);
-            if (!ShouldBeIgnored(text.PlainText))
+            if (!ShouldBeIgnored(text?.PlainText))
             {
-                shapeInfo.Text = text.FormattedText;
+                switch (direction)
+                {
+                    case TranslationDirection.Get:
+                        shapeInfo.Text = text.FormattedText;
+                        return true;
+
+                    case TranslationDirection.Set:
+                        TranslateService.BuildXElements(xmlText, shapeInfo.Text);
+                        return true;
+                }
                 return true;
             }
 
@@ -93,19 +110,26 @@ namespace VisioWebTools
             return fieldInfo;
         }
 
-        private static bool TranslateShapeFields(XElement xmlShape, ShapeInfo shapeInfo)
+        private static bool TranslateShapeFields(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
-                if (attributeValue != null && !ShouldBeIgnored(attributeValue.Value))
+                if (!ShouldBeIgnored(attributeValue?.Value))
                 {
                     var fieldInfo = EnsureFieldInfo(shapeInfo, xmlRow);
-                    fieldInfo.Value = attributeValue.Value;
-                    return true;
-                    // attributeValue.Value = translateService.GenerateReadableRandomString(attributeValue.Value);
+                    switch (direction)
+                    {
+                        case TranslationDirection.Get:
+                            fieldInfo.Value = attributeValue.Value;
+                            return true;
+
+                        case TranslationDirection.Set:
+                            attributeValue.Value = fieldInfo.Value;
+                            return true;
+                    }
                 }
             }
             return false;
@@ -124,25 +148,32 @@ namespace VisioWebTools
             return propertyInfo;
         }
 
-        private static bool TranslatePropertyLabels(XElement xmlShape, ShapeInfo shapeInfo)
+        private static bool TranslatePropertyLabels(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Label']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
-                if (attributeValue != null && !ShouldBeIgnored(attributeValue.Value))
+                if (!ShouldBeIgnored(attributeValue?.Value))
                 {
                     var propertyInfo = EnsurePropertyInfo(shapeInfo, xmlRow);
-                    propertyInfo.Label = attributeValue.Value;
-                    return true;
-                    // attributeValue.Value = translateService.GenerateReadableRandomString(attributeValue.Value);
+                    switch (direction)
+                    {
+                        case TranslationDirection.Get:
+                            propertyInfo.Label = attributeValue.Value;
+                            return true;
+
+                        case TranslationDirection.Set:
+                            attributeValue.Value = propertyInfo.Label;
+                            return true;
+                    }
                 }
             }
             return false;
         }
 
-        private static bool TranslatePropertyValues(XElement xmlShape, ShapeInfo shapeInfo)
+        private static bool TranslatePropertyValues(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
@@ -158,13 +189,19 @@ namespace VisioWebTools
                         {
                             var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                             var attributeValue = xmlValue?.Attribute("V");
-                            if (attributeValue != null && !ShouldBeIgnored(attributeValue.Value))
+                            if (!ShouldBeIgnored(attributeValue?.Value))
                             {
                                 var propertyInfo = EnsurePropertyInfo(shapeInfo, xmlRow);
-                                propertyInfo.Value = attributeValue.Value;
-                                return true;
-                                // 
-                                // attributeValue.Value = translateService.GenerateReadableRandomString(attributeValue.Value);
+                                switch (direction)
+                                {
+                                    case TranslationDirection.Get:
+                                        propertyInfo.Value = attributeValue.Value;
+                                        return true;
+
+                                    case TranslationDirection.Set:
+                                        attributeValue.Value = propertyInfo.Value;
+                                        return true;
+                                }
                             }
                             break;
                         }
@@ -176,17 +213,18 @@ namespace VisioWebTools
                             if (xmlFormat != null)
                             {
                                 var attributeFormat = xmlFormat.Attribute("V");
-                                if (attributeFormat != null && !ShouldBeIgnored(attributeFormat.Value))
+                                if (!ShouldBeIgnored(attributeFormat?.Value))
                                 {
                                     var propertyInfo = EnsurePropertyInfo(shapeInfo, xmlRow);
-                                    propertyInfo.Format = attributeFormat?.Value;
-                                    return true;
-                                    // var items = attributeFormat.Split(';');
-                                    // if (items.Length > 0)
-                                    // {
-                                    //     var newItems = items.Select(x => translateService.GenerateReadableRandomString(x)).ToArray();
-                                    //     xmlFormat.Attribute("V").Value = string.Join(";", newItems);
-                                    // }
+                                    switch (direction)
+                                    {
+                                        case TranslationDirection.Get:
+                                            propertyInfo.Format = attributeFormat.Value;
+                                            return true;
+                                        case TranslationDirection.Set:
+                                            attributeFormat.Value = propertyInfo.Format;
+                                            return true;
+                                    }
                                 }
                             }
                             break;
@@ -196,9 +234,10 @@ namespace VisioWebTools
             return false;
         }
 
-        public static void ProcessPages(Stream stream, TranslateOptions options, DocumentInfo documentInfo)
+        public static void ProcessPages(Stream stream, TranslateOptions options, DocumentInfo documentInfo, TranslationDirection direction)
         {
-            using (Package package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
+            var fileAccess = direction == TranslationDirection.Get ? FileAccess.Read : FileAccess.ReadWrite;
+            using (Package package = Package.Open(stream, FileMode.Open, fileAccess))
             {
                 var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
                 Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
@@ -208,70 +247,102 @@ namespace VisioWebTools
                 Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
                 var pagesPart = package.GetPart(pagesUri);
 
-                var pagesStream = pagesPart.GetStream(FileMode.Open, FileAccess.ReadWrite);
+                var pagesStream = pagesPart.GetStream(FileMode.Open, fileAccess);
                 var xmlPages = XDocument.Load(pagesStream);
 
-                documentInfo.Pages = [];
                 var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
                 foreach (var pageRel in pageRels)
                 {
                     var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
-                    var attributeName = xmlPage.Attribute("Name");
-                    var attributeNameU = xmlPage.Attribute("NameU");
+
+                    var pageId = int.Parse(xmlPage.Attribute("ID").Value);
+                    documentInfo.Pages ??= [];
+                    if (!documentInfo.Pages.TryGetValue(pageId, out var pageInfo))
+                    {
+                        pageInfo = new PageInfo();
+                        documentInfo.Pages.Add(pageId, pageInfo);
+                    }
 
                     if (options.EnableTranslatePageNames)
                     {
-                        // if (attributeName != null)
-                        //     attributeName.Value = translateService.GenerateReadableRandomString(attributeName.Value);
-                        // var attributeNameU = xmlPage.Attribute("NameU");
-                        // if (attributeNameU != null)
-                        //     attributeNameU.Value = translateService.GenerateReadableRandomString(attributeNameU.Value);
+                        var attributeName = xmlPage.Attribute("Name");
+                        var attributeNameU = xmlPage.Attribute("NameU");
+
+                        switch (direction)
+                        {
+                            case TranslationDirection.Get:
+                                if (attributeName != null)
+                                    pageInfo.Name = attributeName.Value;
+                                if (attributeNameU != null)
+                                    pageInfo.NameU = attributeNameU.Value;
+                                break;
+
+                            case TranslationDirection.Set:
+                                if (attributeName != null)
+                                    attributeName.Value = pageInfo.Name;
+                                if (attributeNameU != null)
+                                    attributeNameU.Value = pageInfo.NameU;
+                                break;
+                        }
                     }
 
-                    var pageId = int.Parse(xmlPage.Attribute("ID").Value);
-                    var pageInfo = new PageInfo
-                    {
-                        Name = attributeName?.Value,
-                        NameU = attributeNameU?.Value,
-                    };
-
-                    documentInfo.Pages.Add(pageId, pageInfo);
 
                     Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
                     var pagePart = package.GetPart(pageUri);
-                    ProcessPage(pagePart, options, pageInfo);
+                    ProcessPage(pagePart, options, pageInfo, direction);
                 }
 
-                // pagesStream.SetLength(0);
-                // using (var writer = new XmlTextWriter(pagesStream, new UTF8Encoding(false)))
-                // {
-                //     xmlPages.Save(writer);
-                // }
-                // package.Flush();
+                if (direction == TranslationDirection.Set)
+                {
+                    pagesStream.SetLength(0);
+                    using (var writer = new XmlTextWriter(pagesStream, new UTF8Encoding(false)))
+                    {
+                        xmlPages.Save(writer);
+                    }
+                    package.Flush();
+                }
             }
         }
 
-        public static byte[] Process(byte[] input, TranslateOptions options)
+        public static byte[] ApplyTranslationJson(byte[] input, TranslateOptions options, string json)
+        {
+            using (var stream = new MemoryStream(input))
+            {
+                var context = CreateJsonSerializerContext();
+                var documentInfo = JsonSerializer.Deserialize(json, context.DocumentInfo);
+
+                ProcessPages(stream, options, documentInfo, TranslationDirection.Set);
+
+                stream.Flush();
+                return stream.ToArray();
+            }
+        }
+
+        public static string GetTranslationJson(byte[] input, TranslateOptions options)
         {
             using (var stream = new MemoryStream(input))
             {
                 var documentInfo = new DocumentInfo();
-                ProcessPages(stream, options, documentInfo);
+                ProcessPages(stream, options, documentInfo, TranslationDirection.Get);
 
-                var jsonOptions = new JsonSerializerOptions
-                {
-                    WriteIndented = true, 
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                };
-
-                var context = new DocumentInfoJsonContext(jsonOptions);
+                var context = CreateJsonSerializerContext();
                 var json = JsonSerializer.Serialize(documentInfo, context.DocumentInfo);
-                return Encoding.UTF8.GetBytes(json);
-                // stream.Flush();
-                // return stream.ToArray();
+                return json;
             }
+        }
+
+        private static DocumentInfoJsonContext CreateJsonSerializerContext()
+        {
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            };
+
+            var context = new DocumentInfoJsonContext(jsonOptions);
+            return context;
         }
     }
 }
