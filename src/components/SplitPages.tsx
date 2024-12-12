@@ -63,7 +63,7 @@ export const SplitPages = (props: {
       <ErrorNotification error={error || loadError} />
       <DropZone
         accept="application/vnd.ms-visio.drawing"
-        sampleFileName="SplitPages.vsdx"
+        sampleFileName="SplitMe.vsdx"
         label="Drop the Visio VSDX file to split pages here"
         onChange={onFileChange}
       />

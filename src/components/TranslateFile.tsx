@@ -76,7 +76,7 @@ export const TranslateFile = (props: {
       <ErrorNotification error={error || loadError} />
       <DropZone
         accept="application/vnd.ms-visio.drawing"
-        sampleFileName="Translate.vsdx"
+        sampleFileName="TranslateMe.vsdx"
         label="Drop the Visio VSDX file to split pages here"
         onChange={onFileChange}
       />

@@ -78,7 +78,7 @@ export const CipherFile = (props: {
       <ErrorNotification error={error || loadError} />
       <DropZone
         accept="application/vnd.ms-visio.drawing"
-        sampleFileName="Cipher.vsdx"
+        sampleFileName="CipherMe.vsdx"
         label="Drop the Visio VSDX file to split pages here"
         onChange={onFileChange}
       />

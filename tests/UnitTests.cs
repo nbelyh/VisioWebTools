@@ -10,7 +10,7 @@ public class SplitFileTest
     [TestMethod]
     public void SplitPagesSampleFile()
     {
-        using var input = File.OpenRead(@"../../../../public/samples/SplitPages.vsdx");
+        using var input = File.OpenRead(@"../../../../public/samples/SplitMe.vsdx");
         var bytes = SplitPagesService.SplitPages(input);
 
         using var zip = new System.IO.Compression.ZipArchive(new MemoryStream(bytes));
@@ -32,8 +32,8 @@ public class SplitFileTest
     [TestMethod]
     public void AddTooltips()
     {
-        using var vsdx = File.OpenRead(@"../../../../public/samples/Drawing1.vsdx");
-        using var pdf = File.OpenRead(@"../../../../public/samples/Drawing1.pdf");
+        using var vsdx = File.OpenRead(@"../../../../public/samples/VisioSource-DropMe.vsdx");
+        using var pdf = File.OpenRead(@"../../../../public/samples/ExportedPdf-DropMe");
         var bytes = PdfUpdater.Process(pdf, vsdx, new PdfOptions { });
 
         Assert.IsNotNull(bytes);
@@ -43,7 +43,7 @@ public class SplitFileTest
     [TestMethod]
     public void TranslateFile()
     {
-        var input = File.ReadAllBytes(@"../../../../public/samples/Translate.vsdx");
+        var input = File.ReadAllBytes(@"../../../../public/samples/TranslateMe.vsdx");
 
         var options = new TranslateOptions
         {
@@ -63,7 +63,7 @@ public class SplitFileTest
     [TestMethod]
     public void CipherFile()
     {
-        var input = File.ReadAllBytes(@"../../../../public/samples/Cipher.vsdx");
+        var input = File.ReadAllBytes(@"../../../../public/samples/CipherMe.vsdx");
 
         var options = new CipherOptions
         {
