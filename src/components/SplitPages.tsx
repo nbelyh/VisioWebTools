@@ -10,7 +10,7 @@ export const SplitPages = (props: {
 
   const [vsdx, setVsdx] = useState<File>();
   const [error, setError] = useState('');
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState('');
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -41,7 +41,7 @@ export const SplitPages = (props: {
       return;
     }
 
-    setProcessing(true);
+    setProcessing('Splitting...');
     try {
       const blob = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(blob);
@@ -54,7 +54,7 @@ export const SplitPages = (props: {
     } catch (e: any) {
       setError(`${e}`);
     } finally {
-      setProcessing(false);
+      setProcessing('');
     }
   }
 
@@ -70,7 +70,7 @@ export const SplitPages = (props: {
 
       <hr className="my-4" />
 
-      <PrimaryButton disabled={!vsdx || processing || loading} onClick={onSplitPages}>Split Pages</PrimaryButton>
+      <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onSplitPages}>{processing || "Split Pages"}</PrimaryButton>
     </>
   );
 }

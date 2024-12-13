@@ -10,7 +10,7 @@ export const ExtractImages = (props: {
 
   const [vsdx, setVsdx] = useState<File>();
   const [error, setError] = useState('');
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState('');
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -41,7 +41,7 @@ export const ExtractImages = (props: {
       return;
     }
 
-    setProcessing(true);
+    setProcessing('Extracting...');
     try {
       const out = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(out);
@@ -54,7 +54,7 @@ export const ExtractImages = (props: {
     } catch (e: any) {
       setError(`${e}`);
     } finally {
-      setProcessing(false);
+      setProcessing('');
     }
   }
 
@@ -70,7 +70,7 @@ export const ExtractImages = (props: {
 
       <hr className="my-4" />
 
-      <PrimaryButton disabled={!vsdx || processing || loading} onClick={onExtractImages}>Extract Images</PrimaryButton>
+      <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onExtractImages}>{processing || "Extract Images"}</PrimaryButton>
     </>
   );
 }

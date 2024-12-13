@@ -10,14 +10,23 @@ export const TranslateFile = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
+  const [apiKey, setApiKey] = useState('');
   const [error, setError] = useState('');
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState('');
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
   }
 
   const { dotnet, loading, loadError } = useDotNetFixedUrl();
+
+  const getApiUrl = (key: string) => {
+    return key
+      ? "https://api.openai.com/v1/chat/completions"
+      : location.hostname === 'localhost' 
+        ? "http://localhost:7071/api/TranslateAzureFunction" 
+        : "https://visiowebtools.azurewebsites.net/api/api/TranslateAzureFunction";
+  }
 
   const doProcessing = async (vsdx: File) => {
     var options = {
@@ -29,10 +38,13 @@ export const TranslateFile = (props: {
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
+
       var ab = new Uint8Array(await vsdx.arrayBuffer());
       const original = dotnet.FileProcessor.GetTranslationJson(ab, optionsJson);
-      const translated = await dotnet.FileProcessor.Translate(original, targetLanguage);
-      console.log(translated);
+      
+      var apiUrl = getApiUrl(apiKey);
+      const translated = await dotnet.FileProcessor.Translate(apiUrl, apiKey, original, targetLanguage);
+
       const result = dotnet.FileProcessor.ApplyTranslationJson(ab, optionsJson, translated);
       return new Blob([result], { type: 'application/vnd.ms-visio.drawing' });
     } else {
@@ -53,7 +65,7 @@ export const TranslateFile = (props: {
       return;
     }
 
-    setProcessing(true);
+    setProcessing('Translating...');
     try {
       const blob = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(blob);
@@ -65,7 +77,7 @@ export const TranslateFile = (props: {
     } catch (e: any) {
       setError(`${e}`);
     } finally {
-      setProcessing(false);
+      setProcessing('');
     }
   }
 
@@ -91,7 +103,7 @@ export const TranslateFile = (props: {
 
         <div className="flex items-center mb-2">
           <label htmlFor="targetLanguage">Target Language</label>
-          <select id="targetLanguage" className="ml-2" value={targetLanguage} onChange={(e) => setTargetLanguage(e.target.value)}>
+          <select id="targetLanguage" className="ml-2 rounded-sm" value={targetLanguage} onChange={(e) => setTargetLanguage(e.target.value)}>
             {Languages.map(l => <option key={l}>{l}</option>)}
           </select>
         </div>
@@ -120,11 +132,17 @@ export const TranslateFile = (props: {
           <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePropertyLabels" checked={enableTranslatePropertyLabels} onChange={(e) => setEnableTranslatePropertyLabels(e.target.checked)} />
           <label htmlFor="enableTranslatePropertyLabels">Translate Property Labels</label>
         </div>
+
+        <div className="flex items-center">
+          <label htmlFor="apiKey" className="mr-2">Your own OpenAI API Key (optional)</label>
+          <input type="text" id="apiKey" className="rounded-sm grow mt-2" value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
+        </div>
+
       </div>
 
       <hr className="my-4" />
 
-      <PrimaryButton disabled={!vsdx || processing || loading} onClick={onTranslateFile}>Translate</PrimaryButton>
+      <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onTranslateFile}>{processing || "Translate"}</PrimaryButton>
     </>
   );
 }

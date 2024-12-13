@@ -7,11 +7,10 @@ import { TranslateFile } from '../components/TranslateFile';
 
 # Translate File Tool
 
-This tool allows you to translate the content of the Visio diagram. 
-It analyzes the Visio file and ciphers all text and shape content, according to the selected ciphering options.
-You can then save the ciphered file to a new location.
-
-Your files will not leave your browser, all the processing will be done locally on your machine in this browser using web assemtly
+This tool allows you to translate the content of the Visio diagram. The tool uses OpenAI GPT-4O-MINI model 
+to translate the text. The tool will try to translate the text as close as possible to the original text.
+By default, the size of the translation is limited to 1000 tokens. If you need to translate more text, you can
+bring your own OpenAI key and use the full power of the model. You can get your OpenAI key by signing up at [OpenAI](https://platform.openai.com/signup).
 
 Please report issues to our [GitHub Issue Tracker](https://github.com/nbelyh/VisioWebTools/issues)
 

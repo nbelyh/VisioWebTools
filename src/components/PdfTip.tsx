@@ -10,7 +10,7 @@ export const PdfTip = (props: {
 }) => {
 
   const [error, setError] = useState('');
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState('');
 
   const [pdf, setPdf] = useState<File>();
   const [vsdx, setVsdx] = useState<File>();
@@ -47,7 +47,7 @@ export const PdfTip = (props: {
       window.appInsights.trackEvent({ name: "PdfTipClicked" });
     }
 
-    setProcessing(true);
+    setProcessing('Adding tooltips...');
 
     try {
 
@@ -62,7 +62,7 @@ export const PdfTip = (props: {
     } catch (e: any) {
       setError(`${e}`);
     } finally {
-      setProcessing(false);
+      setProcessing('');
     }
   }
 
@@ -112,7 +112,7 @@ export const PdfTip = (props: {
       
       <hr className="my-4" />
 
-      <PrimaryButton onClick={uploadFiles} disabled={!pdf || !vsdx || processing || loading}>Add comments to PDF</PrimaryButton>
+      <PrimaryButton onClick={uploadFiles} disabled={!pdf || !vsdx || !!processing || loading}>{processing || "Add comments to PDF"}</PrimaryButton>
     </>
   );
 }

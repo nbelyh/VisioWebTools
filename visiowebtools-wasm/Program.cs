@@ -77,14 +77,10 @@ public partial class FileProcessor
 
     [JSExport]
     [SupportedOSPlatform("browser")]
-    internal static async Task<string> Translate(string json, string language, string? apiKey = null)
+    internal static async Task<string> Translate(string apiUrl, string apiKey, string json, string language)
     {
-        var url = string.IsNullOrEmpty(apiKey)
-            ? "http://localhost:7071/api/TranslateAzureFunction"
-            : "https://api.openai.com/v1/chat/completions";
-
         var chatRequest = OpenAIChatService.CreateChatRequest(json, language);
-        var chatResponse = await OpenAIChatService.MakeRequest(url, apiKey, chatRequest);
+        var chatResponse = await OpenAIChatService.MakeRequest(apiUrl, apiKey, chatRequest);
         var translated = OpenAIChatService.ParseChatResponse(chatResponse);
         return translated;
     }
