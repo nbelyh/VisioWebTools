@@ -25,7 +25,7 @@ export const TranslateFile = (props: {
       ? "https://api.openai.com/v1/chat/completions"
       : location.hostname === 'localhost' 
         ? "http://localhost:7071/api/TranslateAzureFunction" 
-        : "https://visiowebtools.azurewebsites.net/api/api/TranslateAzureFunction";
+        : "https://visiowebtools.azurewebsites.net/api/TranslateAzureFunction";
   }
 
   const doProcessing = async (vsdx: File) => {
