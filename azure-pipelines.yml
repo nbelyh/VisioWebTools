@@ -55,10 +55,11 @@ stages:
               artifactName: 'drop'
               downloadPath: '$(System.ArtifactsDirectory)'
 
-          - task: AzureFunctionApp@2 # Add this at the end of your file
+          - task: AzureFunctionApp@1
             inputs:
               azureSubscription: 'azure'
-              appType: functionApp # default is functionApp
+              appType: functionApp
               appName: 'visiowebtools'
               package: $(System.ArtifactsDirectory)/drop/**/*.zip
+              runtimeStack: DOTNET-ISOLATED|8.0
               deploymentMethod: 'auto' # 'auto' | 'zipDeploy' | 'runFromPackage'. Required. Deployment method. Default: auto.
