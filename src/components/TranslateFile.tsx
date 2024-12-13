@@ -32,6 +32,7 @@ export const TranslateFile = (props: {
       var ab = new Uint8Array(await vsdx.arrayBuffer());
       const original = dotnet.FileProcessor.GetTranslationJson(ab, optionsJson);
       const translated = await dotnet.FileProcessor.Translate(original, targetLanguage);
+      console.log(translated);
       const result = dotnet.FileProcessor.ApplyTranslationJson(ab, optionsJson, translated);
       return new Blob([result], { type: 'application/vnd.ms-visio.drawing' });
     } else {

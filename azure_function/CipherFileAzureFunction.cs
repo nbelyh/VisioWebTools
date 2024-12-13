@@ -19,7 +19,7 @@ namespace VisioWebToolsAzureFunctions
         [Function("CipherFileAzureFunction")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData req)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("CipherFileAzureFunction");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -34,7 +34,7 @@ namespace VisioWebToolsAzureFunctions
             }
 
             var optionsJson = parser.GetParameterValue("optionsJson");
-            var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Default.CipherOptions);
+            var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Context.CipherOptions);
 
             using (var memoryStream = new MemoryStream())
             {

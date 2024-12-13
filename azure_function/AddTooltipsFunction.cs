@@ -20,7 +20,7 @@ namespace VisioWebToolsAzureFunctions
         [Function("AddTooltipsFunction")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData  req)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("AddTooltipsFunction");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

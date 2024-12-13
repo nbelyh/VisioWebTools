@@ -308,8 +308,7 @@ namespace VisioWebTools
         {
             using (var stream = new MemoryStream(input))
             {
-                var context = CreateJsonSerializerContext();
-                var documentInfo = JsonSerializer.Deserialize(json, context.DocumentInfo);
+                var documentInfo = JsonSerializer.Deserialize(json, DocumentInfoJsonContext.Context.DocumentInfo);
 
                 ProcessPages(stream, options, documentInfo, TranslationDirection.Set);
 
@@ -324,25 +323,9 @@ namespace VisioWebTools
             {
                 var documentInfo = new DocumentInfo();
                 ProcessPages(stream, options, documentInfo, TranslationDirection.Get);
-
-                var context = CreateJsonSerializerContext();
-                var json = JsonSerializer.Serialize(documentInfo, context.DocumentInfo);
+                var json = JsonSerializer.Serialize(documentInfo, DocumentInfoJsonContext.Context.DocumentInfo);
                 return json;
             }
-        }
-
-        private static DocumentInfoJsonContext CreateJsonSerializerContext()
-        {
-            var jsonOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            };
-
-            var context = new DocumentInfoJsonContext(jsonOptions);
-            return context;
         }
     }
 }

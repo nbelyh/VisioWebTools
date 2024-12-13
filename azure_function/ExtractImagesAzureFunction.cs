@@ -18,7 +18,7 @@ namespace VisioWebToolsAzureFunctions
         [Function("ExtractImagesAzureFunction")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData req)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("ExtractImagesAzureFunction");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

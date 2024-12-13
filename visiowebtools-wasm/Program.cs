@@ -53,7 +53,7 @@ public partial class FileProcessor
     [SupportedOSPlatform("browser")]
     internal static byte[] CipherFile(byte[] vsdx, string optionsJson)
     {
-        var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Default.CipherOptions);
+        var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Context.CipherOptions);
         return CipherFileService.Process(vsdx, options);
     }
 
@@ -61,7 +61,7 @@ public partial class FileProcessor
     [SupportedOSPlatform("browser")]
     internal static string GetTranslationJson(byte[] vsdx, string optionsJson)
     {
-        var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Default.TranslateOptions);
+        var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Context.TranslateOptions);
         var translations = TranslateFileService.GetTranslationJson(vsdx, options);
         return translations;
     }
@@ -70,7 +70,7 @@ public partial class FileProcessor
     [SupportedOSPlatform("browser")]
     internal static byte[] ApplyTranslationJson(byte[] vsdx, string optionsJson, string json)
     {
-        var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Default.TranslateOptions);
+        var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Context.TranslateOptions);
         var bytes = TranslateFileService.ApplyTranslationJson(vsdx, options, json);
         return bytes;
     }
@@ -79,7 +79,13 @@ public partial class FileProcessor
     [SupportedOSPlatform("browser")]
     internal static async Task<string> Translate(string json, string language, string? apiKey = null)
     {
-        var translated = await OpenAIChatService.Translate(json, language, apiKey);
+        var url = string.IsNullOrEmpty(apiKey)
+            ? "http://localhost:7071/api/TranslateAzureFunction"
+            : "https://api.openai.com/v1/chat/completions";
+
+        var chatRequest = OpenAIChatService.CreateChatRequest(json, language);
+        var chatResponse = await OpenAIChatService.MakeRequest(url, apiKey, chatRequest);
+        var translated = OpenAIChatService.ParseChatResponse(chatResponse);
         return translated;
     }
 }

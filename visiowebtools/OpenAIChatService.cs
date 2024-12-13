@@ -8,13 +8,13 @@ using VisioWebTools;
 
 public class OpenAIChatService
 {
-    public static async Task<ChatResponse> MakeRequest(ChatRequest chatRequest, string apiKey)
+    public static async Task<ChatResponse> MakeRequest(
+        string url,
+        string apiKey,
+        ChatRequest chatRequest)
     {
-        // Set the endpoint URL for the Chat Completion API
-        string url = "https://api.openai.com/v1/chat/completions";
-
         // Serialize the request body to JSON
-        string jsonRequestBody = JsonSerializer.Serialize(chatRequest, ChatRequestJsonContext.Default.ChatRequest);
+        string jsonRequestBody = JsonSerializer.Serialize(chatRequest, ChatRequestJsonContext.Context.ChatRequest);
 
         // Create the HTTP content with the serialized request body
         var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
@@ -31,12 +31,13 @@ public class OpenAIChatService
 
         // Read and deserialize the response content
         string jsonResponse = await response.Content.ReadAsStringAsync();
-        var chatResponse = JsonSerializer.Deserialize(jsonResponse, ChatResponseJsonContext.Default.ChatResponse);
+
+        var chatResponse = JsonSerializer.Deserialize(jsonResponse, ChatResponseJsonContext.Context.ChatResponse);
 
         return chatResponse;
     }
 
-    public static async Task<string> Translate(string json, string language, string apiKey)
+    public static ChatRequest CreateChatRequest(string json, string language)
     {
         // Prepare the request body
         var chatRequest = new ChatRequest
@@ -51,8 +52,11 @@ public class OpenAIChatService
             ]
         };
 
-        var chatResponse = await MakeRequest(chatRequest, apiKey);
+        return chatRequest;
+    }
 
+    public static string ParseChatResponse(ChatResponse chatResponse)
+    {
         return chatResponse?.Choices?[0]?.Message?.Content;
     }
 }

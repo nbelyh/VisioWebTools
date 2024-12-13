@@ -18,7 +18,7 @@ namespace VisioWebToolsAzureFunctions
         [Function("SplitPagesAzureFunction")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData req)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("SplitPagesAzureFunction");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

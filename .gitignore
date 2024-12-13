@@ -24,3 +24,5 @@ obj
 .vs
 TestResults
 public/AppBundle
+__azurite*__.json
+local.settings.json
