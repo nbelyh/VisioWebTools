@@ -200,17 +200,6 @@ namespace VisioWebTools
             var masterRels = mastersPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/master").ToList();
             foreach (var masterRel in masterRels)
             {
-                // if (options.EnableCipherMasterNames)
-                // {
-                //     var xmlMaster = xmlMasters.XPathSelectElement($"/v:Masters/v:Master[v:Rel/@r:id='{masterRel.Id}']", VisioParser.NamespaceManager);
-                //     var attributeName = xmlMaster.Attribute("Name");
-                //     if (attributeName != null)
-                //         attributeName.Value = randomStringService.GenerateReadableRandomString(attributeName.Value);
-                //     var attributeNameU = xmlMaster.Attribute("NameU");
-                //     if (attributeNameU != null)
-                //         attributeNameU.Value = randomStringService.GenerateReadableRandomString(attributeNameU.Value);
-                // }
-
                 Uri masterUri = PackUriHelper.ResolvePartUri(mastersPart.Uri, masterRel.TargetUri);
                 var masterPart = package.GetPart(masterUri);
                 ProcessMaster(masterPart, options);

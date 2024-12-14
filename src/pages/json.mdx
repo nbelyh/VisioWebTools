@@ -1,0 +1,15 @@
+---
+layout: ../layouts/Layout.astro
+title: "Export JSON File"
+---
+
+import { JsonExport } from '../components/JsonExport';
+
+# Export JSON Tool
+
+This tool allows you to generate plain JSON from the diagram file content. The tool will analyze the Visio file and generate a JSON representation of the content. 
+The JSON will include all the shapes and their properties, as well as the connections between the shapes.
+
+Please report issues to our [GitHub Issue Tracker](https://github.com/nbelyh/VisioWebTools/issues)
+
+<JsonExport client:load />

@@ -16,6 +16,12 @@ namespace VisioWebTools
         public static readonly TranslateOptionsJsonContext Context = new(JsonSerializationHelper.CreateJsonJsonSerializerOptions(JsonNamingPolicy.CamelCase));
     }
 
+    [JsonSerializable(typeof(JsonExportOptions))]
+    public partial class JsonExportOptionsJsonContext : JsonSerializerContext
+    {
+        public static readonly JsonExportOptionsJsonContext Context = new(JsonSerializationHelper.CreateJsonJsonSerializerOptions(JsonNamingPolicy.CamelCase));
+    }
+
     [JsonSerializable(typeof(DocumentInfo))]
     public partial class DocumentInfoJsonContext : JsonSerializerContext
     {

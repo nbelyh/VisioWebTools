@@ -84,4 +84,13 @@ public partial class FileProcessor
         var translated = OpenAIChatService.ParseChatResponse(chatResponse);
         return translated;
     }
+
+    [JSExport]
+    [SupportedOSPlatform("browser")]
+    internal static string ExtractJson(byte[] vsdx, string optionsJson)
+    {
+        var options = JsonSerializer.Deserialize(optionsJson, JsonExportOptionsJsonContext.Context.JsonExportOptions);
+        var result = JsonExportService.Process(vsdx, options);
+        return result;
+    }
 }

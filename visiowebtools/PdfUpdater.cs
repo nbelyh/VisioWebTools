@@ -19,13 +19,25 @@ namespace VisioWebTools
         {
             using (Package package = Package.Open(vsdxStream))
             {
-                var documentPart = VisioParser.GetPackageParts(package, "http://schemas.microsoft.com/visio/2010/relationships/document").First();
+                var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
+                Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
+                var documentPart = package.GetPart(docUri);
 
-                var pagesPart = VisioParser.GetPackageParts(package, documentPart, "http://schemas.microsoft.com/visio/2010/relationships/pages").First();
+                var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").First();
+                Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
+                var pagesPart = package.GetPart(pagesUri);
 
-                var pageParts = VisioParser.GetPackageParts(package, pagesPart, "http://schemas.microsoft.com/visio/2010/relationships/page");
+                var xmlPages = VisioParser.GetXMLFromPart(pagesPart);
+                var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
 
-                var visioPages = pageParts.Select(pagePart => VisioParser.GetXMLFromPart(pagePart)).ToList();
+                var visioPages = pageRels.Select(pageRel => 
+                {
+                    Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
+                    var pagePart = package.GetPart(pageUri);
+                    var xmlPage = VisioParser.GetXMLFromPart(pagePart);
+                    return xmlPage;
+                    
+                }).ToList();
 
                 return AddCommentsToPdf(visioPages, pdfStream, options);
             }

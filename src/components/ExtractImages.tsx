@@ -41,7 +41,7 @@ export const ExtractImages = (props: {
       return;
     }
 
-    setProcessing('Extracting...');
+    setProcessing('Extracting Images...');
     try {
       const out = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(out);

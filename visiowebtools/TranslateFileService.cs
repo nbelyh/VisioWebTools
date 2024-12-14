@@ -100,11 +100,11 @@ namespace VisioWebTools
         private static FieldInfo EnsureFieldInfo(ShapeInfo shapeInfo, XElement xmlRow)
         {
             var rowName = xmlRow.Attribute("N")?.Value;
-            shapeInfo.FieldInfos ??= [];
-            if (!shapeInfo.FieldInfos.TryGetValue(rowName, out var fieldInfo))
+            shapeInfo.FieldRows ??= [];
+            if (!shapeInfo.FieldRows.TryGetValue(rowName, out var fieldInfo))
             {
                 fieldInfo = new FieldInfo();
-                shapeInfo.FieldInfos.Add(rowName, fieldInfo);
+                shapeInfo.FieldRows.Add(rowName, fieldInfo);
             }
 
             return fieldInfo;
@@ -113,6 +113,7 @@ namespace VisioWebTools
         private static bool TranslateShapeFields(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
+            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
@@ -124,25 +125,27 @@ namespace VisioWebTools
                     {
                         case TranslationDirection.Get:
                             fieldInfo.Value = attributeValue.Value;
-                            return true;
+                            result = true;
+                            break;
 
                         case TranslationDirection.Set:
                             attributeValue.Value = fieldInfo.Value;
-                            return true;
+                            result = true;
+                            break;
                     }
                 }
             }
-            return false;
+            return result;
         }
 
         private static PropertyInfo EnsurePropertyInfo(ShapeInfo shapeInfo, XElement xmlRow)
         {
             var rowName = xmlRow.Attribute("N")?.Value;
-            shapeInfo.PropertyInfos ??= [];
-            if (!shapeInfo.PropertyInfos.TryGetValue(rowName, out var propertyInfo))
+            shapeInfo.PropRows ??= [];
+            if (!shapeInfo.PropRows.TryGetValue(rowName, out var propertyInfo))
             {
                 propertyInfo = new PropertyInfo();
-                shapeInfo.PropertyInfos.Add(rowName, propertyInfo);
+                shapeInfo.PropRows.Add(rowName, propertyInfo);
             }
 
             return propertyInfo;
@@ -151,6 +154,7 @@ namespace VisioWebTools
         private static bool TranslatePropertyLabels(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
+            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Label']", VisioParser.NamespaceManager);
@@ -162,20 +166,23 @@ namespace VisioWebTools
                     {
                         case TranslationDirection.Get:
                             propertyInfo.Label = attributeValue.Value;
-                            return true;
+                            result = true;
+                            break;
 
                         case TranslationDirection.Set:
                             attributeValue.Value = propertyInfo.Label;
-                            return true;
+                            result = true;
+                            break;
                     }
                 }
             }
-            return false;
+            return result;
         }
 
         private static bool TranslatePropertyValues(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
+            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlType = xmlRow.XPathSelectElement("v:Cell[@N='Type']", VisioParser.NamespaceManager);
@@ -196,11 +203,13 @@ namespace VisioWebTools
                                 {
                                     case TranslationDirection.Get:
                                         propertyInfo.Value = attributeValue.Value;
-                                        return true;
+                                        result = true;
+                                        break;
 
                                     case TranslationDirection.Set:
                                         attributeValue.Value = propertyInfo.Value;
-                                        return true;
+                                        result = true;
+                                        break;
                                 }
                             }
                             break;
@@ -220,10 +229,13 @@ namespace VisioWebTools
                                     {
                                         case TranslationDirection.Get:
                                             propertyInfo.Format = attributeFormat.Value;
-                                            return true;
+                                            result = true;
+                                            break;
+
                                         case TranslationDirection.Set:
                                             attributeFormat.Value = propertyInfo.Format;
-                                            return true;
+                                            result = true;
+                                            break;
                                     }
                                 }
                             }
@@ -231,7 +243,7 @@ namespace VisioWebTools
                         }
                 }
             }
-            return false;
+            return result;
         }
 
         public static void ProcessPages(Stream stream, TranslateOptions options, DocumentInfo documentInfo, TranslationDirection direction)
@@ -266,22 +278,17 @@ namespace VisioWebTools
                     if (options.EnableTranslatePageNames)
                     {
                         var attributeName = xmlPage.Attribute("Name");
-                        var attributeNameU = xmlPage.Attribute("NameU");
 
                         switch (direction)
                         {
                             case TranslationDirection.Get:
                                 if (attributeName != null)
                                     pageInfo.Name = attributeName.Value;
-                                if (attributeNameU != null)
-                                    pageInfo.NameU = attributeNameU.Value;
                                 break;
 
                             case TranslationDirection.Set:
                                 if (attributeName != null)
                                     attributeName.Value = pageInfo.Name;
-                                if (attributeNameU != null)
-                                    attributeNameU.Value = pageInfo.NameU;
                                 break;
                         }
                     }
