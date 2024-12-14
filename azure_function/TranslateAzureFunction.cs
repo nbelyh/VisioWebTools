@@ -12,7 +12,7 @@ namespace VisioWebToolsAzureFunctions
     {
         private ILogger<ExtractImagesAzureFunction> log;
         private IConfiguration config;
-        
+
         public TranslateAzureFunction(ILogger<ExtractImagesAzureFunction> log, IConfiguration config)
         {
             this.log = log;
@@ -29,17 +29,27 @@ namespace VisioWebToolsAzureFunctions
             var chatRequestJson = await req.ReadAsStringAsync();
             var chatRequest = JsonSerializer.Deserialize(chatRequestJson, ChatRequestJsonContext.Context.ChatRequest);
 
-            var key = this.config["OPEN_AI_KEY"];
-            if (string.IsNullOrEmpty(key))
-                throw new Exception("You must provide an OpenAI key to be able to use this function.");
+            try
+            {
+                var key = this.config["OPEN_AI_KEY"];
+                if (string.IsNullOrEmpty(key))
+                    throw new Exception("You must provide an OpenAI key to be able to use this function.");
 
-            var chatResponse = await OpenAIChatService.MakeRequest("https://api.openai.com/v1/chat/completions", key, chatRequest);
-
-            var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "application/json");
-            var responseJson = JsonSerializer.Serialize(chatResponse, ChatResponseJsonContext.Context.ChatResponse);
-            await response.WriteStringAsync(responseJson);
-            return response;
+                var chatResponse = await OpenAiService.MakeRequest("https://api.openai.com/v1/chat/completions", key, chatRequest);
+                var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
+                response.Headers.Add("Content-Type", "application/json");
+                var responseJson = JsonSerializer.Serialize(chatResponse, ChatResponseJsonContext.Context.ChatResponse);
+                await response.WriteStringAsync(responseJson);
+                return response;
+            }
+            catch (OpenAiException ex)
+            {
+                log.LogError(ex, "Error in TranslateAzureFunction");
+                var response = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
+                response.Headers.Add("Content-Type", "application/json");
+                await response.WriteStringAsync(ex.Json);
+                return response;
+            }
         }
     }
 }

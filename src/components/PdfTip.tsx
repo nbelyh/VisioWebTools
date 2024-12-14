@@ -4,6 +4,7 @@ import { PrimaryButton } from './PrimaryButton';
 import { ErrorNotification } from './ErrorNotification';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
+import { stringifyError } from '../services/parse';
 
 export const PdfTip = (props: {
 
@@ -60,7 +61,7 @@ export const PdfTip = (props: {
       a.href = url;
       a.click();
     } catch (e: any) {
-      setError(`${e}`);
+      setError(stringifyError(e));
     } finally {
       setProcessing('');
     }

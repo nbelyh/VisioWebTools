@@ -1,3 +1,4 @@
+import { parseResponseError } from './parse';
 
 export class AzureFunctionBackend {
 
@@ -7,13 +8,14 @@ export class AzureFunctionBackend {
       formData.append(key, input[key]);
     }
     const response = await fetch(`https://visiowebtools.azurewebsites.net/api/${fn}`, {
-    // const response = await fetch(`http://localhost:7071/api/${fn}`, {
+      // const response = await fetch(`http://localhost:7071/api/${fn}`, {
       method: 'POST',
       body: formData
     });
 
     if (!response.ok) {
-      throw new Error(response.statusText);
+      const error = await parseResponseError(response);
+      throw error;
     }
 
     return await response.blob();

@@ -79,10 +79,17 @@ public partial class FileProcessor
     [SupportedOSPlatform("browser")]
     internal static async Task<string> Translate(string apiUrl, string apiKey, string json, string language)
     {
-        var chatRequest = OpenAIChatService.CreateChatRequest(json, language);
-        var chatResponse = await OpenAIChatService.MakeRequest(apiUrl, apiKey, chatRequest);
-        var translated = OpenAIChatService.ParseChatResponse(chatResponse);
-        return translated;
+        var chatRequest = OpenAiService.CreateChatRequest(json, language);
+        try {
+            var chatResponse = await OpenAiService.MakeRequest(apiUrl, apiKey, chatRequest);    
+            var translated = OpenAiService.ParseChatResponse(chatResponse);
+            return translated;
+        } 
+        catch (OpenAiException ex) 
+        {
+            var response = JsonSerializer.Deserialize(ex.Json, ChatErrorResponseJsonContext.Context.ChatErrorResponse);
+            throw new Exception(response?.Error?.Message ?? ex.Message);
+        }
     }
 
     [JSExport]

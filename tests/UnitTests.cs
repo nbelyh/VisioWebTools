@@ -3,8 +3,6 @@ namespace VisioWebTools.Tests;
 using System.IO;
 using VisioWebTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text;
-using System.Threading.Tasks;
 
 [TestClass]
 public class SplitFileTest

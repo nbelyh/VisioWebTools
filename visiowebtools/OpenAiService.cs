@@ -4,9 +4,18 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using VisioWebTools;
+namespace VisioWebTools;
 
-public class OpenAIChatService
+public class OpenAiException : Exception
+{
+    public string Json { get; }
+    public OpenAiException(string message, string json) : base(message)
+    {
+        this.Json = json;
+    }
+}
+
+public class OpenAiService
 {
     public static async Task<ChatResponse> MakeRequest(
         string url,
@@ -26,15 +35,25 @@ public class OpenAIChatService
         // Send the request
         HttpResponseMessage response = await httpClient.PostAsync(url, content);
 
-        // Ensure the response is successful
-        response.EnsureSuccessStatusCode();
-
-        // Read and deserialize the response content
-        string jsonResponse = await response.Content.ReadAsStringAsync();
-
-        var chatResponse = JsonSerializer.Deserialize(jsonResponse, ChatResponseJsonContext.Context.ChatResponse);
-
-        return chatResponse;
+        if (response.IsSuccessStatusCode)
+        {
+            // Read and deserialize the response content
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+            var chatResponse = JsonSerializer.Deserialize(jsonResponse, ChatResponseJsonContext.Context.ChatResponse);
+            return chatResponse;
+        }
+        else 
+        {
+            if (response.Content != null)
+            {
+                string jsonErrorResponse = await response.Content.ReadAsStringAsync();
+                throw new OpenAiException("Unable to call OpenAI API", jsonErrorResponse);
+            }
+            else 
+            {
+                throw new OpenAiException("Unable to call OpenAI API", "{\"error\": { \"message\": \"There is no OpenAI response\"}}");
+            }
+        }
     }
 
     public static ChatRequest CreateChatRequest(string json, string language)
@@ -83,6 +102,18 @@ public class ChatResponse
     public Choice[] Choices { get; set; }
     public Usage Usage { get; set; }
 }
+
+public class ChatErrorResponse
+{
+    public ChatError Error { get; set; }
+}
+
+public class ChatError
+{
+    public string Message { get; set; }
+    public string Type { get; set; }
+    public string Code { get; set; }
+}   
 
 public class Choice
 {

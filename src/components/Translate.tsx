@@ -5,6 +5,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { Languages } from './Languages';
+import { stringifyError } from '../services/parse';
 
 export const Translate = (props: {
 }) => {
@@ -75,7 +76,7 @@ export const Translate = (props: {
       a.download = vsdx.name;
       a.click();
     } catch (e: any) {
-      setError(`${e}`);
+      setError(stringifyError(e));
     } finally {
       setProcessing('');
     }

@@ -4,6 +4,7 @@ import { PrimaryButton } from './PrimaryButton';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
+import { stringifyError } from '../services/parse';
 
 export const ExtractImages = (props: {
 }) => {
@@ -52,7 +53,7 @@ export const ExtractImages = (props: {
       a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`;
       a.click();
     } catch (e: any) {
-      setError(`${e}`);
+      setError(stringifyError(e));
     } finally {
       setProcessing('');
     }
