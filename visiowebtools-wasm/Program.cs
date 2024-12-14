@@ -54,7 +54,7 @@ public partial class FileProcessor
     internal static byte[] CipherFile(byte[] vsdx, string optionsJson)
     {
         var options = JsonSerializer.Deserialize(optionsJson, CipherOptionsJsonContext.Context.CipherOptions);
-        return CipherFileService.Process(vsdx, options);
+        return CipherService.Process(vsdx, options);
     }
 
     [JSExport]
@@ -62,7 +62,7 @@ public partial class FileProcessor
     internal static string GetTranslationJson(byte[] vsdx, string optionsJson)
     {
         var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Context.TranslateOptions);
-        var translations = TranslateFileService.GetTranslationJson(vsdx, options);
+        var translations = TranslateService.GetTranslationJson(vsdx, options);
         return translations;
     }
 
@@ -71,7 +71,7 @@ public partial class FileProcessor
     internal static byte[] ApplyTranslationJson(byte[] vsdx, string optionsJson, string json)
     {
         var options = JsonSerializer.Deserialize(optionsJson, TranslateOptionsJsonContext.Context.TranslateOptions);
-        var bytes = TranslateFileService.ApplyTranslationJson(vsdx, options, json);
+        var bytes = TranslateService.ApplyTranslationJson(vsdx, options, json);
         return bytes;
     }
 

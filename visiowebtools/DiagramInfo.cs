@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace VisioWebTools
 {
@@ -55,5 +57,21 @@ namespace VisioWebTools
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
         public Dictionary<int, PageInfo> Pages { get; set; }
         public Dictionary<string, MasterInfo> Masters { get; set; }
+    }
+
+    public class DiagramInfoService
+    {
+        public static T EnsureCollection<T>(XElement xmlRow, Func<Dictionary<string, T>> getPropInfos) where T : new()
+        {
+            var rowName = xmlRow.Attribute("N")?.Value;
+            var propInfos = getPropInfos();
+            if (!propInfos.TryGetValue(rowName, out var propertyInfo))
+            {
+                propertyInfo = new T();
+                propInfos.Add(rowName, propertyInfo);
+            }
+
+            return propertyInfo;
+        }
     }
 }

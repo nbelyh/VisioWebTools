@@ -11,7 +11,7 @@ using SixLabors.ImageSharp;
 
 namespace VisioWebTools
 {
-    public class CipherFileService
+    public class CipherService
     {
         static readonly RandomStringService randomStringService = new();
 
@@ -24,6 +24,9 @@ namespace VisioWebTools
 
                 if (options.EnableCipherShapeFields)
                     CipherShapeFields(xmlShape);
+
+                if (options.EnableCipherUserRows)
+                    CipherUserRows(xmlShape);
 
                 if (options.EnableCipherPropertyValues)
                     CipherPropertyValues(xmlShape);
@@ -64,6 +67,18 @@ namespace VisioWebTools
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
+                var attributeValue = xmlValue?.Attribute("V");
+                if (attributeValue != null)
+                    attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
+            }
+        }
+
+        private static void CipherUserRows(XElement xmlShape)
+        {
+            var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='User']/v:Row", VisioParser.NamespaceManager).ToList();
+            foreach (var xmlRow in xmlRows)
+            {
+                var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
                 if (attributeValue != null)
                     attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);

@@ -6,7 +6,7 @@ import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { Languages } from './Languages';
 
-export const TranslateFile = (props: {
+export const Translate = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
@@ -86,6 +86,7 @@ export const TranslateFile = (props: {
   const [enableTranslatePageNames, setEnableTranslatePageNames] = useState(false);
   const [enableTranslatePropertyValues, setEnableTranslatePropertyValues] = useState(false);
   const [enableTranslatePropertyLabels, setEnableTranslatePropertyLabels] = useState(false);
+  const [enableTranslateUserRows, setEnableTranslateUserRows] = useState(false);
 
   const [targetLanguage, setTargetLanguage] = useState('German');
 
@@ -131,6 +132,11 @@ export const TranslateFile = (props: {
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePropertyLabels" checked={enableTranslatePropertyLabels} onChange={(e) => setEnableTranslatePropertyLabels(e.target.checked)} />
           <label htmlFor="enableTranslatePropertyLabels">Translate Property Labels</label>
+        </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateUserRows" checked={enableTranslateUserRows} onChange={(e) => setEnableTranslateUserRows(e.target.checked)} />
+          <label htmlFor="enableTranslateUserRows">Translate User Rows</label>
         </div>
 
         <div className="flex items-center">

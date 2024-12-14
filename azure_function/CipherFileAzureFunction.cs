@@ -41,7 +41,7 @@ namespace VisioWebToolsAzureFunctions
                 await vsdx.Data.CopyToAsync(memoryStream);
                 var vsdxData = memoryStream.ToArray();
 
-                var output = CipherFileService.Process(vsdxData, options);
+                var output = CipherService.Process(vsdxData, options);
 
                 var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
                 response.Headers.Add("Content-Disposition", $"attachment; filename={vsdx.FileName}");

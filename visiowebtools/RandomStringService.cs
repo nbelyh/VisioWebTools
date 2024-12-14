@@ -16,7 +16,7 @@ namespace VisioWebTools
 
         public static bool ShouldBeIgnored(string input)
         {
-            return Regex.IsMatch(input, @"^[\s\d\n\r]*$");
+            return string.IsNullOrWhiteSpace(input) || Regex.IsMatch(input, @"^[\s\d\n\r\.]*$");
         }
 
         public string GenerateReadableRandomString(string input)
@@ -36,9 +36,6 @@ namespace VisioWebTools
         /// <returns>A pseudo-readable random string with the same length and number of spaces as the input.</returns>
         public string GenerateReadableRandomLine(string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-                return input;
-
             if (ShouldBeIgnored(input))
                 return input;
                 

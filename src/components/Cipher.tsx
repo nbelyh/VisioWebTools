@@ -5,7 +5,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 
-export const CipherFile = (props: {
+export const Cipher = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
@@ -25,7 +25,8 @@ export const CipherFile = (props: {
       enableCipherPageNames,
       enableCipherPropertyValues,
       enableCipherPropertyLabels,
-      enableCipherMasters
+      enableCipherMasters,
+      enableCipherUserRows
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -72,6 +73,7 @@ export const CipherFile = (props: {
   const [enableCipherPropertyValues, setEnableCipherPropertyValues] = useState(true);
   const [enableCipherPropertyLabels, setEnableCipherPropertyLabels] = useState(false);
   const [enableCipherMasters, setEnableCipherMasters] = useState(false);
+  const [enableCipherUserRows, setEnableCipherUserRows] = useState(false);
 
   return (
     <>
@@ -113,6 +115,12 @@ export const CipherFile = (props: {
           <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyLabels" checked={enableCipherPropertyLabels} onChange={(e) => setEnableCipherPropertyLabels(e.target.checked)} />
           <label htmlFor="enableCipherPropertyLabels">Cipher Property Labels</label>
         </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherUserRows" checked={enableCipherUserRows} onChange={(e) => setEnableCipherUserRows(e.target.checked)} />
+          <label htmlFor="enableCipherUserRows">Cipher User Rows</label>
+        </div>
+
       </div>
 
       <hr className="my-4" />

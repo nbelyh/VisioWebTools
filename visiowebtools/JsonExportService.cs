@@ -35,7 +35,7 @@ namespace VisioWebTools
                     ProcessShapeText(xmlShape, shapeInfo);
 
                 if (options.IncludeShapeFields)
-                    GetShapeFields(xmlShape, shapeInfo);
+                    GetShapeFields(xmlShape, () => shapeInfo.FieldRows ??= []);
 
                 if (options.IncludePropertyRows)
                     GetPropertyRows(xmlShape, () => shapeInfo.PropRows ??= []);
@@ -51,57 +51,20 @@ namespace VisioWebTools
             if (xmlText == null)
                 return;
 
-            var text = TranslateService.GetShapeText(xmlText);
+            var text = TranslateFormattedTextService.GetShapeText(xmlText);
             shapeInfo.Text = text.PlainText;
         }
 
-        private static FieldInfo EnsureFieldInfo(ShapeInfo shapeInfo, XElement xmlRow)
-        {
-            var rowName = xmlRow.Attribute("N")?.Value;
-            shapeInfo.FieldRows ??= [];
-            if (!shapeInfo.FieldRows.TryGetValue(rowName, out var fieldInfo))
-            {
-                fieldInfo = new FieldInfo();
-                shapeInfo.FieldRows.Add(rowName, fieldInfo);
-            }
-            return fieldInfo;
-        }
-
-        private static void GetShapeFields(XElement xmlShape, ShapeInfo shapeInfo)
+        private static void GetShapeFields(XElement xmlShape, Func<Dictionary<string, FieldInfo>> getShapeInfos)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
             {
-                var fieldInfo = EnsureFieldInfo(shapeInfo, xmlRow);
+                var fieldInfo = DiagramInfoService.EnsureCollection(xmlRow, getShapeInfos);
 
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
                 fieldInfo.Value = xmlValue?.Attribute("V")?.Value;
             }
-        }
-
-        private static PropertyInfo EnsurePropertyInfo(XElement xmlRow, Func<Dictionary<string, PropertyInfo>> getShapeInfo)
-        {
-            var rowName = xmlRow.Attribute("N")?.Value;
-            var shapeInfo = getShapeInfo();
-            if (!shapeInfo.TryGetValue(rowName, out var propertyInfo))
-            {
-                propertyInfo = new();
-                shapeInfo.Add(rowName, propertyInfo);
-            }
-
-            return propertyInfo;
-        }
-
-        private static UserRowInfo EnsureUserRowInfo(Func<Dictionary<string, UserRowInfo>> getUserRows, XElement xmlRow)
-        {
-            var rowName = xmlRow.Attribute("N")?.Value;
-            var userRows = getUserRows();
-            if (!userRows.TryGetValue(rowName, out var userRowInfo))
-            {
-                userRowInfo = new UserRowInfo();
-                userRows.Add(rowName, userRowInfo);
-            }
-            return userRowInfo;
         }
 
         private static void GetUserRows(XElement xmlShape, Func<Dictionary<string, UserRowInfo>> getUserRows)
@@ -109,7 +72,7 @@ namespace VisioWebTools
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='User']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
             {
-                var userRowInfo = EnsureUserRowInfo(getUserRows, xmlRow);
+                var userRowInfo = DiagramInfoService.EnsureCollection(xmlRow, getUserRows);
 
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                 userRowInfo.Value = xmlValue?.Attribute("V")?.Value;
@@ -124,7 +87,7 @@ namespace VisioWebTools
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
             {
-                var propertyInfo = EnsurePropertyInfo(xmlRow, getShapeInfo);
+                var propertyInfo = DiagramInfoService.EnsureCollection(xmlRow, getShapeInfo);
 
                 var xmlType = xmlRow.XPathSelectElement("v:Cell[@N='Type']", VisioParser.NamespaceManager);
                 propertyInfo.Type = xmlType?.Attribute("V")?.Value;

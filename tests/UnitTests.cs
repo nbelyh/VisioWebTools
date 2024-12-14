@@ -1,4 +1,4 @@
-namespace azure_function_test;
+namespace VisioWebTools.Tests;
 
 using System.IO;
 using VisioWebTools;
@@ -53,14 +53,15 @@ public class SplitFileTest
             EnableTranslateShapeFields = true,
             EnableTranslatePageNames = true,
             EnableTranslatePropertyValues = true,
-            EnableTranslatePropertyLabels = true
+            EnableTranslatePropertyLabels = true,
+            EnableTranslateUserRows = true
         };
 
-        var json = TranslateFileService.GetTranslationJson(input, options);
+        var json = TranslateService.GetTranslationJson(input, options);
 
         // var translated = await OpenAIChatService.Translate(json, "German");
 
-        var bytes = TranslateFileService.ApplyTranslationJson(input, options, json);
+        var bytes = TranslateService.ApplyTranslationJson(input, options, json);
 
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
@@ -80,10 +81,11 @@ public class SplitFileTest
             EnableCipherPageNames = true,
             EnableCipherPropertyValues = true,
             EnableCipherPropertyLabels = true,
-            EnableCipherMasters = true
+            EnableCipherMasters = true,
+            EnableCipherUserRows = true
         };
 
-        var bytes = CipherFileService.Process(input, options);
+        var bytes = CipherService.Process(input, options);
         Assert.IsNotNull(bytes);
         Assert.IsTrue(bytes.Length > 100);
         // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
