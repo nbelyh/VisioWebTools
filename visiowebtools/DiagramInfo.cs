@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace VisioWebTools
 {
-    public class MasterInfo 
+    public class MasterInfo
     {
         public string Name { get; set; }
         public string NameU { get; set; }
@@ -42,7 +42,6 @@ namespace VisioWebTools
     public class PageInfo
     {
         public string Name { get; set; }
-        public int? Index { get; set; }
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
         public Dictionary<int, ShapeInfo> Shapes { get; set; }
     }
@@ -50,9 +49,8 @@ namespace VisioWebTools
     public class DocumentInfo
     {
         public string Name { get; set; }
-        public string FullName { get; set; }
-        public string Path { get; set; }
         public string Title { get; set; }
+        public string Creator { get; set; }
 
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
         public Dictionary<int, PageInfo> Pages { get; set; }

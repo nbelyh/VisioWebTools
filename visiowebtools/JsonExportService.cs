@@ -106,10 +106,29 @@ namespace VisioWebTools
             }
         }
 
+        public static void GetDocProps(Package package, DocumentInfo documentInfo)
+        {
+            var corePropsRel = package.GetRelationshipsByType("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties").First();
+            Uri corePropsUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), corePropsRel.TargetUri);
+            var corePropsPart = package.GetPart(corePropsUri);
+
+            var pagesStream = corePropsPart.GetStream(FileMode.Open);
+            var xmlCoreProps = XDocument.Load(pagesStream);
+
+            var xmlCreator = xmlCoreProps.XPathSelectElements("/cp:coreProperties/dc:creator", VisioParser.NamespaceManager).FirstOrDefault();
+            documentInfo.Creator = xmlCreator?.Value;
+
+            var xmlTitle = xmlCoreProps.XPathSelectElements("/cp:coreProperties/dc:title", VisioParser.NamespaceManager).FirstOrDefault();
+            documentInfo.Title = xmlTitle?.Value;
+        }
+
         public static void ProcessPages(Stream stream, JsonExportOptions options, DocumentInfo documentInfo)
         {
             using (Package package = Package.Open(stream, FileMode.Open))
             {
+                if (options.IncludeDocumentProperties)
+                    GetDocProps(package, documentInfo);
+
                 var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
                 Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
                 var documentPart = package.GetPart(docUri);

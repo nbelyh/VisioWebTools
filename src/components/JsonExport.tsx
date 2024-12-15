@@ -23,7 +23,8 @@ export const JsonExport = (props: {
       includeShapeText,
       includeShapeFields,
       includePropertyRows,
-      includeUserRows
+      includeUserRows,
+      includeDocumentProperties
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -68,6 +69,7 @@ export const JsonExport = (props: {
   const [includeShapeFields, setincludeShapeFields] = useState(true);
   const [includePropertyRows, setIncludePropertyRows] = useState(true);
   const [includeUserRows, setIncludeUserRows] = useState(true);
+  const [includeDocumentProperties, setIncludeDocumentProperties] = useState(true);
 
   return (
     <>
@@ -100,6 +102,11 @@ export const JsonExport = (props: {
           <input type="checkbox" className="rounded-sm mr-2" id="includeUserRows" checked={includeUserRows} onChange={(e) => setIncludeUserRows(e.target.checked)} />
           <label htmlFor="includeUserRows">Export User Rows</label>
         </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="includeDocumentProperties" checked={includeDocumentProperties} onChange={(e) => setIncludeDocumentProperties(e.target.checked)} />
+          <label htmlFor="includeDocumentProperties">Export Document Properties</label>
+        </div>        
 
       </div>
 
