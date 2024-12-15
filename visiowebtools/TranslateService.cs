@@ -32,30 +32,22 @@ namespace VisioWebTools
             var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
             foreach (var xmlShape in xmlShapes)
             {
-                var shapeId = xmlShape.Attribute("ID").Value;
+                ShapeInfo getShapeInfo() => DiagramInfoService.EnsureCollection(xmlShape, () => pageInfo.Shapes ??= []);
 
-                pageInfo.Shapes ??= [];
-                if (!pageInfo.Shapes.TryGetValue(shapeId, out var shapeInfo))
-                    shapeInfo = new ShapeInfo();
-
-                var initialized = false;
                 if (options.EnableTranslateShapeText)
-                    initialized = ProcessShapeText(xmlShape, shapeInfo, direction) || initialized;
+                    ProcessShapeText(xmlShape, getShapeInfo, direction);
 
                 if (options.EnableTranslateShapeFields)
-                    initialized = TranslateShapeFields(xmlShape, () => shapeInfo.FieldRows ??= [], direction) || initialized;
+                    TranslateShapeFields(xmlShape, () => getShapeInfo().FieldRows ??= [], direction);
 
                 if (options.EnableTranslatePropertyValues)
-                    initialized = TranslatePropertyValues(xmlShape, () => shapeInfo.PropRows ??= [], direction) || initialized;
+                    TranslatePropertyValues(xmlShape, () => getShapeInfo().PropRows ??= [], direction);
 
                 if (options.EnableTranslatePropertyLabels)
-                    initialized = TranslatePropertyLabels(xmlShape, () => shapeInfo.PropRows ?? [], direction) || initialized;
+                    TranslatePropertyLabels(xmlShape, () => getShapeInfo().PropRows ?? [], direction);
 
                 if (options.EnableTranslateUserRows)
-                    initialized = ProcessUserRows(xmlShape, () => pageInfo.UserRows ??= [], direction) || initialized;
-
-                if (initialized && !pageInfo.Shapes.ContainsKey(shapeId))
-                    pageInfo.Shapes.Add(shapeId, shapeInfo);
+                    ProcessUserRows(xmlShape, () => pageInfo.UserRows ??= [], direction);
             }
 
             if (direction == TranslationDirection.Set)
@@ -73,35 +65,32 @@ namespace VisioWebTools
             return string.IsNullOrWhiteSpace(input) || Regex.IsMatch(input, @"^[\s\d\n\r\.]*$");
         }
 
-        private static bool ProcessShapeText(XElement xmlShape, ShapeInfo shapeInfo, TranslationDirection direction)
+        private static void ProcessShapeText(XElement xmlShape, Func<ShapeInfo> getShapeInfo, TranslationDirection direction)
         {
             var xmlText = xmlShape.XPathSelectElement("v:Text", VisioParser.NamespaceManager);
             if (xmlText == null)
-                return false;
+                return;
 
             var text = FormattedTextService.GetShapeText(xmlText);
             if (!ShouldBeIgnored(text?.PlainText))
             {
+                var shapeInfo = getShapeInfo();
                 switch (direction)
                 {
                     case TranslationDirection.Get:
                         shapeInfo.Text = text.FormattedText;
-                        return true;
+                        break;
 
                     case TranslationDirection.Set:
                         FormattedTextService.BuildXElements(xmlText, shapeInfo.Text);
-                        return true;
+                        break;
                 }
-                return true;
             }
-
-            return false;
         }
 
-        private static bool ProcessUserRows(XElement xmlShape, Func<Dictionary<string, UserRowInfo>> getUserRows, TranslationDirection direction)
+        private static void ProcessUserRows(XElement xmlShape, Func<Dictionary<string, UserRowInfo>> getUserRows, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='User']/v:Row", VisioParser.NamespaceManager).ToList();
-            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
@@ -113,12 +102,10 @@ namespace VisioWebTools
                     {
                         case TranslationDirection.Get:
                             userRowInfo.Value = attributeValue.Value;
-                            result = true;
                             break;
 
                         case TranslationDirection.Set:
                             attributeValue.Value = userRowInfo.Value;
-                            result = true;
                             break;
                     }
                 }
@@ -132,23 +119,19 @@ namespace VisioWebTools
                     {
                         case TranslationDirection.Get:
                             userRowInfo.Prompt = attributePrompt.Value;
-                            result = true;
                             break;
 
                         case TranslationDirection.Set:
                             attributePrompt.Value = userRowInfo.Prompt;
-                            result = true;
                             break;
                     }
                 }
             }
-            return result;
         }
 
-        private static bool TranslateShapeFields(XElement xmlShape, Func<Dictionary<string, FieldInfo>> getShapeInfos, TranslationDirection direction)
+        private static void TranslateShapeFields(XElement xmlShape, Func<Dictionary<string, FieldInfo>> getShapeInfos, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
-            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
@@ -160,23 +143,19 @@ namespace VisioWebTools
                     {
                         case TranslationDirection.Get:
                             fieldInfo.Value = attributeValue.Value;
-                            result = true;
                             break;
 
                         case TranslationDirection.Set:
                             attributeValue.Value = fieldInfo.Value;
-                            result = true;
                             break;
                     }
                 }
             }
-            return result;
         }
 
-        private static bool TranslatePropertyLabels(XElement xmlShape, Func<Dictionary<string, PropertyInfo>> getPropInfos, TranslationDirection direction)
+        private static void TranslatePropertyLabels(XElement xmlShape, Func<Dictionary<string, PropertyInfo>> getPropInfos, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
-            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Label']", VisioParser.NamespaceManager);
@@ -188,23 +167,19 @@ namespace VisioWebTools
                     {
                         case TranslationDirection.Get:
                             propertyInfo.Label = attributeValue.Value;
-                            result = true;
                             break;
 
                         case TranslationDirection.Set:
                             attributeValue.Value = propertyInfo.Label;
-                            result = true;
                             break;
                     }
                 }
             }
-            return result;
         }
 
-        private static bool TranslatePropertyValues(XElement xmlShape, Func<Dictionary<string, PropertyInfo>> getPropInfos, TranslationDirection direction)
+        private static void TranslatePropertyValues(XElement xmlShape, Func<Dictionary<string, PropertyInfo>> getPropInfos, TranslationDirection direction)
         {
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Property']/v:Row", VisioParser.NamespaceManager).ToList();
-            var result = false;
             foreach (var xmlRow in xmlRows)
             {
                 var xmlType = xmlRow.XPathSelectElement("v:Cell[@N='Type']", VisioParser.NamespaceManager);
@@ -225,12 +200,10 @@ namespace VisioWebTools
                                 {
                                     case TranslationDirection.Get:
                                         propertyInfo.Value = attributeValue.Value;
-                                        result = true;
                                         break;
 
                                     case TranslationDirection.Set:
                                         attributeValue.Value = propertyInfo.Value;
-                                        result = true;
                                         break;
                                 }
                             }
@@ -251,12 +224,10 @@ namespace VisioWebTools
                                     {
                                         case TranslationDirection.Get:
                                             propertyInfo.Format = attributeFormat.Value;
-                                            result = true;
                                             break;
 
                                         case TranslationDirection.Set:
                                             attributeFormat.Value = propertyInfo.Format;
-                                            result = true;
                                             break;
                                     }
                                 }
@@ -265,61 +236,48 @@ namespace VisioWebTools
                         }
                 }
             }
-            return result;
         }
 
-        public static void ProcessPages(Stream stream, TranslateOptions options, DocumentInfo documentInfo, TranslationDirection direction)
+        public static void ProcessPages(Package package, PackagePart documentPart, TranslateOptions options, Func<Dictionary<string, PageInfo>> getPagesInfo, TranslationDirection direction)
         {
+            var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").First();
+            Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
+            var pagesPart = package.GetPart(pagesUri);
+
             var fileAccess = direction == TranslationDirection.Get ? FileAccess.Read : FileAccess.ReadWrite;
-            using (Package package = Package.Open(stream, FileMode.Open, fileAccess))
+            var pagesStream = pagesPart.GetStream(FileMode.Open, fileAccess);
+            var xmlPages = XDocument.Load(pagesStream);
+
+            var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
+            foreach (var pageRel in pageRels)
             {
-                var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
-                Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
-                var documentPart = package.GetPart(docUri);
+                var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
 
-                var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").First();
-                Uri pagesUri = PackUriHelper.ResolvePartUri(documentPart.Uri, pagesRel.TargetUri);
-                var pagesPart = package.GetPart(pagesUri);
+                var pageInfo = DiagramInfoService.EnsureCollection(xmlPage, getPagesInfo);
 
-                var pagesStream = pagesPart.GetStream(FileMode.Open, fileAccess);
-                var xmlPages = XDocument.Load(pagesStream);
-
-                var pageRels = pagesPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/page").ToList();
-                foreach (var pageRel in pageRels)
+                if (options.EnableTranslatePageNames)
                 {
-                    var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
+                    var attributeName = xmlPage.Attribute("Name");
 
-                    var pageId = xmlPage.Attribute("ID").Value;
-                    documentInfo.Pages ??= [];
-                    if (!documentInfo.Pages.TryGetValue(pageId, out var pageInfo))
+                    switch (direction)
                     {
-                        pageInfo = new PageInfo();
-                        documentInfo.Pages.Add(pageId, pageInfo);
+                        case TranslationDirection.Get:
+                            if (attributeName != null)
+                                pageInfo.Name = attributeName.Value;
+                            break;
+
+                        case TranslationDirection.Set:
+                            if (attributeName != null)
+                                attributeName.Value = pageInfo.Name;
+                            break;
                     }
-
-                    if (options.EnableTranslatePageNames)
-                    {
-                        var attributeName = xmlPage.Attribute("Name");
-
-                        switch (direction)
-                        {
-                            case TranslationDirection.Get:
-                                if (attributeName != null)
-                                    pageInfo.Name = attributeName.Value;
-                                break;
-
-                            case TranslationDirection.Set:
-                                if (attributeName != null)
-                                    attributeName.Value = pageInfo.Name;
-                                break;
-                        }
-                    }
-
-
-                    Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
-                    var pagePart = package.GetPart(pageUri);
-                    ProcessPage(pagePart, options, pageInfo, direction);
                 }
+
+
+                Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
+                var pagePart = package.GetPart(pageUri);
+
+                ProcessPage(pagePart, options, pageInfo, direction);
 
                 if (direction == TranslationDirection.Set)
                 {
@@ -328,10 +286,25 @@ namespace VisioWebTools
                     {
                         xmlPages.Save(writer);
                     }
-                    package.Flush();
                 }
             }
         }
+
+        public static void ProcessDocument(Stream stream, TranslateOptions options, DocumentInfo documentInfo, TranslationDirection direction)
+        {
+             var fileAccess = direction == TranslationDirection.Get ? FileAccess.Read : FileAccess.ReadWrite;
+            using (Package package = Package.Open(stream, FileMode.Open, fileAccess))
+            {
+                var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
+                Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
+                var documentPart = package.GetPart(docUri);
+
+                ProcessPages(package, documentPart, options, () => documentInfo.Pages ??= [], direction);
+
+                if (direction == TranslationDirection.Set)
+                    package.Flush();
+            }
+       }
 
         public static byte[] ApplyTranslationJson(byte[] input, TranslateOptions options, string json)
         {
@@ -339,7 +312,7 @@ namespace VisioWebTools
             {
                 var documentInfo = JsonSerializer.Deserialize(json, DocumentInfoJsonContext.Context.DocumentInfo);
 
-                ProcessPages(stream, options, documentInfo, TranslationDirection.Set);
+                ProcessDocument(stream, options, documentInfo, TranslationDirection.Set);
 
                 stream.Flush();
                 return stream.ToArray();
@@ -351,7 +324,9 @@ namespace VisioWebTools
             using (var stream = new MemoryStream(input))
             {
                 var documentInfo = new DocumentInfo();
-                ProcessPages(stream, options, documentInfo, TranslationDirection.Get);
+
+                ProcessDocument(stream, options, documentInfo, TranslationDirection.Get);
+                
                 var json = JsonSerializer.Serialize(documentInfo, DocumentInfoJsonContext.Context.DocumentInfo);
                 return json;
             }
