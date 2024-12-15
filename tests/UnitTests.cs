@@ -106,6 +106,6 @@ public class SplitFileTest
         Assert.IsNotNull(json);
         Assert.IsTrue(json.Length > 100);
 
-        File.WriteAllText(@"../../../../public/samples/_.json", json);
+        // File.WriteAllText(@"../../../../public/samples/_.json", json);
     }
 }
