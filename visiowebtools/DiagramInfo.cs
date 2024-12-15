@@ -61,7 +61,7 @@ namespace VisioWebTools
     {
         public static T EnsureCollection<T>(XElement xmlRow, Func<Dictionary<string, T>> getPropInfos) where T : new()
         {
-            var rowName = xmlRow.Attribute("N")?.Value;
+            var rowName = xmlRow.Attribute("N")?.Value ?? xmlRow.Attribute("IX")?.Value;
             var propInfos = getPropInfos();
             if (!propInfos.TryGetValue(rowName, out var propertyInfo))
             {

@@ -108,4 +108,25 @@ public class SplitFileTest
 
         // File.WriteAllText(@"../../../../public/samples/_.json", json);
     }
+
+    [TestMethod]
+    public void ExtractJsonOrgChart()
+    {
+        var input = File.ReadAllBytes(@"../../../samples/OrgChart.vsdx");
+
+        var options = new JsonExportOptions
+        {
+            IncludePropertyRows = true,
+            IncludeShapeText = true,
+            IncludeShapeFields = true,
+            IncludeUserRows = true,
+            IncludeDocumentProperties = true,
+        };
+
+        var json = JsonExportService.Process(input, options);
+        Assert.IsNotNull(json);
+        Assert.IsTrue(json.Length > 100);
+
+        // File.WriteAllText(@"../../../../public/samples/_.json", json);
+    }
 }
