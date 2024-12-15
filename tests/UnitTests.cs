@@ -112,7 +112,7 @@ public class SplitFileTest
     [TestMethod]
     public void ExtractJsonOrgChart()
     {
-        var input = File.ReadAllBytes(@"../../../samples/OrgChart.vsdx");
+        var input = File.ReadAllBytes(@"../../../samples/Drawing1.vsdx");
 
         var options = new JsonExportOptions
         {
@@ -121,6 +121,7 @@ public class SplitFileTest
             IncludeShapeFields = true,
             IncludeUserRows = true,
             IncludeDocumentProperties = true,
+            IncludeMasters = true,
         };
 
         var json = JsonExportService.Process(input, options);

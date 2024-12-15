@@ -19,7 +19,7 @@ namespace VisioWebTools
         public string FormattedText { get; set; }
     }
 
-    public class TranslateFormattedTextService
+    public class FormattedTextService
     {
         public static TextResult GetShapeText(XElement xmlText)
         {

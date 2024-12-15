@@ -6,6 +6,7 @@ namespace VisioWebTools
         public bool IncludeShapeFields { get; set; }
         public bool IncludePropertyRows { get; set; }
         public bool IncludeUserRows { get; set; }
+        public bool IncludeMasters { get; set; }
         public bool IncludeDocumentProperties { get; set; }
     }
 }

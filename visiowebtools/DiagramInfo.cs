@@ -6,6 +6,7 @@ namespace VisioWebTools
 {
     public class MasterInfo
     {
+        public string MasterType { get; set; }
         public string Name { get; set; }
         public string NameU { get; set; }
     }
@@ -42,8 +43,9 @@ namespace VisioWebTools
     public class PageInfo
     {
         public string Name { get; set; }
+        public string NameU { get; set; }
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
-        public Dictionary<int, ShapeInfo> Shapes { get; set; }
+        public Dictionary<string, ShapeInfo> Shapes { get; set; }
     }
 
     public class DocumentInfo
@@ -53,7 +55,7 @@ namespace VisioWebTools
         public string Creator { get; set; }
 
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
-        public Dictionary<int, PageInfo> Pages { get; set; }
+        public Dictionary<string, PageInfo> Pages { get; set; }
         public Dictionary<string, MasterInfo> Masters { get; set; }
     }
 
@@ -61,7 +63,7 @@ namespace VisioWebTools
     {
         public static T EnsureCollection<T>(XElement xmlRow, Func<Dictionary<string, T>> getPropInfos) where T : new()
         {
-            var rowName = xmlRow.Attribute("N")?.Value ?? xmlRow.Attribute("IX")?.Value;
+            var rowName = xmlRow.Attribute("ID")?.Value ?? xmlRow.Attribute("N")?.Value ?? xmlRow.Attribute("IX")?.Value;
             var propInfos = getPropInfos();
             if (!propInfos.TryGetValue(rowName, out var propertyInfo))
             {

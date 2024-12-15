@@ -32,7 +32,7 @@ namespace VisioWebTools
             var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
             foreach (var xmlShape in xmlShapes)
             {
-                var shapeId = int.Parse(xmlShape.Attribute("ID").Value);
+                var shapeId = xmlShape.Attribute("ID").Value;
 
                 pageInfo.Shapes ??= [];
                 if (!pageInfo.Shapes.TryGetValue(shapeId, out var shapeInfo))
@@ -79,7 +79,7 @@ namespace VisioWebTools
             if (xmlText == null)
                 return false;
 
-            var text = TranslateFormattedTextService.GetShapeText(xmlText);
+            var text = FormattedTextService.GetShapeText(xmlText);
             if (!ShouldBeIgnored(text?.PlainText))
             {
                 switch (direction)
@@ -89,7 +89,7 @@ namespace VisioWebTools
                         return true;
 
                     case TranslationDirection.Set:
-                        TranslateFormattedTextService.BuildXElements(xmlText, shapeInfo.Text);
+                        FormattedTextService.BuildXElements(xmlText, shapeInfo.Text);
                         return true;
                 }
                 return true;
@@ -289,7 +289,7 @@ namespace VisioWebTools
                 {
                     var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
 
-                    var pageId = int.Parse(xmlPage.Attribute("ID").Value);
+                    var pageId = xmlPage.Attribute("ID").Value;
                     documentInfo.Pages ??= [];
                     if (!documentInfo.Pages.TryGetValue(pageId, out var pageInfo))
                     {
