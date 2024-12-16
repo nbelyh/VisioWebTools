@@ -117,7 +117,7 @@ export const Translate = (props: {
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateShapeFields" checked={enableTranslateShapeFields} onChange={(e) => setEnableTranslateShapeFields(e.target.checked)} />
-          <label htmlFor="enableTranslateShapeFields">Translate Shape Fields</label>
+          <label htmlFor="enableTranslateShapeFields">Translate Text Fields</label>
         </div>
 
         <div className="flex items-center">
@@ -127,7 +127,7 @@ export const Translate = (props: {
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateUserRows" checked={enableTranslateUserRows} onChange={(e) => setEnableTranslateUserRows(e.target.checked)} />
-          <label htmlFor="enableTranslateUserRows">Translate User Rows</label>
+          <label htmlFor="enableTranslateUserRows">Translate Text User Rows</label>
         </div>
 
         <div className="flex items-center">
