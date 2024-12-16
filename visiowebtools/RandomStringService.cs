@@ -14,11 +14,6 @@ namespace VisioWebTools
         private readonly Random _random = new();
         private readonly Dictionary<string, string> _wordCache = [];
 
-        public static bool ShouldBeIgnored(string input)
-        {
-            return string.IsNullOrWhiteSpace(input) || Regex.IsMatch(input, @"^[\s\d\n\r\.]*$");
-        }
-
         public string GenerateReadableRandomString(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
@@ -36,7 +31,7 @@ namespace VisioWebTools
         /// <returns>A pseudo-readable random string with the same length and number of spaces as the input.</returns>
         private string GenerateReadableRandomLine(string input)
         {
-            if (ShouldBeIgnored(input))
+            if (!VisioParser.IsTextValue(input))
                 return input;
                 
             if (_wordCache.TryGetValue(input, out string cachedValue))

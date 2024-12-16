@@ -8,5 +8,6 @@ namespace VisioWebTools
         public bool IncludeUserRows { get; set; }
         public bool IncludeMasters { get; set; }
         public bool IncludeDocumentProperties { get; set; }
+        public bool TranslatableOnly { get; set; }
     }
 }

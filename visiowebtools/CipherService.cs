@@ -177,7 +177,7 @@ namespace VisioWebTools
                 ProcessPage(pagePart, options);
             }
 
-            FlushStream(xmlPages, pagesStream);
+            VisioParser.FlushStream(xmlPages, pagesStream);
             package.Flush();
         }
 
@@ -189,7 +189,7 @@ namespace VisioWebTools
             var xmlShapes = xmlMaster.XPathSelectElements("/v:MasterContents//v:Shape", VisioParser.NamespaceManager).ToList();
             ProcessShapes(xmlShapes, options);
 
-            FlushStream(xmlMaster, masterStream);
+            VisioParser.FlushStream(xmlMaster, masterStream);
         }
 
         public static void ProcessMasters(Package package, PackagePart documentPart, CipherOptions options)
@@ -212,7 +212,7 @@ namespace VisioWebTools
                 ProcessMaster(masterPart, options);
             }
 
-            FlushStream(xmlMasters, mastersStream);
+            VisioParser.FlushStream(xmlMasters, mastersStream);
             package.Flush();
         }
 
@@ -238,7 +238,7 @@ namespace VisioWebTools
             for (int i = 0; i < items.Length; i++)
                 CipherNode(xmlCoreProps, items[i]);
 
-            FlushStream(xmlCoreProps, docPropsStream);
+            VisioParser.FlushStream(xmlCoreProps, docPropsStream);
             package.Flush();
         }
 
@@ -276,13 +276,6 @@ namespace VisioWebTools
                     ]);
                 }
             }
-        }
-
-        private static void FlushStream(XDocument doc, Stream stream)
-        {
-            stream.SetLength(0);
-            using var writer = new XmlTextWriter(stream, new UTF8Encoding(false));
-            doc.Save(writer);
         }
 
         public static byte[] Process(byte[] input, CipherOptions options)

@@ -121,13 +121,13 @@ export const Translate = (props: {
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePageNames" checked={enableTranslatePageNames} onChange={(e) => setEnableTranslatePageNames(e.target.checked)} />
-          <label htmlFor="enableTranslatePageNames">Translate Page Names</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePropertyValues" checked={enableTranslatePropertyValues} onChange={(e) => setEnableTranslatePropertyValues(e.target.checked)} />
+          <label htmlFor="enableTranslatePropertyValues">Translate Text Properties</label>
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePropertyValues" checked={enableTranslatePropertyValues} onChange={(e) => setEnableTranslatePropertyValues(e.target.checked)} />
-          <label htmlFor="enableTranslatePropertyValues">Translate Property Values</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateUserRows" checked={enableTranslateUserRows} onChange={(e) => setEnableTranslateUserRows(e.target.checked)} />
+          <label htmlFor="enableTranslateUserRows">Translate User Rows</label>
         </div>
 
         <div className="flex items-center">
@@ -136,8 +136,8 @@ export const Translate = (props: {
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateUserRows" checked={enableTranslateUserRows} onChange={(e) => setEnableTranslateUserRows(e.target.checked)} />
-          <label htmlFor="enableTranslateUserRows">Translate User Rows</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePageNames" checked={enableTranslatePageNames} onChange={(e) => setEnableTranslatePageNames(e.target.checked)} />
+          <label htmlFor="enableTranslatePageNames">Translate Page Names</label>
         </div>
 
         <div className="flex items-center">

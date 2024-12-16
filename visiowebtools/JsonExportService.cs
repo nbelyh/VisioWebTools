@@ -152,7 +152,7 @@ namespace VisioWebTools
             }
         }
 
-        public static void GetDocProps(Package package, DocumentInfo documentInfo)
+        public static void GetDocumentProperties(Package package, DocumentInfo documentInfo)
         {
             GetDocPropItems(package, "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties",
             [
@@ -186,18 +186,14 @@ namespace VisioWebTools
 
                 var pageInfo = DiagramInfoService.EnsureCollection(xmlPage, getPages);
 
-                if (options.IncludeUserRows)
+                var pageSheet = xmlPage.XPathSelectElement("v:PageSheet", VisioParser.NamespaceManager);
+                if (pageSheet != null)
                 {
-                    var pageSheet = xmlPage.XPathSelectElement("v:PageSheet", VisioParser.NamespaceManager);
-                    if (pageSheet != null)
-                        GetUserRows(pageSheet, () => pageInfo.UserRows ??= []);
-                }
-
-                if (options.IncludePropertyRows)
-                {
-                    var pageSheet = xmlPage.XPathSelectElement("v:PageSheet", VisioParser.NamespaceManager);
-                    if (pageSheet != null)
+                    if (options.IncludePropertyRows)
                         GetPropertyRows(pageSheet, () => pageInfo.PropRows ??= []);
+
+                    if (options.IncludeUserRows)
+                        GetUserRows(pageSheet, () => pageInfo.UserRows ??= []);
                 }
 
                 var attributeName = xmlPage.Attribute("Name");
@@ -229,22 +225,17 @@ namespace VisioWebTools
                 var documentInfo = new DocumentInfo();
 
                 if (options.IncludeDocumentProperties)
-                    GetDocProps(package, documentInfo);
+                    GetDocumentProperties(package, documentInfo);
 
                 if (options.IncludeMasters)
                     ProcessMasters(package, documentPart, () => documentInfo.Masters ??= []);
 
-                if (options.IncludePropertyRows)
+                var documentSheet = xmlDocument.XPathSelectElement("/v:VisioDocument/v:DocumentSheet", VisioParser.NamespaceManager);
+                if (documentSheet != null)
                 {
-                    var documentSheet = xmlDocument.XPathSelectElement("/v:VisioDocument/v:DocumentSheet", VisioParser.NamespaceManager);
-                    if (documentSheet != null)
+                    if (options.IncludePropertyRows)
                         GetPropertyRows(documentSheet, () => documentInfo.PropRows ??= []);
-                }
-
-                if (options.IncludeUserRows)
-                {
-                    var documentSheet = xmlDocument.XPathSelectElement("/v:VisioDocument/v:DocumentSheet", VisioParser.NamespaceManager);
-                    if (documentSheet != null)
+                    if (options.IncludeUserRows)
                         GetUserRows(documentSheet, () => documentInfo.UserRows ??= []);
                 }
 

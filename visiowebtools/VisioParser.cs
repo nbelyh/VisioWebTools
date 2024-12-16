@@ -2,6 +2,8 @@
 using System.IO;
 using System.Xml.Linq;
 using System.Xml;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace VisioWebTools
 {
@@ -34,6 +36,18 @@ namespace VisioWebTools
             var partStream = packagePart.GetStream();
             var partXml = XDocument.Load(partStream);
             return partXml;
+        }
+
+        public static bool IsTextValue(string input)
+        {
+            return input != null && Regex.IsMatch(input, @"\p{L}");
+        }
+
+        public static void FlushStream(XDocument doc, Stream stream)
+        {
+            stream.SetLength(0);
+            using var writer = new XmlTextWriter(stream, new UTF8Encoding(false));
+            doc.Save(writer);
         }
     }
 }

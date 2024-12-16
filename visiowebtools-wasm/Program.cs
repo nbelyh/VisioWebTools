@@ -97,7 +97,24 @@ public partial class FileProcessor
     internal static string ExtractJson(byte[] vsdx, string optionsJson)
     {
         var options = JsonSerializer.Deserialize(optionsJson, JsonExportOptionsJsonContext.Context.JsonExportOptions);
-        var result = JsonExportService.Process(vsdx, options);
-        return result;
+
+        if (options?.TranslatableOnly == true)
+        {
+            var translationOptions = new TranslateOptions
+            {
+                EnableTranslateShapeText = options.IncludeShapeText,
+                EnableTranslateShapeFields = options.IncludeShapeFields,
+                EnableTranslateUserRows = options.IncludeUserRows,
+                EnableTranslatePropertyValues = options.IncludePropertyRows,
+                EnableTranslatePropertyLabels = false,
+            };
+            var result = TranslateService.GetTranslationJson(vsdx, translationOptions);
+            return result;
+        } 
+        else 
+        {
+            var result = JsonExportService.Process(vsdx, options);
+            return result;
+        }
     }
 }

@@ -25,7 +25,8 @@ export const JsonExport = (props: {
       includePropertyRows,
       includeUserRows,
       includeDocumentProperties,
-      includeMasters
+      includeMasters,
+      translatableOnly
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -37,7 +38,7 @@ export const JsonExport = (props: {
     }
   }
 
-  const onTranslateFile = async () => {
+  const onJsonExport = async () => {
 
     if (typeof window.appInsights !== 'undefined') {
       window.appInsights.trackEvent({ name: "SplitPagesClicked" });
@@ -72,6 +73,7 @@ export const JsonExport = (props: {
   const [includeUserRows, setIncludeUserRows] = useState(true);
   const [includeMasters, setIncludeMasters] = useState(true);
   const [includeDocumentProperties, setIncludeDocumentProperties] = useState(true);
+  const [translatableOnly, setTranslatableOnly] = useState(false);
 
   return (
     <>
@@ -87,39 +89,44 @@ export const JsonExport = (props: {
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includeText" checked={includeShapeText} onChange={(e) => setincludeShapeText(e.target.checked)} />
-          <label htmlFor="includeText">Export Shape Text</label>
+          <label htmlFor="includeText">Include Shape Text</label>
         </div>
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includePropertyRows" checked={includePropertyRows} onChange={(e) => setIncludePropertyRows(e.target.checked)} />
-          <label htmlFor="includePropertyRows">Export Shape Properties</label>
+          <label htmlFor="includePropertyRows">Include Shape Properties</label>
         </div>
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includeShapeFields" checked={includeShapeFields} onChange={(e) => setincludeShapeFields(e.target.checked)} />
-          <label htmlFor="includeShapeFields">Export Shape Fields</label>
+          <label htmlFor="includeShapeFields">Include Shape Fields</label>
         </div>
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includeUserRows" checked={includeUserRows} onChange={(e) => setIncludeUserRows(e.target.checked)} />
-          <label htmlFor="includeUserRows">Export User Rows</label>
+          <label htmlFor="includeUserRows">Include User Rows</label>
         </div>
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includeDocumentProperties" checked={includeDocumentProperties} onChange={(e) => setIncludeDocumentProperties(e.target.checked)} />
-          <label htmlFor="includeDocumentProperties">Export Document Properties</label>
+          <label htmlFor="includeDocumentProperties">Include Document Properties</label>
         </div>
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includeMasters" checked={includeMasters} onChange={(e) => setIncludeMasters(e.target.checked)} />
-          <label htmlFor="includeMasters">Export Masters</label>
+          <label htmlFor="includeMasters">Include Masters</label>
+        </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="includeTextOnly" checked={translatableOnly} onChange={(e) => setTranslatableOnly(e.target.checked)} />
+          <label htmlFor="includeTextOnly">Translatable Text Only</label>
         </div>
 
       </div>
 
       <hr className="my-4" />
 
-      <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onTranslateFile}>{processing || "Extract JSON"}</PrimaryButton>
+      <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onJsonExport}>{processing || "Extract JSON"}</PrimaryButton>
     </>
   );
 }

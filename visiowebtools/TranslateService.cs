@@ -52,17 +52,8 @@ namespace VisioWebTools
 
             if (direction == TranslationDirection.Set)
             {
-                pageStream.SetLength(0);
-                using (var writer = new XmlTextWriter(pageStream, new UTF8Encoding(false)))
-                {
-                    xmlPage.Save(writer);
-                }
+                VisioParser.FlushStream(xmlPage, pageStream);
             }
-        }
-
-        public static bool ShouldBeIgnored(string input)
-        {
-            return string.IsNullOrWhiteSpace(input) || Regex.IsMatch(input, @"^[\s\d\n\r\.]*$");
         }
 
         private static void ProcessShapeText(XElement xmlShape, Func<ShapeInfo> getShapeInfo, TranslationDirection direction)
@@ -72,7 +63,7 @@ namespace VisioWebTools
                 return;
 
             var text = FormattedTextService.GetShapeText(xmlText);
-            if (!ShouldBeIgnored(text?.PlainText))
+            if (VisioParser.IsTextValue(text?.PlainText))
             {
                 var shapeInfo = getShapeInfo();
                 switch (direction)
@@ -95,7 +86,7 @@ namespace VisioWebTools
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
-                if (!ShouldBeIgnored(attributeValue?.Value))
+                if (VisioParser.IsTextValue(attributeValue?.Value))
                 {
                     var userRowInfo = DiagramInfoService.EnsureCollection(xmlRow, getUserRows);
                     switch (direction)
@@ -112,7 +103,7 @@ namespace VisioWebTools
 
                 var xmlPrompt = xmlRow.XPathSelectElement("v:Cell[@N='Prompt']", VisioParser.NamespaceManager);
                 var attributePrompt = xmlPrompt?.Attribute("V");
-                if (!ShouldBeIgnored(attributePrompt?.Value))
+                if (VisioParser.IsTextValue(attributePrompt?.Value))
                 {
                     var userRowInfo = DiagramInfoService.EnsureCollection(xmlRow, getUserRows);
                     switch (direction)
@@ -136,7 +127,7 @@ namespace VisioWebTools
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
-                if (!ShouldBeIgnored(attributeValue?.Value))
+                if (VisioParser.IsTextValue(attributeValue?.Value))
                 {
                     var fieldInfo = DiagramInfoService.EnsureCollection(xmlRow, getShapeInfos);
                     switch (direction)
@@ -160,7 +151,7 @@ namespace VisioWebTools
             {
                 var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Label']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
-                if (!ShouldBeIgnored(attributeValue?.Value))
+                if (VisioParser.IsTextValue(attributeValue?.Value))
                 {
                     var propertyInfo = DiagramInfoService.EnsureCollection(xmlRow, getPropInfos);
                     switch (direction)
@@ -193,7 +184,7 @@ namespace VisioWebTools
                         {
                             var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                             var attributeValue = xmlValue?.Attribute("V");
-                            if (!ShouldBeIgnored(attributeValue?.Value))
+                            if (VisioParser.IsTextValue(attributeValue?.Value))
                             {
                                 var propertyInfo = DiagramInfoService.EnsureCollection(xmlRow, getPropInfos);
                                 switch (direction)
@@ -217,7 +208,7 @@ namespace VisioWebTools
                             if (xmlFormat != null)
                             {
                                 var attributeFormat = xmlFormat.Attribute("V");
-                                if (!ShouldBeIgnored(attributeFormat?.Value))
+                                if (VisioParser.IsTextValue(attributeFormat?.Value))
                                 {
                                     var propertyInfo = DiagramInfoService.EnsureCollection(xmlRow, getPropInfos);
                                     switch (direction)
@@ -273,6 +264,15 @@ namespace VisioWebTools
                     }
                 }
 
+                var pageSheet = xmlPage.XPathSelectElement("v:PageSheet", VisioParser.NamespaceManager);
+                if (pageSheet != null)
+                {
+                    if (options.EnableTranslatePropertyValues)
+                        TranslatePropertyValues(pageSheet, () => pageInfo.PropRows ??= [], direction);
+
+                    if (options.EnableTranslateUserRows)
+                        ProcessUserRows(pageSheet, () => pageInfo.UserRows ??= [], direction);
+                }
 
                 Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
                 var pagePart = package.GetPart(pageUri);
@@ -280,13 +280,7 @@ namespace VisioWebTools
                 ProcessPage(pagePart, options, pageInfo, direction);
 
                 if (direction == TranslationDirection.Set)
-                {
-                    pagesStream.SetLength(0);
-                    using (var writer = new XmlTextWriter(pagesStream, new UTF8Encoding(false)))
-                    {
-                        xmlPages.Save(writer);
-                    }
-                }
+                    VisioParser.FlushStream(xmlPages, pagesStream);
             }
         }
 
@@ -299,10 +293,29 @@ namespace VisioWebTools
                 Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
                 var documentPart = package.GetPart(docUri);
 
+                var documentStream = documentPart.GetStream(FileMode.Open);
+                var xmlDocument = XDocument.Load(documentStream);
+
                 ProcessPages(package, documentPart, options, () => documentInfo.Pages ??= [], direction);
 
+                var documentSheet = xmlDocument.XPathSelectElement("/v:VisioDocument/v:DocumentSheet", VisioParser.NamespaceManager);
+                if (documentSheet != null)
+                {
+                    if (options.EnableTranslatePropertyValues)
+                        TranslatePropertyValues(documentSheet, () => documentInfo.PropRows ??= [], direction);
+
+                    if (options.EnableTranslatePropertyLabels)
+                        TranslatePropertyLabels(documentSheet, () => documentInfo.PropRows ??= [], direction);
+
+                    if (options.EnableTranslateUserRows)
+                        ProcessUserRows(documentSheet, () => documentInfo.UserRows ??= [], direction);
+                }
+
                 if (direction == TranslationDirection.Set)
+                {
+                    VisioParser.FlushStream(xmlDocument, documentStream);
                     package.Flush();
+                }
             }
        }
 

@@ -106,12 +106,7 @@ export const Cipher = (props: {
 
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyValues" checked={enableCipherPropertyValues} onChange={(e) => setEnableCipherPropertyValues(e.target.checked)} />
-          <label htmlFor="enableCipherPropertyValues">Cipher Property Values</label>
-        </div>
-
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyLabels" checked={enableCipherPropertyLabels} onChange={(e) => setEnableCipherPropertyLabels(e.target.checked)} />
-          <label htmlFor="enableCipherPropertyLabels">Cipher Property Labels</label>
+          <label htmlFor="enableCipherPropertyValues">Cipher Properties</label>
         </div>
 
         <div className="flex items-center">
@@ -124,6 +119,11 @@ export const Cipher = (props: {
           <label htmlFor="enableCipherDocumentProperties">Cipher Document Properties</label>
         </div>
 
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyLabels" checked={enableCipherPropertyLabels} onChange={(e) => setEnableCipherPropertyLabels(e.target.checked)} />
+          <label htmlFor="enableCipherPropertyLabels">Cipher Property Labels</label>
+        </div>
+        
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableCipherMasters" checked={enableCipherMasters} onChange={(e) => setEnableCipherMasters(e.target.checked)} />
           <label htmlFor="enableCipherMasters">Cipher Masters</label>
