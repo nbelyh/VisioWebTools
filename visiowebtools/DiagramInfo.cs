@@ -52,7 +52,12 @@ namespace VisioWebTools
     {
         public string Name { get; set; }
         public string Title { get; set; }
+        public string Subject { get; set; }
         public string Creator { get; set; }
+        public string Company { get; set; }
+        public string Category { get; set; }
+        public string Manager { get; set; }
+        public string Keywords { get; set; }
 
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
         public Dictionary<string, PageInfo> Pages { get; set; }

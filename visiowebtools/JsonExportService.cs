@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Text.Json;
 using System.Collections.Generic;
+using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
 
 namespace VisioWebTools
 {
@@ -128,20 +129,45 @@ namespace VisioWebTools
             }
         }
 
-        public static void GetDocProps(Package package, DocumentInfo documentInfo)
+        class DocPropItem
         {
-            var corePropsRel = package.GetRelationshipsByType("http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties").First();
+            public string Name { get; set; }
+            public Action<string> Assign { get; set; }
+        }
+
+        private static void GetDocPropItems(Package package, string ns, DocPropItem[] items)
+        {
+            var corePropsRel = package.GetRelationshipsByType(ns).First();
             Uri corePropsUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), corePropsRel.TargetUri);
             var corePropsPart = package.GetPart(corePropsUri);
 
             var pagesStream = corePropsPart.GetStream(FileMode.Open);
             var xmlCoreProps = XDocument.Load(pagesStream);
 
-            var xmlCreator = xmlCoreProps.XPathSelectElements("/cp:coreProperties/dc:creator", VisioParser.NamespaceManager).FirstOrDefault();
-            documentInfo.Creator = xmlCreator?.Value;
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+                var xmlItem = xmlCoreProps.XPathSelectElements(item.Name, VisioParser.NamespaceManager).FirstOrDefault();
+                item.Assign(xmlItem?.Value);
+            }
+        }
 
-            var xmlTitle = xmlCoreProps.XPathSelectElements("/cp:coreProperties/dc:title", VisioParser.NamespaceManager).FirstOrDefault();
-            documentInfo.Title = xmlTitle?.Value;
+        public static void GetDocProps(Package package, DocumentInfo documentInfo)
+        {
+            GetDocPropItems(package, "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties",
+            [
+                new DocPropItem { Name = "/cp:coreProperties/dc:creator", Assign = (string v) => documentInfo.Creator = v },
+                new DocPropItem { Name = "/cp:coreProperties/dc:title", Assign = (string v) => documentInfo.Title = v },
+                new DocPropItem { Name = "/cp:coreProperties/dc:subject", Assign = (string v) => documentInfo.Subject = v },
+                new DocPropItem { Name = "/cp:coreProperties/dc:category", Assign = (string v) => documentInfo.Category = v },
+                new DocPropItem { Name = "/cp:coreProperties/dc:keywords", Assign = (string v) => documentInfo.Keywords = v },
+            ]);
+
+            GetDocPropItems(package, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties",
+            [
+                new DocPropItem { Name = "/ep:Properties/ep:Manager", Assign = (string v) => documentInfo.Manager = v },
+                new DocPropItem { Name = "/ep:Properties/ep:Company", Assign = (string v) => documentInfo.Company = v },
+            ]);
         }
 
         public static void ProcessPages(Package package, PackagePart documentPart, JsonExportOptions options, Func<Dictionary<string, PageInfo>> getPages)
