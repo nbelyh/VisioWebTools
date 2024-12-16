@@ -11,7 +11,7 @@ using PdfSharpCore.Pdf.Annotations;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     public class PdfUpdater
     {

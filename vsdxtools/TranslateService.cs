@@ -10,7 +10,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     public enum TranslationDirection
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     public class MasterInfo
     {

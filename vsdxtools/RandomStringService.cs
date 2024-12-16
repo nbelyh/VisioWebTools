@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     /// <summary>
     /// Service for generating random readable strings with specific constraints.

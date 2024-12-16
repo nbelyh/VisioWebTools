@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     /// <summary>
     /// Service for generating random readable strings with specific constraints.

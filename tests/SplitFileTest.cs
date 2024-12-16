@@ -1,7 +1,7 @@
-namespace VisioWebTools.Tests;
+namespace VsdxTools.Tests;
 
 using System.IO;
-using VisioWebTools;
+using VsdxTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]

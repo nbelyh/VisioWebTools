@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 using System.Drawing;
-using VisioWebTools;
+using VsdxTools;
 using System.Runtime.Versioning;
 using System.Text.Json;
 

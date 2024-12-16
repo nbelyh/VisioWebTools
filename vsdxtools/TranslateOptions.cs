@@ -1,4 +1,4 @@
-namespace VisioWebTools
+namespace VsdxTools
 {
     public class TranslateOptions
     {

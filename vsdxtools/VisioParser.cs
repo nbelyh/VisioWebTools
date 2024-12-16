@@ -5,7 +5,7 @@ using System.Xml;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     internal static class VisioParser
     {

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\visiowebtools\VisioWebTools.csproj" />
+    <ProjectReference Include="..\vsdxtools\VsdxTools.csproj" />
   </ItemGroup>
 
 </Project>

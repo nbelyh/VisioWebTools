@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.IO.Compression;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
 
     public class ExtractMediaService

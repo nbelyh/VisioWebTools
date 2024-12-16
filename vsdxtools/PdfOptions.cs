@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     public class PdfOptions
     {

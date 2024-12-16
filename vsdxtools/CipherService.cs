@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using SixLabors.ImageSharp;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     public class CipherService
     {

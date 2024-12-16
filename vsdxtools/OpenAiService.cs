@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-namespace VisioWebTools;
+namespace VsdxTools;
 
 public class OpenAiException : Exception
 {

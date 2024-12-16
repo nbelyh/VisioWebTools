@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace VisioWebTools
+namespace VsdxTools
 {
     public class ParsedItem
     {
