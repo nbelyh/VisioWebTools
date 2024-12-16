@@ -40,7 +40,7 @@ namespace VisioWebTools
 
                             var xmlPage = VisioParser.GetXMLFromPart(pagePart);
 
-                            var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape[@Type='Foreign']", VisioParser.NamespaceManager).ToList();
+                            var xmlShapes = xmlPage.XPathSelectElements("v:PageContents//v:Shape[@Type='Foreign']", VisioParser.NamespaceManager).ToList();
                             foreach (var xmlShape in xmlShapes)
                             {
                                 var pageId = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager).Attribute("ID").Value;

@@ -29,7 +29,7 @@ namespace VisioWebTools
             var pageStream = pagePart.GetStream(FileMode.Open, fileAccess);
             var xmlPage = XDocument.Load(pageStream);
 
-            var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
+            var xmlShapes = xmlPage.XPathSelectElements("v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
             foreach (var xmlShape in xmlShapes)
             {
                 ShapeInfo getShapeInfo() => DiagramInfoService.EnsureCollection(xmlShape, () => pageInfo.Shapes ??= []);

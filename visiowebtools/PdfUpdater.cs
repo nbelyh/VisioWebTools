@@ -52,7 +52,7 @@ namespace VisioWebTools
                     var pdfPage = pdfDoc.Pages[i];
                     var visioPage = visioPages[i];
 
-                    var shapes = visioPage.XPathSelectElements("/v:PageContents/v:Shapes/v:Shape", VisioParser.NamespaceManager).ToList();
+                    var shapes = visioPage.XPathSelectElements("v:PageContents/v:Shapes/v:Shape", VisioParser.NamespaceManager).ToList();
 
                     foreach (var shape in shapes)
                     {

@@ -41,7 +41,7 @@ namespace VisioWebTools
             var pageStream = pagePart.GetStream(FileMode.Open, FileAccess.ReadWrite);
             var xmlPage = XDocument.Load(pageStream);
 
-            var xmlShapes = xmlPage.XPathSelectElements("/v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
+            var xmlShapes = xmlPage.XPathSelectElements("v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
             ProcessShapes(xmlShapes, options);
 
             pageStream.SetLength(0);
