@@ -188,8 +188,16 @@ namespace VisioWebTools
 
                 if (options.IncludeUserRows)
                 {
-                    var pageSheet = xmlPage.XPathSelectElement("/v:PageSheet", VisioParser.NamespaceManager);
-                    GetUserRows(xmlPage, () => pageInfo.UserRows ??= []);
+                    var pageSheet = xmlPage.XPathSelectElement("v:PageSheet", VisioParser.NamespaceManager);
+                    if (pageSheet != null)
+                        GetUserRows(pageSheet, () => pageInfo.UserRows ??= []);
+                }
+
+                if (options.IncludePropertyRows)
+                {
+                    var pageSheet = xmlPage.XPathSelectElement("v:PageSheet", VisioParser.NamespaceManager);
+                    if (pageSheet != null)
+                        GetPropertyRows(pageSheet, () => pageInfo.PropRows ??= []);
                 }
 
                 var attributeName = xmlPage.Attribute("Name");
@@ -215,6 +223,9 @@ namespace VisioWebTools
                 Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
                 var documentPart = package.GetPart(docUri);
 
+                var documentStream = documentPart.GetStream(FileMode.Open);
+                var xmlDocument = XDocument.Load(documentStream);
+
                 var documentInfo = new DocumentInfo();
 
                 if (options.IncludeDocumentProperties)
@@ -222,6 +233,20 @@ namespace VisioWebTools
 
                 if (options.IncludeMasters)
                     ProcessMasters(package, documentPart, () => documentInfo.Masters ??= []);
+
+                if (options.IncludePropertyRows)
+                {
+                    var documentSheet = xmlDocument.XPathSelectElement("/v:VisioDocument/v:DocumentSheet", VisioParser.NamespaceManager);
+                    if (documentSheet != null)
+                        GetPropertyRows(documentSheet, () => documentInfo.PropRows ??= []);
+                }
+
+                if (options.IncludeUserRows)
+                {
+                    var documentSheet = xmlDocument.XPathSelectElement("/v:VisioDocument/v:DocumentSheet", VisioParser.NamespaceManager);
+                    if (documentSheet != null)
+                        GetUserRows(documentSheet, () => documentInfo.UserRows ??= []);
+                }
 
                 ProcessPages(package, documentPart, options, () => documentInfo.Pages ??= []);
                 return documentInfo;

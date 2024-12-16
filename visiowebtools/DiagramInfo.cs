@@ -45,6 +45,7 @@ namespace VisioWebTools
         public string Name { get; set; }
         public string NameU { get; set; }
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
+        public Dictionary<string, PropertyInfo> PropRows { get; set; }
         public Dictionary<string, ShapeInfo> Shapes { get; set; }
     }
 
@@ -60,6 +61,7 @@ namespace VisioWebTools
         public string Keywords { get; set; }
 
         public Dictionary<string, UserRowInfo> UserRows { get; set; }
+        public Dictionary<string, PropertyInfo> PropRows { get; set; }
         public Dictionary<string, PageInfo> Pages { get; set; }
         public Dictionary<string, MasterInfo> Masters { get; set; }
     }
