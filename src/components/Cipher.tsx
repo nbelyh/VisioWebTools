@@ -27,7 +27,8 @@ export const Cipher = (props: {
       enableCipherPropertyValues,
       enableCipherPropertyLabels,
       enableCipherMasters,
-      enableCipherUserRows
+      enableCipherUserRows,
+      enableCipherDocumentProperties
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -75,6 +76,7 @@ export const Cipher = (props: {
   const [enableCipherPropertyLabels, setEnableCipherPropertyLabels] = useState(false);
   const [enableCipherMasters, setEnableCipherMasters] = useState(false);
   const [enableCipherUserRows, setEnableCipherUserRows] = useState(false);
+  const [enableCipherDocumentProperties, setEnableCipherDocumentProperties] = useState(false);
 
   return (
     <>
@@ -108,11 +110,6 @@ export const Cipher = (props: {
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherMasters" checked={enableCipherMasters} onChange={(e) => setEnableCipherMasters(e.target.checked)} />
-          <label htmlFor="enableCipherMasters">Cipher Masters</label>
-        </div>
-
-        <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyLabels" checked={enableCipherPropertyLabels} onChange={(e) => setEnableCipherPropertyLabels(e.target.checked)} />
           <label htmlFor="enableCipherPropertyLabels">Cipher Property Labels</label>
         </div>
@@ -122,6 +119,16 @@ export const Cipher = (props: {
           <label htmlFor="enableCipherUserRows">Cipher User Rows</label>
         </div>
 
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherDocumentProperties" checked={enableCipherDocumentProperties} onChange={(e) => setEnableCipherDocumentProperties(e.target.checked)} />
+          <label htmlFor="enableCipherDocumentProperties">Cipher Document Properties</label>
+        </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="enableCipherMasters" checked={enableCipherMasters} onChange={(e) => setEnableCipherMasters(e.target.checked)} />
+          <label htmlFor="enableCipherMasters">Cipher Masters</label>
+        </div>
+        
       </div>
 
       <hr className="my-4" />

@@ -9,5 +9,6 @@ namespace VisioWebTools
         public bool EnableCipherPropertyLabels { get; set; }
         public bool EnableCipherMasters { get; set; }
         public bool EnableCipherUserRows { get; set; }
+        public bool EnableCipherDocumentProperties { get; set; }
     }
 }

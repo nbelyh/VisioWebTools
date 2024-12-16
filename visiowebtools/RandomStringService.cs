@@ -34,7 +34,7 @@ namespace VisioWebTools
         /// </summary>
         /// <param name="input">The original string to base the random string on.</param>
         /// <returns>A pseudo-readable random string with the same length and number of spaces as the input.</returns>
-        public string GenerateReadableRandomLine(string input)
+        private string GenerateReadableRandomLine(string input)
         {
             if (ShouldBeIgnored(input))
                 return input;

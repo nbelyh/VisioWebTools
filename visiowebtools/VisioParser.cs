@@ -23,6 +23,7 @@ namespace VisioWebTools
             ns.AddNamespace("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
             ns.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
             ns.AddNamespace("cp", "http://schemas.openxmlformats.org/package/2006/metadata/core-properties");
+            ns.AddNamespace("ep", "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties");
             return ns;
         }
 

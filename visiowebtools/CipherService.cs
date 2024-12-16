@@ -66,7 +66,7 @@ namespace VisioWebTools
             var xmlRows = xmlShape.XPathSelectElements("v:Section[@N='Field']/v:Row", VisioParser.NamespaceManager).ToList();
             foreach (var xmlRow in xmlRows)
             {
-                var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value' and @U='STR']", VisioParser.NamespaceManager);
+                var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                 var attributeValue = xmlValue?.Attribute("V");
                 if (attributeValue != null)
                     attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
@@ -116,9 +116,7 @@ namespace VisioWebTools
                             var xmlValue = xmlRow.XPathSelectElement("v:Cell[@N='Value']", VisioParser.NamespaceManager);
                             var attributeValue = xmlValue?.Attribute("V");
                             if (attributeValue != null)
-                            {
                                 attributeValue.Value = randomStringService.GenerateReadableRandomString(attributeValue.Value);
-                            }
                             break;
                         }
 
@@ -163,9 +161,11 @@ namespace VisioWebTools
                 if (options.EnableCipherPageNames)
                 {
                     var xmlPage = xmlPages.XPathSelectElement($"/v:Pages/v:Page[v:Rel/@r:id='{pageRel.Id}']", VisioParser.NamespaceManager);
+
                     var attributeName = xmlPage.Attribute("Name");
                     if (attributeName != null)
                         attributeName.Value = randomStringService.GenerateReadableRandomString(attributeName.Value);
+
                     var attributeNameU = xmlPage.Attribute("NameU");
                     if (attributeNameU != null)
                         attributeNameU.Value = randomStringService.GenerateReadableRandomString(attributeNameU.Value);
@@ -177,11 +177,7 @@ namespace VisioWebTools
                 ProcessPage(pagePart, options);
             }
 
-            pagesStream.SetLength(0);
-            using (var writer = new XmlTextWriter(pagesStream, new UTF8Encoding(false)))
-            {
-                xmlPages.Save(writer);
-            }
+            FlushStream(xmlPages, pagesStream);
             package.Flush();
         }
 
@@ -193,11 +189,7 @@ namespace VisioWebTools
             var xmlShapes = xmlMaster.XPathSelectElements("/v:MasterContents//v:Shape", VisioParser.NamespaceManager).ToList();
             ProcessShapes(xmlShapes, options);
 
-            masterStream.SetLength(0);
-            using (var writer = new XmlTextWriter(masterStream, new UTF8Encoding(false)))
-            {
-                xmlMaster.Save(writer);
-            }
+            FlushStream(xmlMaster, masterStream);
         }
 
         public static void ProcessMasters(Package package, PackagePart documentPart, CipherOptions options)
@@ -220,11 +212,33 @@ namespace VisioWebTools
                 ProcessMaster(masterPart, options);
             }
 
-            mastersStream.SetLength(0);
-            using (var writer = new XmlTextWriter(mastersStream, new UTF8Encoding(false)))
-            {
-                xmlMasters.Save(writer);
-            }
+            FlushStream(xmlMasters, mastersStream);
+            package.Flush();
+        }
+
+        private static void CipherNode(XDocument xmlDoc, string path)
+        {
+            var xmlNode = xmlDoc.XPathSelectElements(path, VisioParser.NamespaceManager).FirstOrDefault();
+            if (xmlNode != null)
+                xmlNode.Value = randomStringService.GenerateReadableRandomString(xmlNode.Value);
+        }
+
+        private static void ProcessDocProps(Package package, string ns, string[] items)
+        {
+            var corePropsRel = package.GetRelationshipsByType(ns).FirstOrDefault();
+            if (corePropsRel == null)
+                return;
+
+            Uri corePropsUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), corePropsRel.TargetUri);
+            var corePropsPart = package.GetPart(corePropsUri);
+
+            var docPropsStream = corePropsPart.GetStream(FileMode.Open);
+            var xmlCoreProps = XDocument.Load(docPropsStream);
+
+            for (int i = 0; i < items.Length; i++)
+                CipherNode(xmlCoreProps, items[i]);
+
+            FlushStream(xmlCoreProps, docPropsStream);
             package.Flush();
         }
 
@@ -243,7 +257,32 @@ namespace VisioWebTools
 
                 if (options.EnableCipherMasters)
                     ProcessMasters(package, documentPart, options);
+
+                if (options.EnableCipherDocumentProperties)
+                {
+                    ProcessDocProps(package, "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties",
+                    [
+                        "/cp:coreProperties/dc:creator",
+                        "/cp:coreProperties/dc:title",
+                        "/cp:coreProperties/dc:subject",
+                        "/cp:coreProperties/dc:category",
+                        "/cp:coreProperties/dc:keywords",
+                    ]);
+
+                    ProcessDocProps(package, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties",
+                    [
+                        "/ep:Properties/ep:Manager",
+                        "/ep:Properties/ep:Company",
+                    ]);
+                }
             }
+        }
+
+        private static void FlushStream(XDocument doc, Stream stream)
+        {
+            stream.SetLength(0);
+            using var writer = new XmlTextWriter(stream, new UTF8Encoding(false));
+            doc.Save(writer);
         }
 
         public static byte[] Process(byte[] input, CipherOptions options)
