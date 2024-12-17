@@ -6,14 +6,7 @@ using System.Xml.Linq;
 
 namespace VsdxTools
 {
-    public class ParsedItem
-    {
-        public bool IsTag { get; set; }
-        public string Content { get; set; }
-        public int IX { get; set; }
-    }
-
-    public class TextResult 
+    public class TextResult
     {
         public string PlainText { get; set; }
         public string FormattedText { get; set; }
@@ -21,6 +14,13 @@ namespace VsdxTools
 
     public class FormattedTextService
     {
+        class ParsedItem
+        {
+            public bool IsTag { get; set; }
+            public string Content { get; set; }
+            public int IX { get; set; }
+        }
+
         public static TextResult GetShapeText(XElement xmlText)
         {
             var plainText = new StringBuilder();

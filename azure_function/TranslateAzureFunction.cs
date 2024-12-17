@@ -5,6 +5,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using VsdxTools;
+using VsdxTools.OpenAi;
 
 namespace VisioWebToolsAzureFunctions
 {
@@ -35,14 +36,15 @@ namespace VisioWebToolsAzureFunctions
                 if (string.IsNullOrEmpty(key))
                     throw new Exception("You must provide an OpenAI key to be able to use this function.");
 
-                var chatResponse = await OpenAiService.MakeRequest("https://api.openai.com/v1/chat/completions", key, chatRequest);
+                var chatResponse = await ChatService.MakeRequest("https://api.openai.com/v1/chat/completions", key, chatRequest);
+                
                 var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "application/json");
                 var responseJson = JsonSerializer.Serialize(chatResponse, ChatResponseJsonContext.Context.ChatResponse);
                 await response.WriteStringAsync(responseJson);
                 return response;
             }
-            catch (OpenAiException ex)
+            catch (ChatException ex)
             {
                 log.LogError(ex, "Error in TranslateAzureFunction");
                 var response = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);

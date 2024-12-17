@@ -26,3 +26,4 @@ TestResults
 public/AppBundle
 __azurite*__.json
 local.settings.json
+pack.ps1

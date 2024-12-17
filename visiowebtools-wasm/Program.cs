@@ -3,6 +3,7 @@ using System.Drawing;
 using VsdxTools;
 using System.Runtime.Versioning;
 using System.Text.Json;
+using VsdxTools.OpenAi;
 
 // Create a "Main" method. This is required by the tooling.
 return;
@@ -79,13 +80,13 @@ public partial class FileProcessor
     [SupportedOSPlatform("browser")]
     internal static async Task<string> Translate(string apiUrl, string apiKey, string json, string language)
     {
-        var chatRequest = OpenAiService.CreateChatRequest(json, language);
+        var chatRequest = ChatService.CreateChatRequest(json, language);
         try {
-            var chatResponse = await OpenAiService.MakeRequest(apiUrl, apiKey, chatRequest);    
-            var translated = OpenAiService.ParseChatResponse(chatResponse);
+            var chatResponse = await ChatService.MakeRequest(apiUrl, apiKey, chatRequest);    
+            var translated = ChatService.ParseChatResponse(chatResponse);
             return translated;
         } 
-        catch (OpenAiException ex) 
+        catch (ChatException ex) 
         {
             var response = JsonSerializer.Deserialize(ex.Json, ChatErrorResponseJsonContext.Context.ChatErrorResponse);
             throw new Exception(response?.Error?.Message ?? ex.Message);

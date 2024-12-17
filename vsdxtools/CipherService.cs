@@ -15,7 +15,7 @@ namespace VsdxTools
     {
         static readonly RandomStringService randomStringService = new();
 
-        public static void ProcessShapes(List<XElement> xmlShapes, CipherOptions options)
+        private static void ProcessShapes(List<XElement> xmlShapes, CipherOptions options)
         {
             foreach (var xmlShape in xmlShapes)
             {
@@ -36,7 +36,7 @@ namespace VsdxTools
             }
         }
 
-        public static void ProcessPage(PackagePart pagePart, CipherOptions options)
+        private static void ProcessPage(PackagePart pagePart, CipherOptions options)
         {
             var pageStream = pagePart.GetStream(FileMode.Open, FileAccess.ReadWrite);
             var xmlPage = XDocument.Load(pageStream);
@@ -143,7 +143,7 @@ namespace VsdxTools
             }
         }
 
-        public static void ProcessPages(Package package, PackagePart documentPart, CipherOptions options)
+        private static void ProcessPages(Package package, PackagePart documentPart, CipherOptions options)
         {
             var pagesRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/pages").FirstOrDefault();
             if (pagesRel == null)
@@ -181,7 +181,7 @@ namespace VsdxTools
             package.Flush();
         }
 
-        public static void ProcessMaster(PackagePart masterPart, CipherOptions options)
+        private static void ProcessMaster(PackagePart masterPart, CipherOptions options)
         {
             var masterStream = masterPart.GetStream(FileMode.Open, FileAccess.ReadWrite);
             var xmlMaster = XDocument.Load(masterStream);
@@ -192,7 +192,7 @@ namespace VsdxTools
             VisioParser.FlushStream(xmlMaster, masterStream);
         }
 
-        public static void ProcessMasters(Package package, PackagePart documentPart, CipherOptions options)
+        private static void ProcessMasters(Package package, PackagePart documentPart, CipherOptions options)
         {
             var mastersRel = documentPart.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/masters").FirstOrDefault();
             if (mastersRel == null)
@@ -242,7 +242,7 @@ namespace VsdxTools
             package.Flush();
         }
 
-        public static void ProcessDocument(Stream stream, CipherOptions options)
+        private static void ProcessDocument(Stream stream, CipherOptions options)
         {
             using (Package package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
             {
