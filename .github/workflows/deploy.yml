@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore visiowebtools-wasm
       - name: Test
-        run: dotnet test tests --logger trx --results-directory "TestResults"
+        run: dotnet test vsdxtools.tests --logger trx --results-directory "TestResults"
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v3
         with:

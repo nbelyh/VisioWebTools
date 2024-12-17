@@ -6,13 +6,13 @@ using System.Xml.Linq;
 
 namespace VsdxTools
 {
-    public class TextResult
+    class TextResult
     {
         public string PlainText { get; set; }
         public string FormattedText { get; set; }
     }
 
-    public class FormattedTextService
+    class FormattedTextService
     {
         class ParsedItem
         {

@@ -13,7 +13,7 @@ using PdfSharpCore.Pdf;
 
 namespace VsdxTools;
 
-public class PdfUpdater
+public class PdfService
 {
     public static byte[] Process(Stream pdfStream, Stream vsdxStream, PdfOptions options)
     {

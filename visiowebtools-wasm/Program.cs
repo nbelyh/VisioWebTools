@@ -47,7 +47,7 @@ public partial class FileProcessor
         using (var pdfStream = new MemoryStream(pdf))
         using (var vsdxStream = new MemoryStream(vsdx))
         {
-            return PdfUpdater.Process(pdfStream, vsdxStream, options);
+            return PdfService.Process(pdfStream, vsdxStream, options);
         }
     }
 

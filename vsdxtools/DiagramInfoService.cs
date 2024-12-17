@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace VsdxTools;
 
-public class DiagramInfoService
+class DiagramInfoService
 {
     public static T EnsureCollection<T>(XElement xmlRow, Func<Dictionary<string, T>> getPropInfos) where T : new()
     {

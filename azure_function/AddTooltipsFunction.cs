@@ -62,7 +62,7 @@ namespace VisioWebToolsAzureFunctions
                 return errorResponse;
             }
 
-            var output = PdfUpdater.Process(pdf.Data, vsdx.Data, options);
+            var output = PdfService.Process(pdf.Data, vsdx.Data, options);
 
             var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
             response.Headers.Add("Content-Disposition", "attachment; filename=result.pdf");
