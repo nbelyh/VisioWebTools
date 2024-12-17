@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using VsdxTools.OpenAi.Models;
+using VsdxTools.Serialization;
 
 namespace VsdxTools.OpenAi;
 

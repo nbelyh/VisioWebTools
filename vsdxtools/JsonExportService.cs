@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using System.Text.Json;
 using System.Collections.Generic;
 using VsdxTools.Models;
+using VsdxTools.Serialization;
 
 namespace VsdxTools;
 

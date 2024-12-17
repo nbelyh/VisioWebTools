@@ -4,6 +4,7 @@ using VsdxTools;
 using System.Runtime.Versioning;
 using System.Text.Json;
 using VsdxTools.OpenAi;
+using VsdxTools.Serialization;
 
 // Create a "Main" method. This is required by the tooling.
 return;

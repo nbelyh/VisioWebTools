@@ -1,9 +1,11 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-namespace VsdxTools;
+
 using VsdxTools.Models;
 using VsdxTools.OpenAi.Models;
+
+namespace VsdxTools.Serialization;
 
 [JsonSerializable(typeof(CipherOptions))]
 public partial class CipherOptionsJsonContext : JsonSerializerContext
