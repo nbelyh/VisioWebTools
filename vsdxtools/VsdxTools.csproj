@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>1.0.7</Version>
+    <Version>1.0.2</Version>
     <Authors>Nikolay Belykh</Authors>
     <Company>Nikolay Belykh</Company>
     <PackageId>UnmanagedVisio.VsdxTools</PackageId>
-    <Description>Manipulating Visio VSDX files</Description>
+    <Description>Manipulating Visio VSDX files without Visio installed. Collect information formt the file, such as shape text, properties, user cells. Part of the VisioWebTools.</Description>
     <PackageTags>VISIO;OpenXML</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/nbelyh/VisioWebTools</RepositoryUrl>
