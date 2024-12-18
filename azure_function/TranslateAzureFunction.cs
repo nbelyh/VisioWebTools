@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using VsdxTools;
+using VsdxTools.Serialization;
 using VsdxTools.OpenAi;
 
 namespace VisioWebToolsAzureFunctions

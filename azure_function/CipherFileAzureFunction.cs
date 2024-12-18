@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using HttpMultipartParser;
 using VsdxTools;
+using VsdxTools.Serialization;
 using System.Text.Json;
 
 namespace VisioWebToolsAzureFunctions
