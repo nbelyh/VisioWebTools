@@ -27,3 +27,4 @@ public/AppBundle
 __azurite*__.json
 local.settings.json
 pack.ps1
+visiowebtools-wasm/*.Backup.tmp

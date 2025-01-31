@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using VsdxTools.Serialization;
 using VsdxTools.OpenAi;
+using System.Diagnostics;
 
 namespace VisioWebToolsAzureFunctions
 {
@@ -30,13 +31,19 @@ namespace VisioWebToolsAzureFunctions
             var chatRequestJson = await req.ReadAsStringAsync();
             var chatRequest = JsonSerializer.Deserialize(chatRequestJson, ChatRequestJsonContext.Context.ChatRequest);
 
+            log.LogMetric("TranslateAzureFunction OpenAPI Chat Request Size", chatRequestJson.Length);
+
             try
             {
                 var key = this.config["OPEN_AI_KEY"];
                 if (string.IsNullOrEmpty(key))
                     throw new Exception("You must provide an OpenAI key to be able to use this function.");
 
+                var stopwatch = Stopwatch.StartNew();
                 var chatResponse = await ChatService.MakeRequest("https://api.openai.com/v1/chat/completions", key, chatRequest);
+                stopwatch.Stop();
+                
+                log.LogMetric("TranslateAzureFunction OpenAPI Chat Request", stopwatch.ElapsedMilliseconds);
                 
                 var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "application/json");

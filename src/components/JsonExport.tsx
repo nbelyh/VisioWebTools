@@ -73,7 +73,7 @@ export const JsonExport = (props: {
   const [includeUserRows, setIncludeUserRows] = useState(true);
   const [includeMasters, setIncludeMasters] = useState(true);
   const [includeDocumentProperties, setIncludeDocumentProperties] = useState(true);
-  const [translatableOnly, setTranslatableOnly] = useState(false);
+  const [translatableOnly, setTranslatableOnly] = useState(true);
 
   return (
     <>

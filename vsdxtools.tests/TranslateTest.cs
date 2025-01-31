@@ -35,4 +35,23 @@ public class TranslateTest
         // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
     }
 
+    [DataTestMethod]
+    [DataRow(@"../../../../public/samples/ExtractFromMe.vsdx")]
+    public void TestApplyTranslation(string folder)
+    {
+        var json = File.ReadAllText("../../../samples/json1.json");
+        var input = File.ReadAllBytes(folder);
+
+        var options = new TranslateOptions
+        {
+            EnableTranslateShapeText = true,
+            EnableTranslatePropertyValues = true,
+        };
+
+        var bytes = TranslateService.ApplyTranslationJson(input, options, json);
+
+        Assert.IsNotNull(bytes);
+        Assert.IsTrue(bytes.Length > 100);
+   }
+
 }

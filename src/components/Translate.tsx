@@ -116,13 +116,13 @@ export const Translate = (props: {
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateShapeFields" checked={enableTranslateShapeFields} onChange={(e) => setEnableTranslateShapeFields(e.target.checked)} />
-          <label htmlFor="enableTranslateShapeFields">Translate Text Fields</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePropertyValues" checked={enableTranslatePropertyValues} onChange={(e) => setEnableTranslatePropertyValues(e.target.checked)} />
+          <label htmlFor="enableTranslatePropertyValues">Translate Text Properties</label>
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslatePropertyValues" checked={enableTranslatePropertyValues} onChange={(e) => setEnableTranslatePropertyValues(e.target.checked)} />
-          <label htmlFor="enableTranslatePropertyValues">Translate Text Properties</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="enableTranslateShapeFields" checked={enableTranslateShapeFields} onChange={(e) => setEnableTranslateShapeFields(e.target.checked)} />
+          <label htmlFor="enableTranslateShapeFields">Translate Text Fields</label>
         </div>
 
         <div className="flex items-center">

@@ -65,7 +65,7 @@ public class ChatService
         var chatRequest = new ChatRequest
         {
             Model = "gpt-4o-mini",
-            MaxTokens = 4000,
+            MaxTokens = 15000,
             ResponseFormat = new ChatRequestResponseFormat { Type = "json_object" },
             Messages =
             [

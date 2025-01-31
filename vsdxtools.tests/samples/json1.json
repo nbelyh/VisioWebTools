@@ -1,0 +1,57 @@
+{
+  "propRows": {
+    "Row_1": {
+      "value": "HELLO"
+    }
+  },
+  "pages": {
+    "4": {
+      "propRows": {
+        "Something": {
+          "value": "Some Value XXX"
+        }
+      }
+    },
+    "0": {
+      "propRows": {
+        "Property1": {
+          "value": "Page Prop 1"
+        },
+        "Row_2": {
+          "value": "Page Prop 2"
+        }
+      },
+      "shapes": {
+        "2": {
+          "text": "{cp0}WORLD \n{cp1}OF{cp2}\n{cp3}TEXT{cp4}\n",
+          "propRows": {
+            "PropertyA": {
+              "value": "AAA AAA AAA AAA"
+            },
+            "PropertyC": {
+              "value": "Some Text"
+            },
+            "PropertyD": {
+              "format": "XXX;YYY;ZZZ"
+            },
+            "Row_7": {
+              "format": "KKK;LLL;MMM"
+            }
+          }
+        },
+        "5": {
+          "text": "{pp0}Group Shape\n"
+        },
+        "3": {
+          "text": "First Shape\n"
+        },
+        "4": {
+          "text": "Second Shape Tag\n"
+        },
+        "9": {
+          "text": "Shape With User Rows\n"
+        }
+      }
+    }
+  }
+}
