@@ -51,11 +51,11 @@ export const Cipher = (props: {
     setError('');
 
     if (!vsdx) {
-      setError('Please select the VSDX file');
+      setError('Пожалуйста, выберите файл VSDX');
       return;
     }
 
-    setProcessing('Ciphering...');
+    setProcessing('Шифрование...');
     try {
       const blob = await doProcessing(vsdx);
       const url = window.URL.createObjectURL(blob);
@@ -83,8 +83,8 @@ export const Cipher = (props: {
       <ErrorNotification error={error || loadError} />
       <DropZone
         accept="application/vnd.ms-visio.drawing"
-        sampleFileName="CipherMe.vsdx"
-        label="Drop the Visio VSDX file to cipher here"
+        sampleFileName="Пример.vsdx"
+        label="Перетащите сюда файл Visio VSDX для шифрования"
         onChange={onFileChange}
       />
 
@@ -92,52 +92,52 @@ export const Cipher = (props: {
         <div className='w-1/2'>
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherText" checked={enableCipherShapeText} onChange={(e) => setEnableCipherShapeText(e.target.checked)} />
-            <label htmlFor="enableCipherText">Cipher Shape Text</label>
+            <label htmlFor="enableCipherText">Шифровать текст фигур</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherShapeFields" checked={enableCipherShapeFields} onChange={(e) => setEnableCipherShapeFields(e.target.checked)} />
-            <label htmlFor="enableCipherShapeFields">Cipher Shape Text Fields</label>
+            <label htmlFor="enableCipherShapeFields">Шифровать текстовые поля фигур</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPageNames" checked={enableCipherPageNames} onChange={(e) => setEnableCipherPageNames(e.target.checked)} />
-            <label htmlFor="enableCipherPageNames">Cipher Page Names</label>
+            <label htmlFor="enableCipherPageNames">Шифровать названия страниц</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyValues" checked={enableCipherPropertyValues} onChange={(e) => setEnableCipherPropertyValues(e.target.checked)} />
-            <label htmlFor="enableCipherPropertyValues">Cipher Properties</label>
+            <label htmlFor="enableCipherPropertyValues">Шифровать свойства</label>
           </div>
-
         </div>
         <div className='w-1/2'>
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherUserRows" checked={enableCipherUserRows} onChange={(e) => setEnableCipherUserRows(e.target.checked)} />
-            <label htmlFor="enableCipherUserRows">Cipher User Rows</label>
+            <label htmlFor="enableCipherUserRows">Шифровать пользовательские строки</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherDocumentProperties" checked={enableCipherDocumentProperties} onChange={(e) => setEnableCipherDocumentProperties(e.target.checked)} />
-            <label htmlFor="enableCipherDocumentProperties">Cipher Document Properties</label>
+            <label htmlFor="enableCipherDocumentProperties">Шифровать свойства документа</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherPropertyLabels" checked={enableCipherPropertyLabels} onChange={(e) => setEnableCipherPropertyLabels(e.target.checked)} />
-            <label htmlFor="enableCipherPropertyLabels">Cipher Property Labels</label>
+            <label htmlFor="enableCipherPropertyLabels">Шифровать метки свойств</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" className="rounded-sm mr-2" id="enableCipherMasters" checked={enableCipherMasters} onChange={(e) => setEnableCipherMasters(e.target.checked)} />
-            <label htmlFor="enableCipherMasters">Cipher Masters</label>
+            <label htmlFor="enableCipherMasters">Шифровать мастера</label>
           </div>
         </div>
+
       </div>
 
       <hr className="my-4" />
       {downloadUrl
-        ? <DownloadButton downloadUrl={downloadUrl} fileName={vsdx?.name}>Download Result</DownloadButton>
-        : <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onCipherFile}>{processing || "Cipher"}</PrimaryButton>
+        ? <DownloadButton downloadUrl={downloadUrl} fileName={vsdx?.name}>Скачать результат</DownloadButton>
+        : <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onCipherFile}>{processing || "Шифровать"}</PrimaryButton>
       }
     </>
   );

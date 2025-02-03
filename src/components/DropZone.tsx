@@ -75,12 +75,12 @@ export const DropZone = (props: {
         <div className={className} onDragOver={onDragOver} onDrop={onDrop} onDragLeave={onDragLeave}>
           {file
             ? <div>
-                <p>&#10004; You have selected: <strong>{file.name}</strong></p>
-                <input type="button" value="Reset" onClick={() => setFile()} className="inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none" />
+                <p>&#10004; Вы выбрали: <strong>{file.name}</strong></p>
+                <input type="button" value="Сбросить" onClick={() => setFile()} className="inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none" />
               </div>
             : <div>
               <p>{props.label}</p>
-              <button className="inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none" onClick={onUploadButtonClick}>Or click here pick a file...</button>
+              <button className="inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none" onClick={onUploadButtonClick}>Или нажмите здесь, чтобы выбрать файл...</button>
             </div>
           }
         </div>
@@ -88,7 +88,7 @@ export const DropZone = (props: {
       </div>
       <div className="md:w-1/6 p-4">
         <a href={`/samples/${props.sampleFileName}`} onDragStart={onDragStart} draggable="true" className="p-3 bg-neutral-100 border-2 border-neutral-300 no-underline shadow-xl rounded cursor-move">
-          &#128196;&nbsp;<span className='underline cursor-pointer' title='Click to download, drag to the area on the left to use'>{props.sampleFileName}</span>
+          &#128196;&nbsp;<span className='underline cursor-pointer' title='Нажмите, чтобы скачать, перетащите в область слева, чтобы использовать'>{props.sampleFileName}</span>
         </a>
       </div>
     </div>
