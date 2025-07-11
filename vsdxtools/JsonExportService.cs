@@ -254,12 +254,15 @@ public class JsonExportService
             {
                 foreach (var page in documentInfo.Pages.Values)
                 {
-                    page.Shapes = page.Shapes.Where(s =>
-                        !string.IsNullOrEmpty(s.Value.Text)
-                        || s.Value.PropRows?.Count > 0
-                        || s.Value.UserRows?.Count > 0
-                        || s.Value.FieldRows?.Count > 0
-                    ).ToDictionary(k => k.Key, v => v.Value);
+                    if (page.Shapes != null)
+                    {
+                        page.Shapes = page.Shapes.Where(s =>
+                            !string.IsNullOrEmpty(s.Value.Text)
+                            || s.Value.PropRows?.Count > 0
+                            || s.Value.UserRows?.Count > 0
+                            || s.Value.FieldRows?.Count > 0
+                        ).ToDictionary(k => k.Key, v => v.Value);
+                    }
                 }
             }
             var json = JsonSerializer.Serialize(documentInfo, DocumentInfoJsonContext.Context.DocumentInfo);

@@ -47,6 +47,10 @@ namespace VsdxTools
         private static List<ParsedItem> ParseShapeText(string input)
         {
             var result = new List<ParsedItem>();
+            if (string.IsNullOrEmpty(input))
+            {
+                return result;
+            }
             string pattern = @"\{(?<TagName>[a-zA-Z]+)(?<IX>\d+)\}|(?<Text>[^{}]+)";
 
             foreach (Match match in Regex.Matches(input, pattern))
