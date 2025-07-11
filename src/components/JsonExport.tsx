@@ -26,7 +26,7 @@ export const JsonExport = (props: {
       includeUserRows,
       includeDocumentProperties,
       includeMasters,
-      translatableOnly
+      includeEmptyShapes: false,
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -73,7 +73,7 @@ export const JsonExport = (props: {
   const [includeUserRows, setIncludeUserRows] = useState(true);
   const [includeMasters, setIncludeMasters] = useState(true);
   const [includeDocumentProperties, setIncludeDocumentProperties] = useState(true);
-  const [translatableOnly, setTranslatableOnly] = useState(true);
+  const [includeEmptyShapes, setIncludeEmptyShapes] = useState(false);
 
   return (
     <>
@@ -118,8 +118,8 @@ export const JsonExport = (props: {
         </div>
 
         <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeTextOnly" checked={translatableOnly} onChange={(e) => setTranslatableOnly(e.target.checked)} />
-          <label htmlFor="includeTextOnly">Translatable Text Only</label>
+          <input type="checkbox" className="rounded-sm mr-2" id="includeEmptyShapes" checked={includeEmptyShapes} onChange={(e) => setIncludeEmptyShapes(e.target.checked)} />
+          <label htmlFor="includeEmptyShapes">Include Shapes with no data</label>
         </div>
 
       </div>

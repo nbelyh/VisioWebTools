@@ -8,5 +8,5 @@ public class JsonExportOptions
     public bool IncludeUserRows { get; set; }
     public bool IncludeMasters { get; set; }
     public bool IncludeDocumentProperties { get; set; }
-    public bool TranslatableOnly { get; set; }
+    public bool IncludeEmptyShapes { get; set; }
 }
