@@ -89,43 +89,43 @@ export const JsonExport = (props: {
 
       <div className='mb-4'>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeText" checked={includeShapeText} onChange={(e) => setincludeShapeText(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeText" checked={includeShapeText} onChange={(e) => setincludeShapeText(e.target.checked)} />
           <label htmlFor="includeText">Include Shape Text</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includePropertyRows" checked={includePropertyRows} onChange={(e) => setIncludePropertyRows(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includePropertyRows" checked={includePropertyRows} onChange={(e) => setIncludePropertyRows(e.target.checked)} />
           <label htmlFor="includePropertyRows">Include Shape Properties</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeShapeFields" checked={includeShapeFields} onChange={(e) => setincludeShapeFields(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeShapeFields" checked={includeShapeFields} onChange={(e) => setincludeShapeFields(e.target.checked)} />
           <label htmlFor="includeShapeFields">Include Shape Fields</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeUserRows" checked={includeUserRows} onChange={(e) => setIncludeUserRows(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeUserRows" checked={includeUserRows} onChange={(e) => setIncludeUserRows(e.target.checked)} />
           <label htmlFor="includeUserRows">Include User Rows</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeDocumentProperties" checked={includeDocumentProperties} onChange={(e) => setIncludeDocumentProperties(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeDocumentProperties" checked={includeDocumentProperties} onChange={(e) => setIncludeDocumentProperties(e.target.checked)} />
           <label htmlFor="includeDocumentProperties">Include Document Properties</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeMasters" checked={includeMasters} onChange={(e) => setIncludeMasters(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeMasters" checked={includeMasters} onChange={(e) => setIncludeMasters(e.target.checked)} />
           <label htmlFor="includeMasters">Include Masters</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeEmptyShapes" checked={includeEmptyShapes} onChange={(e) => setIncludeEmptyShapes(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeEmptyShapes" checked={includeEmptyShapes} onChange={(e) => setIncludeEmptyShapes(e.target.checked)} />
           <label htmlFor="includeEmptyShapes">Include Shapes with no data</label>
         </div>
 
-        <div className="flex items-center">
-          <input type="checkbox" className="rounded-sm mr-2" id="includeConnectors" checked={includeConnectors} onChange={(e) => setIncludeConnectors(e.target.checked)} />
+        <div className="flex-items-center">
+          <input type="checkbox" className="form-checkbox" id="includeConnectors" checked={includeConnectors} onChange={(e) => setIncludeConnectors(e.target.checked)} />
           <label htmlFor="includeConnectors">Include Connectors</label>
         </div>
 

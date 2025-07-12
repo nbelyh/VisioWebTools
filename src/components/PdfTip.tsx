@@ -67,7 +67,7 @@ export const PdfTip = (props: {
     }
   }
 
-  const inputClass = "mt-1 block w-full rounded";
+  const inputClass = "form-input mt-1 block w-full";
 
   return (
     <>
@@ -102,7 +102,7 @@ export const PdfTip = (props: {
         </label>
         <label className="block">
           <span className="text-neutral-700">Tooltip color:</span>
-          <input className={inputClass + " " + "form-input h-10"} type="color" id="color-picker" value={color} onChange={e => setColor(e.target.value)} />
+          <input className={`${inputClass} h-10`} type="color" id="color-picker" value={color} onChange={e => setColor(e.target.value)} />
         </label>
       </div>
 

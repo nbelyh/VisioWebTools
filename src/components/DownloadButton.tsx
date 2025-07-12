@@ -17,6 +17,6 @@ export const DownloadButton = (props: {
       href={props.downloadUrl}
       target='_blank'
       download={props.fileName}
-      className="bg-green-800 cursor-pointer hover:bg-green-900 text-white font-bold py-2 px-4 rounded no-underline disabled:bg-green-300 inline-block">{props.children}</a>
+      className="btn-success">{props.children}</a>
   );
 }

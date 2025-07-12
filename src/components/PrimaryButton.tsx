@@ -6,5 +6,5 @@ export const PrimaryButton = (props: {
   <button 
     onClick={props.onClick} 
     disabled={props.disabled} 
-    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-underline disabled:bg-blue-300">{props.children}</button>
+    className="btn-primary">{props.children}</button>
 );

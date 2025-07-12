@@ -1,0 +1,64 @@
+/* Common Button Styles */
+.btn-primary {
+  @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded no-underline disabled:bg-blue-300;
+}
+
+.btn-success {
+  @apply bg-green-800 cursor-pointer hover:bg-green-900 text-white font-bold py-2 px-4 rounded no-underline disabled:bg-green-300 inline-block;
+}
+
+.btn-neutral {
+  @apply inline-flex items-center bg-neutral-300 hover:bg-neutral-400 text-neutral-900 px-4 py-1 rounded focus:outline-none;
+}
+
+/* Form Controls */
+.form-input {
+  @apply rounded-sm;
+}
+
+.form-checkbox {
+  @apply rounded-sm mr-2;
+}
+
+.form-select {
+  @apply ml-2 rounded-sm;
+}
+
+/* Layout Components */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-items-center {
+  @apply flex items-center;
+}
+
+/* Drop Zone Styles */
+.drop-zone-base {
+  @apply h-48 flex items-center justify-center border-dashed border-neutral-300 border-2 text-center;
+}
+
+.drop-zone-default {
+  @apply bg-neutral-100;
+}
+
+.drop-zone-dragging {
+  @apply bg-neutral-200;
+}
+
+.sample-file-link {
+  @apply p-3 bg-neutral-100 border-2 border-neutral-300 no-underline shadow-xl rounded cursor-move;
+}
+
+/* Card Components */
+.tool-card {
+  @apply bg-white shadow-lg rounded-lg max-w-xl mx-auto flex overflow-hidden border-2;
+}
+
+.tool-card-content {
+  @apply p-6 w-2/3;
+}
+
+.tool-card-image {
+  @apply w-1/3 object-cover pl-4;
+}
