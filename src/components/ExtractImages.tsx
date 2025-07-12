@@ -5,6 +5,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { stringifyError } from '../services/parse';
+import { downloadBlob } from '../services/downloadUtils';
 
 export const ExtractImages = (props: {
 }) => {
@@ -42,16 +43,10 @@ export const ExtractImages = (props: {
       return;
     }
 
-    setProcessing('Extracting Images...');
     try {
+    setProcessing('Extracting Images...');
       const out = await doProcessing(vsdx);
-      const url = window.URL.createObjectURL(out);
-      const a = document.createElement('a');
-      // a.download = "result.pdf"
-      a.target = "_blank";
-      a.href = url;
-      a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`;
-      a.click();
+      downloadBlob(out, `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`);
     } catch (e: any) {
       setError(stringifyError(e));
     } finally {

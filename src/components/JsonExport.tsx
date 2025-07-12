@@ -5,6 +5,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { CheckboxField } from './FormFields';
+import { downloadBlob } from '../services/downloadUtils';
 
 export const JsonExport = (props: {
 }) => {
@@ -53,15 +54,10 @@ export const JsonExport = (props: {
       return;
     }
 
-    setProcessing('Extracting JSON...');
     try {
+      setProcessing('Extracting JSON...');
       const blob = await doProcessing(vsdx);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.target = "_blank";
-      a.href = url;
-      a.download = vsdx.name.replace('.vsdx', '.json');
-      a.click();
+      downloadBlob(blob, vsdx.name.replace('.vsdx', '.json'));
     } catch (e: any) {
       setError(`${e}`);
     } finally {

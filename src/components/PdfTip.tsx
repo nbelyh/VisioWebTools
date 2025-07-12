@@ -6,6 +6,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { stringifyError } from '../services/parse';
 import { TextField, SelectField, ColorField } from './FormFields';
+import { downloadBlob } from '../services/downloadUtils';
 
 export const PdfTip = (props: {
 
@@ -49,18 +50,10 @@ export const PdfTip = (props: {
       window.appInsights.trackEvent({ name: "PdfTipClicked" });
     }
 
-    setProcessing('Adding tooltips...');
-
     try {
-
+      setProcessing('Adding tooltips...');
       const blob = await doProcessing(pdf, vsdx, color, icon, x, y);
-
-      var url = window.URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.download = `Tooltips_${pdf.name}`
-      a.target = "_blank";
-      a.href = url;
-      a.click();
+      downloadBlob(blob, `Tooltips_${pdf.name}`);
     } catch (e: any) {
       setError(stringifyError(e));
     } finally {

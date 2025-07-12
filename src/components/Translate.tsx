@@ -7,6 +7,7 @@ import { ErrorNotification } from './ErrorNotification';
 import { Languages } from './Languages';
 import { stringifyError } from '../services/parse';
 import { CheckboxField, SelectField, TextField } from './FormFields';
+import { downloadBlob } from '../services/downloadUtils';
 
 export const Translate = (props: {
 }) => {
@@ -25,8 +26,8 @@ export const Translate = (props: {
   const getApiUrl = (key: string) => {
     return key
       ? "https://api.openai.com/v1/chat/completions"
-      : location.hostname === 'localhost' 
-        ? "http://localhost:7071/api/TranslateAzureFunction" 
+      : location.hostname === 'localhost'
+        ? "http://localhost:7071/api/TranslateAzureFunction"
         : "https://visiowebtools.azurewebsites.net/api/TranslateAzureFunction";
   }
 
@@ -43,7 +44,7 @@ export const Translate = (props: {
 
       var ab = new Uint8Array(await vsdx.arrayBuffer());
       const original = dotnet.FileProcessor.GetTranslationJson(ab, optionsJson);
-      
+
       var apiUrl = getApiUrl(apiKey);
       const translated = await dotnet.FileProcessor.Translate(apiUrl, apiKey, original, targetLanguage);
 
@@ -67,15 +68,10 @@ export const Translate = (props: {
       return;
     }
 
-    setProcessing('Translating...');
     try {
+      setProcessing('Translating...');
       const blob = await doProcessing(vsdx);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.target = "_blank";
-      a.href = url;
-      a.download = vsdx.name;
-      a.click();
+      downloadBlob(blob, vsdx.name);
     } catch (e: any) {
       setError(stringifyError(e));
     } finally {

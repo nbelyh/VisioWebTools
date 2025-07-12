@@ -5,7 +5,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { stringifyError } from '../services/parse';
-import { DownloadButton } from './DownloadButton';
+import { downloadBlob } from '../services/downloadUtils';
 import { CheckboxField } from './FormFields';
 
 export const Cipher = (props: {
@@ -16,7 +16,6 @@ export const Cipher = (props: {
   const [processing, setProcessing] = useState('');
 
   const onFileChange = (file?: File) => {
-    setDownloadUrl(undefined);
     setVsdx(file);
   }
 
@@ -59,8 +58,7 @@ export const Cipher = (props: {
     setProcessing('Ciphering...');
     try {
       const blob = await doProcessing(vsdx);
-      const url = window.URL.createObjectURL(blob);
-      setDownloadUrl(url);
+      downloadBlob(blob, vsdx.name);
     } catch (e: any) {
       setError(stringifyError(e));
     } finally {
@@ -76,8 +74,6 @@ export const Cipher = (props: {
   const [enableCipherMasters, setEnableCipherMasters] = useState(false);
   const [enableCipherUserRows, setEnableCipherUserRows] = useState(false);
   const [enableCipherDocumentProperties, setEnableCipherDocumentProperties] = useState(false);
-
-  const [downloadUrl, setDownloadUrl] = useState<string>();
 
   return (
     <>
@@ -152,10 +148,7 @@ export const Cipher = (props: {
       </div>
 
       <hr className="my-4" />
-      {downloadUrl
-        ? <DownloadButton downloadUrl={downloadUrl} fileName={vsdx?.name}>Download Result</DownloadButton>
-        : <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onCipherFile}>{processing || "Cipher"}</PrimaryButton>
-      }
+      <PrimaryButton disabled={!vsdx || !!processing || loading} onClick={onCipherFile}>{processing || "Cipher"}</PrimaryButton>
     </>
   );
 }

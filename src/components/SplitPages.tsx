@@ -5,6 +5,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { stringifyError } from '../services/parse';
+import { downloadBlob } from '../services/downloadUtils';
 
 export const SplitPages = (props: {
 }) => {
@@ -42,16 +43,10 @@ export const SplitPages = (props: {
       return;
     }
 
-    setProcessing('Splitting...');
     try {
+      setProcessing('Splitting...');
       const blob = await doProcessing(vsdx);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      // a.download = "result.pdf"
-      a.target = "_blank";
-      a.href = url;
-      a.download = `${vsdx.name.replace(/\.[^/.]+$/, "")}_pages.zip`;
-      a.click();
+      downloadBlob(blob, `${vsdx.name.replace(/\.[^/.]+$/, "")}_pages.zip`);
     } catch (e: any) {
       setError(stringifyError(e));
     } finally {
