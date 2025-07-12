@@ -26,7 +26,8 @@ export const JsonExport = (props: {
       includeUserRows,
       includeDocumentProperties,
       includeMasters,
-      includeEmptyShapes: false,
+      includeEmptyShapes,
+      includeConnectors,
     };
     const optionsJson = JSON.stringify(options);
     if (dotnet) {
@@ -68,12 +69,13 @@ export const JsonExport = (props: {
   }
 
   const [includeShapeText, setincludeShapeText] = useState(true);
-  const [includeShapeFields, setincludeShapeFields] = useState(true);
-  const [includePropertyRows, setIncludePropertyRows] = useState(true);
-  const [includeUserRows, setIncludeUserRows] = useState(true);
-  const [includeMasters, setIncludeMasters] = useState(true);
-  const [includeDocumentProperties, setIncludeDocumentProperties] = useState(true);
+  const [includeShapeFields, setincludeShapeFields] = useState(false);
+  const [includePropertyRows, setIncludePropertyRows] = useState(false);
+  const [includeUserRows, setIncludeUserRows] = useState(false);
+  const [includeMasters, setIncludeMasters] = useState(false);
+  const [includeDocumentProperties, setIncludeDocumentProperties] = useState(false);
   const [includeEmptyShapes, setIncludeEmptyShapes] = useState(false);
+  const [includeConnectors, setIncludeConnectors] = useState(true);
 
   return (
     <>
@@ -120,6 +122,11 @@ export const JsonExport = (props: {
         <div className="flex items-center">
           <input type="checkbox" className="rounded-sm mr-2" id="includeEmptyShapes" checked={includeEmptyShapes} onChange={(e) => setIncludeEmptyShapes(e.target.checked)} />
           <label htmlFor="includeEmptyShapes">Include Shapes with no data</label>
+        </div>
+
+        <div className="flex items-center">
+          <input type="checkbox" className="rounded-sm mr-2" id="includeConnectors" checked={includeConnectors} onChange={(e) => setIncludeConnectors(e.target.checked)} />
+          <label htmlFor="includeConnectors">Include Connectors</label>
         </div>
 
       </div>

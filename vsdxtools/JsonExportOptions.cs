@@ -9,4 +9,5 @@ public class JsonExportOptions
     public bool IncludeMasters { get; set; }
     public bool IncludeDocumentProperties { get; set; }
     public bool IncludeEmptyShapes { get; set; }
+    public bool IncludeConnectors { get; set; }
 }

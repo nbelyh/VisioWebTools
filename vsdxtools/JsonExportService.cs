@@ -45,11 +45,8 @@ public class JsonExportService
         }
     }
 
-    private static void ProcessPage(PackagePart pagePart, JsonExportOptions options, Func<Dictionary<string, ShapeInfo>> getShapeInfo)
+    private static void ProcessPage(XDocument xmlPage, JsonExportOptions options, Func<Dictionary<string, ShapeInfo>> getShapeInfo)
     {
-        var pageStream = pagePart.GetStream(FileMode.Open);
-        var xmlPage = XDocument.Load(pageStream);
-
         var xmlShapes = xmlPage.XPathSelectElements("v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
         foreach (var xmlShape in xmlShapes)
         {
@@ -67,6 +64,35 @@ public class JsonExportService
             if (options.IncludeUserRows)
                 GetUserRows(xmlShape, () => shapeInfo.UserRows ??= []);
         }
+    }
+
+    private static void ProcessConnectors(XDocument xmlPage, PageInfo pageInfo)
+    {
+        var xmlConnects = xmlPage.XPathSelectElements("v:PageContents/v:Connects/v:Connect", VisioParser.NamespaceManager).ToList();
+
+        var groups = xmlConnects.GroupBy(c => c.Attribute("FromSheet")?.Value).ToDictionary(g => g.Key, g => g.ToList());
+        foreach (var g in groups)
+        {
+            var conn = pageInfo.Shapes[g.Key];
+            var fromShape = g.Value.Find(c => c.Attribute("FromCell")?.Value == "BeginX");
+            var toShape = g.Value.Find(c => c.Attribute("FromCell")?.Value == "EndX");
+
+            if (conn == null || (fromShape == null && toShape == null))
+                continue;
+
+            pageInfo.Connections ??= [];
+            var connectInfo = new ConnectionInfo
+            {
+                FromShape = fromShape?.Attribute("ToSheet")?.Value,
+                ToShape = toShape?.Attribute("ToSheet")?.Value,
+                Text = conn.Text
+            };
+            pageInfo.Connections.Add(connectInfo);
+        }
+
+        var keys = groups.Keys.ToHashSet();
+        pageInfo.Shapes = pageInfo.Shapes.Where(s => !keys.Contains(s.Key))
+            .ToDictionary(k => k.Key, v => v.Value);
     }
 
     private static void ProcessShapeText(XElement xmlShape, ShapeInfo shapeInfo)
@@ -205,7 +231,14 @@ public class JsonExportService
 
             Uri pageUri = PackUriHelper.ResolvePartUri(pagesPart.Uri, pageRel.TargetUri);
             var pagePart = package.GetPart(pageUri);
-            ProcessPage(pagePart, options, () => pageInfo.Shapes ??= []);
+
+            var pageStream = pagePart.GetStream(FileMode.Open);
+            var xmlPageContent = XDocument.Load(pageStream);
+
+            ProcessPage(xmlPageContent, options, () => pageInfo.Shapes ??= []);
+            
+            if (options.IncludeConnectors)
+                ProcessConnectors(xmlPageContent, pageInfo);
         }
     }
 

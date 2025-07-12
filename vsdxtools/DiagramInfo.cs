@@ -38,6 +38,13 @@ public class ShapeInfo
     public Dictionary<string, UserRowInfo> UserRows { get; set; }
 }
 
+public class ConnectionInfo
+{
+    public string FromShape { get; set; }
+    public string ToShape { get; set; }
+    public string Text { get; set; }
+}
+
 public class PageInfo
 {
     public string Name { get; set; }
@@ -45,6 +52,7 @@ public class PageInfo
     public Dictionary<string, UserRowInfo> UserRows { get; set; }
     public Dictionary<string, PropertyInfo> PropRows { get; set; }
     public Dictionary<string, ShapeInfo> Shapes { get; set; }
+    public List<ConnectionInfo> Connections { get; set; }
 }
 
 public class DocumentInfo
