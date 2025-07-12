@@ -7,12 +7,13 @@ import { ErrorNotification } from './ErrorNotification';
 import { Languages } from './Languages';
 import { useFileProcessing } from '../services/useFileProcessing';
 import { CheckboxField, SelectField, TextField } from './FormFields';
+import { useLocalStorage } from '../services/useLocalStorage';
 
 export const Translate = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, setApiKey] = useLocalStorage('apiKey', '');
   const { processing, error, processFile, setError } = useFileProcessing();
 
   const onFileChange = (file?: File) => {
@@ -70,14 +71,14 @@ export const Translate = (props: {
     });
   }
 
-  const [enableTranslateShapeText, setEnableTranslateShapeText] = useState(true);
-  const [enableTranslateShapeFields, setEnableTranslateShapeFields] = useState(false);
-  const [enableTranslatePageNames, setEnableTranslatePageNames] = useState(false);
-  const [enableTranslatePropertyValues, setEnableTranslatePropertyValues] = useState(false);
-  const [enableTranslatePropertyLabels, setEnableTranslatePropertyLabels] = useState(false);
-  const [enableTranslateUserRows, setEnableTranslateUserRows] = useState(false);
+  const [enableTranslateShapeText, setEnableTranslateShapeText] = useLocalStorage('enableTranslateShapeText', true);
+  const [enableTranslateShapeFields, setEnableTranslateShapeFields] = useLocalStorage('enableTranslateShapeFields', false);
+  const [enableTranslatePageNames, setEnableTranslatePageNames] = useLocalStorage('enableTranslatePageNames', false);
+  const [enableTranslatePropertyValues, setEnableTranslatePropertyValues] = useLocalStorage('enableTranslatePropertyValues', false);
+  const [enableTranslatePropertyLabels, setEnableTranslatePropertyLabels] = useLocalStorage('enableTranslatePropertyLabels', false);
+  const [enableTranslateUserRows, setEnableTranslateUserRows] = useLocalStorage('enableTranslateUserRows', false);
 
-  const [targetLanguage, setTargetLanguage] = useState('German');
+  const [targetLanguage, setTargetLanguage] = useLocalStorage('targetLanguage', 'German');
 
   return (
     <>

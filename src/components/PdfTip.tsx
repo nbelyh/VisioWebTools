@@ -6,6 +6,7 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { TextField, SelectField, ColorField } from './FormFields';
 import { useFileProcessing } from '../services/useFileProcessing';
+import { useLocalStorage } from '../services/useLocalStorage';
 
 export const PdfTip = (props: {
 
@@ -15,10 +16,10 @@ export const PdfTip = (props: {
 
   const [pdf, setPdf] = useState<File>();
   const [vsdx, setVsdx] = useState<File>();
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
-  const [color, setColor] = useState('#ffffe0');
-  const [icon, setIcon] = useState('Note');
+  const [x, setX] = useLocalStorage('pdfTipX', 0);
+  const [y, setY] = useLocalStorage('pdfTipY', 0);
+  const [color, setColor] = useLocalStorage('pdfTipColor', '#ffffe0');
+  const [icon, setIcon] = useLocalStorage('pdfTipIcon', 'Note');
 
   const { dotnet, loading, loadError } = useDotNetFixedUrl();
 

@@ -6,6 +6,7 @@ import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { useFileProcessing } from '../services/useFileProcessing';
 import { CheckboxField } from './FormFields';
+import { useLocalStorage } from '../services/useLocalStorage';
 
 export const Cipher = (props: {
 }) => {
@@ -57,14 +58,14 @@ export const Cipher = (props: {
     });
   }
 
-  const [enableCipherShapeText, setEnableCipherShapeText] = useState(true);
-  const [enableCipherShapeFields, setEnableCipherShapeFields] = useState(true);
-  const [enableCipherPageNames, setEnableCipherPageNames] = useState(true);
-  const [enableCipherPropertyValues, setEnableCipherPropertyValues] = useState(true);
-  const [enableCipherPropertyLabels, setEnableCipherPropertyLabels] = useState(false);
-  const [enableCipherMasters, setEnableCipherMasters] = useState(false);
-  const [enableCipherUserRows, setEnableCipherUserRows] = useState(false);
-  const [enableCipherDocumentProperties, setEnableCipherDocumentProperties] = useState(false);
+  const [enableCipherShapeText, setEnableCipherShapeText] = useLocalStorage('enableCipherShapeText', true);
+  const [enableCipherShapeFields, setEnableCipherShapeFields] = useLocalStorage('enableCipherShapeFields', true);
+  const [enableCipherPageNames, setEnableCipherPageNames] = useLocalStorage('enableCipherPageNames', true);
+  const [enableCipherPropertyValues, setEnableCipherPropertyValues] = useLocalStorage('enableCipherPropertyValues', true);
+  const [enableCipherPropertyLabels, setEnableCipherPropertyLabels] = useLocalStorage('enableCipherPropertyLabels', false);
+  const [enableCipherMasters, setEnableCipherMasters] = useLocalStorage('enableCipherMasters', false);
+  const [enableCipherUserRows, setEnableCipherUserRows] = useLocalStorage('enableCipherUserRows', false);
+  const [enableCipherDocumentProperties, setEnableCipherDocumentProperties] = useLocalStorage('enableCipherDocumentProperties', false);
 
   return (
     <>

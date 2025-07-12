@@ -6,6 +6,7 @@ import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { CheckboxField } from './FormFields';
 import { useFileProcessing } from '../services/useFileProcessing';
+import { useLocalStorage } from '../services/useLocalStorage';
 
 export const JsonExport = (props: {
 }) => {
@@ -57,14 +58,14 @@ export const JsonExport = (props: {
     });
   }
 
-  const [includeShapeText, setincludeShapeText] = useState(true);
-  const [includeShapeFields, setincludeShapeFields] = useState(false);
-  const [includePropertyRows, setIncludePropertyRows] = useState(false);
-  const [includeUserRows, setIncludeUserRows] = useState(false);
-  const [includeMasters, setIncludeMasters] = useState(false);
-  const [includeDocumentProperties, setIncludeDocumentProperties] = useState(false);
-  const [includeEmptyShapes, setIncludeEmptyShapes] = useState(false);
-  const [includeConnectors, setIncludeConnectors] = useState(true);
+  const [includeShapeText, setincludeShapeText] = useLocalStorage('includeShapeText', true);
+  const [includeShapeFields, setincludeShapeFields] = useLocalStorage('includeShapeFields', false);
+  const [includePropertyRows, setIncludePropertyRows] = useLocalStorage('includePropertyRows', false);
+  const [includeUserRows, setIncludeUserRows] = useLocalStorage('includeUserRows', false);
+  const [includeMasters, setIncludeMasters] = useLocalStorage('includeMasters', false);
+  const [includeDocumentProperties, setIncludeDocumentProperties] = useLocalStorage('includeDocumentProperties', false);
+  const [includeEmptyShapes, setIncludeEmptyShapes] = useLocalStorage('includeEmptyShapes', false);
+  const [includeConnectors, setIncludeConnectors] = useLocalStorage('includeConnectors', true);
 
   return (
     <>
