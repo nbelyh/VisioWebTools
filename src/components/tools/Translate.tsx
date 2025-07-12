@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { DropZone } from './common/DropZone';
 import { PrimaryButton } from './common/PrimaryButton';
-import { AzureFunctionBackend } from '../../services/AzureFunctionBackend';
-import { useDotNetFixedUrl } from '../../services/useDotNetFixedUrl';
+import { AzureFunctionBackend } from 'services/AzureFunctionBackend';
+import { useDotNetFixedUrl } from 'services/useDotNetFixedUrl';
 import { ErrorNotification } from './common/ErrorNotification';
 import { Languages } from './common/Languages';
-import { useFileProcessing } from '../../services/useFileProcessing';
+import { useFileProcessing } from 'services/useFileProcessing';
 import { CheckboxField, SelectField, TextField } from './common/FormFields';
-import { useLocalStorage } from '../../services/useLocalStorage';
+import { useLocalStorage } from 'services/useLocalStorage';
 
 export const Translate = (props: {
 }) => {

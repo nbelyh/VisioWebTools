@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { DropZone } from './common/DropZone';
 import { PrimaryButton } from './common/PrimaryButton';
 import { ErrorNotification } from './common/ErrorNotification';
-import { AzureFunctionBackend } from '../../services/AzureFunctionBackend';
-import { useDotNetFixedUrl } from '../../services/useDotNetFixedUrl';
+import { AzureFunctionBackend } from 'services/AzureFunctionBackend';
+import { useDotNetFixedUrl } from 'services/useDotNetFixedUrl';
 import { TextField, SelectField, ColorField } from './common/FormFields';
-import { useFileProcessing } from '../../services/useFileProcessing';
-import { useLocalStorage } from '../../services/useLocalStorage';
+import { useFileProcessing } from 'services/useFileProcessing';
+import { useLocalStorage } from 'services/useLocalStorage';
 
 export const PdfTip = (props: {
 
