@@ -36,6 +36,7 @@ public class ShapeInfo
     public Dictionary<string, FieldInfo> FieldRows { get; set; }
     public Dictionary<string, PropertyInfo> PropRows { get; set; }
     public Dictionary<string, UserRowInfo> UserRows { get; set; }
+    public Dictionary<string, ShapeInfo> Shapes { get; set; }
 }
 
 public class ConnectionInfo

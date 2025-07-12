@@ -45,9 +45,8 @@ public class JsonExportService
         }
     }
 
-    private static void ProcessPage(XDocument xmlPage, JsonExportOptions options, Func<Dictionary<string, ShapeInfo>> getShapeInfo)
+    private static void ProcessShapes(List<XElement> xmlShapes, JsonExportOptions options, Func<Dictionary<string, ShapeInfo>> getShapeInfo)
     {
-        var xmlShapes = xmlPage.XPathSelectElements("v:PageContents//v:Shape", VisioParser.NamespaceManager).ToList();
         foreach (var xmlShape in xmlShapes)
         {
             var shapeInfo = DiagramInfoService.EnsureCollection(xmlShape, getShapeInfo);
@@ -63,6 +62,9 @@ public class JsonExportService
 
             if (options.IncludeUserRows)
                 GetUserRows(xmlShape, () => shapeInfo.UserRows ??= []);
+
+            var xmlChildShapes = xmlShape.XPathSelectElements("v:Shapes/v:Shape", VisioParser.NamespaceManager).ToList();
+            ProcessShapes(xmlChildShapes, options, () => shapeInfo.Shapes ??= []);
         }
     }
 
@@ -74,25 +76,21 @@ public class JsonExportService
         foreach (var g in groups)
         {
             var conn = pageInfo.Shapes[g.Key];
-            var fromShape = g.Value.Find(c => c.Attribute("FromCell")?.Value == "BeginX");
-            var toShape = g.Value.Find(c => c.Attribute("FromCell")?.Value == "EndX");
+            var fromShapeId = g.Value.Find(c => c.Attribute("FromCell")?.Value == "BeginX")?.Attribute("ToSheet")?.Value;
+            var toShapeId = g.Value.Find(c => c.Attribute("FromCell")?.Value == "EndX")?.Attribute("ToSheet")?.Value;
 
-            if (conn == null || (fromShape == null && toShape == null))
+            if (conn == null || fromShapeId == null || toShapeId == null)
                 continue;
 
             pageInfo.Connections ??= [];
             var connectInfo = new ConnectionInfo
             {
-                FromShape = fromShape?.Attribute("ToSheet")?.Value,
-                ToShape = toShape?.Attribute("ToSheet")?.Value,
+                FromShape = fromShapeId,
+                ToShape = toShapeId,
                 Text = conn.Text
             };
             pageInfo.Connections.Add(connectInfo);
         }
-
-        var keys = groups.Keys.ToHashSet();
-        pageInfo.Shapes = pageInfo.Shapes.Where(s => !keys.Contains(s.Key))
-            .ToDictionary(k => k.Key, v => v.Value);
     }
 
     private static void ProcessShapeText(XElement xmlShape, ShapeInfo shapeInfo)
@@ -235,8 +233,9 @@ public class JsonExportService
             var pageStream = pagePart.GetStream(FileMode.Open);
             var xmlPageContent = XDocument.Load(pageStream);
 
-            ProcessPage(xmlPageContent, options, () => pageInfo.Shapes ??= []);
-            
+            var xmlShapes = xmlPageContent.XPathSelectElements("v:PageContents/v:Shapes/v:Shape", VisioParser.NamespaceManager).ToList();
+            ProcessShapes(xmlShapes, options, () => pageInfo.Shapes ??= []);
+
             if (options.IncludeConnectors)
                 ProcessConnectors(xmlPageContent, pageInfo);
         }
@@ -278,6 +277,27 @@ public class JsonExportService
         }
     }
 
+    private static bool IsShapeIncluded(ShapeInfo s) => !string.IsNullOrEmpty(s.Text) || s.PropRows?.Count > 0 || s.UserRows?.Count > 0 || s.FieldRows?.Count > 0 || s.Shapes?.Count > 0;
+
+    private static void FilterEmptyShapes(Dictionary<string, ShapeInfo> shapes)
+    {
+        if (shapes == null)
+            return;
+
+        var emptyShapeIds = new List<string>();
+        foreach (var kvp in shapes)
+        {
+            var shape = kvp.Value;
+            FilterEmptyShapes(shape.Shapes);
+
+            if (!IsShapeIncluded(shape))
+                emptyShapeIds.Add(kvp.Key);
+        }
+
+        foreach (var key in emptyShapeIds)
+            shapes.Remove(key);
+    }
+
     public static string Process(byte[] input, JsonExportOptions options)
     {
         using (var stream = new MemoryStream(input))
@@ -285,18 +305,8 @@ public class JsonExportService
             DocumentInfo documentInfo = ProcessDocument(stream, options);
             if (!options.IncludeEmptyShapes)
             {
-                foreach (var page in documentInfo.Pages.Values)
-                {
-                    if (page.Shapes != null)
-                    {
-                        page.Shapes = page.Shapes.Where(s =>
-                            !string.IsNullOrEmpty(s.Value.Text)
-                            || s.Value.PropRows?.Count > 0
-                            || s.Value.UserRows?.Count > 0
-                            || s.Value.FieldRows?.Count > 0
-                        ).ToDictionary(k => k.Key, v => v.Value);
-                    }
-                }
+                foreach (var kvp in documentInfo.Pages)
+                    FilterEmptyShapes(kvp.Value.Shapes);
             }
             var json = JsonSerializer.Serialize(documentInfo, DocumentInfoJsonContext.Context.DocumentInfo);
             return json;
