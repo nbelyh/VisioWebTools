@@ -4,15 +4,13 @@ import { PrimaryButton } from './PrimaryButton';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
-import { stringifyError } from '../services/parse';
-import { downloadBlob } from '../services/downloadUtils';
+import { useFileProcessing } from '../services/useFileProcessing';
 
 export const ExtractImages = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
-  const [error, setError] = useState('');
-  const [processing, setProcessing] = useState('');
+  const { processing, error, processFile, setError } = useFileProcessing();
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -36,22 +34,15 @@ export const ExtractImages = (props: {
       window.appInsights.trackEvent({ name: "ExtractImagesClicked" });
     }
 
-    setError('');
-
     if (!vsdx) {
       setError('Please select the VSDX file');
       return;
     }
 
-    try {
-    setProcessing('Extracting Images...');
-      const out = await doProcessing(vsdx);
-      downloadBlob(out, `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`);
-    } catch (e: any) {
-      setError(stringifyError(e));
-    } finally {
-      setProcessing('');
-    }
+    await processFile(() => doProcessing(vsdx), {
+      processingMessage: 'Extracting Images...',
+      fileName: `${vsdx.name.replace(/\.[^/.]+$/, "")}_images.zip`
+    });
   }
 
   return (

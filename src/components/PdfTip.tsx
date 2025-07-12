@@ -4,16 +4,14 @@ import { PrimaryButton } from './PrimaryButton';
 import { ErrorNotification } from './ErrorNotification';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
-import { stringifyError } from '../services/parse';
 import { TextField, SelectField, ColorField } from './FormFields';
-import { downloadBlob } from '../services/downloadUtils';
+import { useFileProcessing } from '../services/useFileProcessing';
 
 export const PdfTip = (props: {
 
 }) => {
 
-  const [error, setError] = useState('');
-  const [processing, setProcessing] = useState('');
+  const { processing, error, processFile, setError } = useFileProcessing();
 
   const [pdf, setPdf] = useState<File>();
   const [vsdx, setVsdx] = useState<File>();
@@ -39,8 +37,6 @@ export const PdfTip = (props: {
 
   const uploadFiles = async () => {
 
-    setError('');
-
     if (!pdf || !vsdx) {
       setError('Please select both PDF and VSDX files');
       return;
@@ -50,15 +46,10 @@ export const PdfTip = (props: {
       window.appInsights.trackEvent({ name: "PdfTipClicked" });
     }
 
-    try {
-      setProcessing('Adding tooltips...');
-      const blob = await doProcessing(pdf, vsdx, color, icon, x, y);
-      downloadBlob(blob, `Tooltips_${pdf.name}`);
-    } catch (e: any) {
-      setError(stringifyError(e));
-    } finally {
-      setProcessing('');
-    }
+    await processFile(() => doProcessing(pdf, vsdx, color, icon, x, y), {
+      processingMessage: 'Adding tooltips...',
+      fileName: `Tooltips_${pdf.name}`
+    });
   }
 
   return (

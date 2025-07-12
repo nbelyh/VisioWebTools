@@ -4,15 +4,13 @@ import { PrimaryButton } from './PrimaryButton';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
-import { stringifyError } from '../services/parse';
-import { downloadBlob } from '../services/downloadUtils';
+import { useFileProcessing } from '../services/useFileProcessing';
 
 export const SplitPages = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
-  const [error, setError] = useState('');
-  const [processing, setProcessing] = useState('');
+  const { processing, error, processFile, setError } = useFileProcessing();
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -36,22 +34,15 @@ export const SplitPages = (props: {
       window.appInsights.trackEvent({ name: "SplitPagesClicked" });
     }
 
-    setError('');
-
     if (!vsdx) {
       setError('Please select the VSDX file');
       return;
     }
 
-    try {
-      setProcessing('Splitting...');
-      const blob = await doProcessing(vsdx);
-      downloadBlob(blob, `${vsdx.name.replace(/\.[^/.]+$/, "")}_pages.zip`);
-    } catch (e: any) {
-      setError(stringifyError(e));
-    } finally {
-      setProcessing('');
-    }
+    await processFile(() => doProcessing(vsdx), {
+      processingMessage: 'Splitting...',
+      fileName: `${vsdx.name.replace(/\.[^/.]+$/, "")}_pages.zip`
+    });
   }
 
   return (

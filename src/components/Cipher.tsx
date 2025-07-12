@@ -4,16 +4,14 @@ import { PrimaryButton } from './PrimaryButton';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
-import { stringifyError } from '../services/parse';
-import { downloadBlob } from '../services/downloadUtils';
+import { useFileProcessing } from '../services/useFileProcessing';
 import { CheckboxField } from './FormFields';
 
 export const Cipher = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
-  const [error, setError] = useState('');
-  const [processing, setProcessing] = useState('');
+  const { processing, error, processFile, setError } = useFileProcessing();
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -48,22 +46,15 @@ export const Cipher = (props: {
       window.appInsights.trackEvent({ name: "SplitPagesClicked" });
     }
 
-    setError('');
-
     if (!vsdx) {
       setError('Please select the VSDX file');
       return;
     }
 
-    setProcessing('Ciphering...');
-    try {
-      const blob = await doProcessing(vsdx);
-      downloadBlob(blob, vsdx.name);
-    } catch (e: any) {
-      setError(stringifyError(e));
-    } finally {
-      setProcessing('');
-    }
+    await processFile(() => doProcessing(vsdx), {
+      processingMessage: 'Ciphering...',
+      fileName: vsdx.name
+    });
   }
 
   const [enableCipherShapeText, setEnableCipherShapeText] = useState(true);

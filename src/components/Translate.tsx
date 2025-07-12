@@ -5,17 +5,15 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { Languages } from './Languages';
-import { stringifyError } from '../services/parse';
+import { useFileProcessing } from '../services/useFileProcessing';
 import { CheckboxField, SelectField, TextField } from './FormFields';
-import { downloadBlob } from '../services/downloadUtils';
 
 export const Translate = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
   const [apiKey, setApiKey] = useState('');
-  const [error, setError] = useState('');
-  const [processing, setProcessing] = useState('');
+  const { processing, error, processFile, setError } = useFileProcessing();
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -61,22 +59,15 @@ export const Translate = (props: {
       window.appInsights.trackEvent({ name: "SplitPagesClicked" });
     }
 
-    setError('');
-
     if (!vsdx) {
       setError('Please select the VSDX file');
       return;
     }
 
-    try {
-      setProcessing('Translating...');
-      const blob = await doProcessing(vsdx);
-      downloadBlob(blob, vsdx.name);
-    } catch (e: any) {
-      setError(stringifyError(e));
-    } finally {
-      setProcessing('');
-    }
+    await processFile(() => doProcessing(vsdx), {
+      processingMessage: 'Translating...',
+      fileName: vsdx.name
+    });
   }
 
   const [enableTranslateShapeText, setEnableTranslateShapeText] = useState(true);

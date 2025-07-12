@@ -5,14 +5,13 @@ import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { CheckboxField } from './FormFields';
-import { downloadBlob } from '../services/downloadUtils';
+import { useFileProcessing } from '../services/useFileProcessing';
 
 export const JsonExport = (props: {
 }) => {
 
   const [vsdx, setVsdx] = useState<File>();
-  const [error, setError] = useState('');
-  const [processing, setProcessing] = useState('');
+  const { processing, error, processFile, setError } = useFileProcessing();
 
   const onFileChange = (file?: File) => {
     setVsdx(file);
@@ -47,22 +46,15 @@ export const JsonExport = (props: {
       window.appInsights.trackEvent({ name: "SplitPagesClicked" });
     }
 
-    setError('');
-
     if (!vsdx) {
       setError('Please select the VSDX file');
       return;
     }
 
-    try {
-      setProcessing('Extracting JSON...');
-      const blob = await doProcessing(vsdx);
-      downloadBlob(blob, vsdx.name.replace('.vsdx', '.json'));
-    } catch (e: any) {
-      setError(`${e}`);
-    } finally {
-      setProcessing('');
-    }
+    await processFile(() => doProcessing(vsdx), {
+      processingMessage: 'Extracting JSON...',
+      fileName: vsdx.name.replace('.vsdx', '.json')
+    });
   }
 
   const [includeShapeText, setincludeShapeText] = useState(true);
