@@ -5,6 +5,7 @@ import { ErrorNotification } from './ErrorNotification';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { stringifyError } from '../services/parse';
+import { TextField, SelectField, ColorField } from './FormFields';
 
 export const PdfTip = (props: {
 
@@ -67,8 +68,6 @@ export const PdfTip = (props: {
     }
   }
 
-  const inputClass = "form-input mt-1 block w-full";
-
   return (
     <>
       <ErrorNotification error={error || loadError} />
@@ -84,26 +83,36 @@ export const PdfTip = (props: {
       />
 
       <div className="grid md:grid-cols-6 gap-4">
-        <label className="block">
-          <span className="text-neutral-700">Tooltip X location:</span>
-          <input className={inputClass} type="number" value={x} onChange={e => setX(Number.parseInt(e.target.value))} />
-        </label>
+        <TextField
+          id="tooltip-x"
+          label="Tooltip X location:"
+          value={x.toString()}
+          onChange={(value) => setX(Number.parseFloat(value) || 0)}
+          type="number"
+        />
 
-        <label className="block">
-          <span className="text-neutral-700">Tooltip Y location:</span>
-          <input className={inputClass} type="number" value={y} onChange={e => setY(Number.parseInt(e.target.value))} />
-        </label>
+        <TextField
+          id="tooltip-y"
+          label="Tooltip Y location:"
+          value={y.toString()}
+          onChange={(value) => setY(Number.parseFloat(value) || 0)}
+          type="number"
+        />
 
-        <label className="block">
-          <span className="text-neutral-700">Tooltip Icon:</span>
-          <select className={inputClass} value={icon} onChange={e => setIcon(e.target.value)}>
-            {icons.map(icon => <option key={icon} value={icon}>{icon}</option>)}
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-neutral-700">Tooltip color:</span>
-          <input className={`${inputClass} h-10`} type="color" id="color-picker" value={color} onChange={e => setColor(e.target.value)} />
-        </label>
+        <SelectField
+          id="tooltip-icon"
+          label="Tooltip Icon:"
+          value={icon}
+          options={icons}
+          onChange={setIcon}
+        />
+
+        <ColorField
+          id="tooltip-color"
+          label="Tooltip color:"
+          value={color}
+          onChange={setColor}
+        />
       </div>
 
       <div className="my-4 bg-slate-100 p-4 rounded w-5/6">

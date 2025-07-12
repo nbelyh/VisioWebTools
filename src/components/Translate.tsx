@@ -6,6 +6,7 @@ import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { Languages } from './Languages';
 import { stringifyError } from '../services/parse';
+import { CheckboxField, SelectField, TextField } from './FormFields';
 
 export const Translate = (props: {
 }) => {
@@ -103,47 +104,62 @@ export const Translate = (props: {
 
       <div className='mb-4'>
 
-        <div className="flex-items-center mb-2">
-          <label htmlFor="targetLanguage">Target Language</label>
-          <select id="targetLanguage" className="form-select" value={targetLanguage} onChange={(e) => setTargetLanguage(e.target.value)}>
-            {Languages.map(l => <option key={l}>{l}</option>)}
-          </select>
-        </div>
+        <SelectField
+          id="targetLanguage"
+          label="Target Language"
+          value={targetLanguage}
+          options={Languages}
+          onChange={setTargetLanguage}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="enableTranslateText" checked={enableTranslateShapeText} onChange={(e) => setEnableTranslateShapeText(e.target.checked)} />
-          <label htmlFor="enableTranslateText">Translate Shape Text</label>
-        </div>
+        <CheckboxField
+          id="enableTranslateText"
+          label="Translate Shape Text"
+          checked={enableTranslateShapeText}
+          onChange={setEnableTranslateShapeText}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="enableTranslatePropertyValues" checked={enableTranslatePropertyValues} onChange={(e) => setEnableTranslatePropertyValues(e.target.checked)} />
-          <label htmlFor="enableTranslatePropertyValues">Translate Text Properties</label>
-        </div>
+        <CheckboxField
+          id="enableTranslatePropertyValues"
+          label="Translate Text Properties"
+          checked={enableTranslatePropertyValues}
+          onChange={setEnableTranslatePropertyValues}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="enableTranslateShapeFields" checked={enableTranslateShapeFields} onChange={(e) => setEnableTranslateShapeFields(e.target.checked)} />
-          <label htmlFor="enableTranslateShapeFields">Translate Text Fields</label>
-        </div>
+        <CheckboxField
+          id="enableTranslateShapeFields"
+          label="Translate Text Fields"
+          checked={enableTranslateShapeFields}
+          onChange={setEnableTranslateShapeFields}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="enableTranslateUserRows" checked={enableTranslateUserRows} onChange={(e) => setEnableTranslateUserRows(e.target.checked)} />
-          <label htmlFor="enableTranslateUserRows">Translate Text User Rows</label>
-        </div>
+        <CheckboxField
+          id="enableTranslateUserRows"
+          label="Translate Text User Rows"
+          checked={enableTranslateUserRows}
+          onChange={setEnableTranslateUserRows}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="enableTranslatePropertyLabels" checked={enableTranslatePropertyLabels} onChange={(e) => setEnableTranslatePropertyLabels(e.target.checked)} />
-          <label htmlFor="enableTranslatePropertyLabels">Translate Property Labels</label>
-        </div>
+        <CheckboxField
+          id="enableTranslatePropertyLabels"
+          label="Translate Property Labels"
+          checked={enableTranslatePropertyLabels}
+          onChange={setEnableTranslatePropertyLabels}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="enableTranslatePageNames" checked={enableTranslatePageNames} onChange={(e) => setEnableTranslatePageNames(e.target.checked)} />
-          <label htmlFor="enableTranslatePageNames">Translate Page Names</label>
-        </div>
+        <CheckboxField
+          id="enableTranslatePageNames"
+          label="Translate Page Names"
+          checked={enableTranslatePageNames}
+          onChange={setEnableTranslatePageNames}
+        />
 
-        <div className="flex-items-center">
-          <label htmlFor="apiKey" className="mr-2">Your own OpenAI API Key (optional)</label>
-          <input type="text" id="apiKey" className="form-input grow mt-2" value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
-        </div>
+        <TextField
+          id="apiKey"
+          label="Your own OpenAI API Key (optional)"
+          value={apiKey}
+          onChange={setApiKey}
+        />
 
       </div>
 

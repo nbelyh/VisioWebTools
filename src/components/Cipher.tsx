@@ -6,6 +6,7 @@ import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
 import { stringifyError } from '../services/parse';
 import { DownloadButton } from './DownloadButton';
+import { CheckboxField } from './FormFields';
 
 export const Cipher = (props: {
 }) => {
@@ -90,47 +91,63 @@ export const Cipher = (props: {
 
       <div className='mb-4 flex'>
         <div className='w-1/2'>
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherText" checked={enableCipherShapeText} onChange={(e) => setEnableCipherShapeText(e.target.checked)} />
-            <label htmlFor="enableCipherText">Cipher Shape Text</label>
-          </div>
+          <CheckboxField
+            id="enableCipherText"
+            label="Cipher Shape Text"
+            checked={enableCipherShapeText}
+            onChange={setEnableCipherShapeText}
+          />
 
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherShapeFields" checked={enableCipherShapeFields} onChange={(e) => setEnableCipherShapeFields(e.target.checked)} />
-            <label htmlFor="enableCipherShapeFields">Cipher Shape Text Fields</label>
-          </div>
+          <CheckboxField
+            id="enableCipherShapeFields"
+            label="Cipher Shape Text Fields"
+            checked={enableCipherShapeFields}
+            onChange={setEnableCipherShapeFields}
+          />
 
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherPageNames" checked={enableCipherPageNames} onChange={(e) => setEnableCipherPageNames(e.target.checked)} />
-            <label htmlFor="enableCipherPageNames">Cipher Page Names</label>
-          </div>
+          <CheckboxField
+            id="enableCipherPageNames"
+            label="Cipher Page Names"
+            checked={enableCipherPageNames}
+            onChange={setEnableCipherPageNames}
+          />
 
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherPropertyValues" checked={enableCipherPropertyValues} onChange={(e) => setEnableCipherPropertyValues(e.target.checked)} />
-            <label htmlFor="enableCipherPropertyValues">Cipher Properties</label>
-          </div>
+          <CheckboxField
+            id="enableCipherPropertyValues"
+            label="Cipher Properties"
+            checked={enableCipherPropertyValues}
+            onChange={setEnableCipherPropertyValues}
+          />
 
         </div>
         <div className='w-1/2'>
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherUserRows" checked={enableCipherUserRows} onChange={(e) => setEnableCipherUserRows(e.target.checked)} />
-            <label htmlFor="enableCipherUserRows">Cipher User Rows</label>
-          </div>
+          <CheckboxField
+            id="enableCipherUserRows"
+            label="Cipher User Rows"
+            checked={enableCipherUserRows}
+            onChange={setEnableCipherUserRows}
+          />
 
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherDocumentProperties" checked={enableCipherDocumentProperties} onChange={(e) => setEnableCipherDocumentProperties(e.target.checked)} />
-            <label htmlFor="enableCipherDocumentProperties">Cipher Document Properties</label>
-          </div>
+          <CheckboxField
+            id="enableCipherDocumentProperties"
+            label="Cipher Document Properties"
+            checked={enableCipherDocumentProperties}
+            onChange={setEnableCipherDocumentProperties}
+          />
 
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherPropertyLabels" checked={enableCipherPropertyLabels} onChange={(e) => setEnableCipherPropertyLabels(e.target.checked)} />
-            <label htmlFor="enableCipherPropertyLabels">Cipher Property Labels</label>
-          </div>
+          <CheckboxField
+            id="enableCipherPropertyLabels"
+            label="Cipher Property Labels"
+            checked={enableCipherPropertyLabels}
+            onChange={setEnableCipherPropertyLabels}
+          />
 
-          <div className="flex-items-center">
-            <input type="checkbox" className="form-checkbox" id="enableCipherMasters" checked={enableCipherMasters} onChange={(e) => setEnableCipherMasters(e.target.checked)} />
-            <label htmlFor="enableCipherMasters">Cipher Masters</label>
-          </div>
+          <CheckboxField
+            id="enableCipherMasters"
+            label="Cipher Masters"
+            checked={enableCipherMasters}
+            onChange={setEnableCipherMasters}
+          />
         </div>
       </div>
 

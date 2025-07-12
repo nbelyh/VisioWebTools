@@ -4,6 +4,7 @@ import { PrimaryButton } from './PrimaryButton';
 import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
 import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
 import { ErrorNotification } from './ErrorNotification';
+import { CheckboxField } from './FormFields';
 
 export const JsonExport = (props: {
 }) => {
@@ -89,45 +90,61 @@ export const JsonExport = (props: {
 
       <div className='mb-4'>
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeText" checked={includeShapeText} onChange={(e) => setincludeShapeText(e.target.checked)} />
-          <label htmlFor="includeText">Include Shape Text</label>
-        </div>
+        <CheckboxField
+          id="includeText"
+          label="Include Shape Text"
+          checked={includeShapeText}
+          onChange={setincludeShapeText}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includePropertyRows" checked={includePropertyRows} onChange={(e) => setIncludePropertyRows(e.target.checked)} />
-          <label htmlFor="includePropertyRows">Include Shape Properties</label>
-        </div>
+        <CheckboxField
+          id="includePropertyRows"
+          label="Include Shape Properties"
+          checked={includePropertyRows}
+          onChange={setIncludePropertyRows}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeShapeFields" checked={includeShapeFields} onChange={(e) => setincludeShapeFields(e.target.checked)} />
-          <label htmlFor="includeShapeFields">Include Shape Fields</label>
-        </div>
+        <CheckboxField
+          id="includeShapeFields"
+          label="Include Shape Fields"
+          checked={includeShapeFields}
+          onChange={setincludeShapeFields}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeUserRows" checked={includeUserRows} onChange={(e) => setIncludeUserRows(e.target.checked)} />
-          <label htmlFor="includeUserRows">Include User Rows</label>
-        </div>
+        <CheckboxField
+          id="includeUserRows"
+          label="Include User Rows"
+          checked={includeUserRows}
+          onChange={setIncludeUserRows}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeDocumentProperties" checked={includeDocumentProperties} onChange={(e) => setIncludeDocumentProperties(e.target.checked)} />
-          <label htmlFor="includeDocumentProperties">Include Document Properties</label>
-        </div>
+        <CheckboxField
+          id="includeDocumentProperties"
+          label="Include Document Properties"
+          checked={includeDocumentProperties}
+          onChange={setIncludeDocumentProperties}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeMasters" checked={includeMasters} onChange={(e) => setIncludeMasters(e.target.checked)} />
-          <label htmlFor="includeMasters">Include Masters</label>
-        </div>
+        <CheckboxField
+          id="includeMasters"
+          label="Include Masters"
+          checked={includeMasters}
+          onChange={setIncludeMasters}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeEmptyShapes" checked={includeEmptyShapes} onChange={(e) => setIncludeEmptyShapes(e.target.checked)} />
-          <label htmlFor="includeEmptyShapes">Include Shapes with no data</label>
-        </div>
+        <CheckboxField
+          id="includeEmptyShapes"
+          label="Include Shapes with no data"
+          checked={includeEmptyShapes}
+          onChange={setIncludeEmptyShapes}
+        />
 
-        <div className="flex-items-center">
-          <input type="checkbox" className="form-checkbox" id="includeConnectors" checked={includeConnectors} onChange={(e) => setIncludeConnectors(e.target.checked)} />
-          <label htmlFor="includeConnectors">Include Connectors</label>
-        </div>
+        <CheckboxField
+          id="includeConnectors"
+          label="Include Connectors"
+          checked={includeConnectors}
+          onChange={setIncludeConnectors}
+        />
 
       </div>
 
