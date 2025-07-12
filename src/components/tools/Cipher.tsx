@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { DropZone } from './DropZone';
-import { PrimaryButton } from './PrimaryButton';
-import { AzureFunctionBackend } from '../services/AzureFunctionBackend';
-import { useDotNetFixedUrl } from '../services/useDotNetFixedUrl';
-import { ErrorNotification } from './ErrorNotification';
-import { useFileProcessing } from '../services/useFileProcessing';
-import { CheckboxField } from './FormFields';
-import { useLocalStorage } from '../services/useLocalStorage';
+import { DropZone } from './common/DropZone';
+import { PrimaryButton } from './common/PrimaryButton';
+import { AzureFunctionBackend } from '../../services/AzureFunctionBackend';
+import { useDotNetFixedUrl } from '../../services/useDotNetFixedUrl';
+import { ErrorNotification } from './common/ErrorNotification';
+import { useFileProcessing } from '../../services/useFileProcessing';
+import { CheckboxField } from './common/FormFields';
+import { useLocalStorage } from '../../services/useLocalStorage';
 
 export const Cipher = (props: {
 }) => {

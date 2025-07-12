@@ -1,4 +1,4 @@
-import { stringifyError } from '../services/parse';
+import { stringifyError } from '../../../services/parse';
 
 export const ErrorNotification = (props: {
   error?: string;
