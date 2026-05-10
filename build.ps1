@@ -1,7 +1,7 @@
 # a dev file to build api ocally
 
 # dotnet workload install wasm-tools
-dotnet restore visiowebtools-wasm
+dotnet restore visiowebtools-wasm-net8
 # dotnet test tests --logger trx --results-directory "TestResults"
 dotnet publish --configuration Debug visiowebtools-wasm
 # dotnet publish --configuration Release azure_function
