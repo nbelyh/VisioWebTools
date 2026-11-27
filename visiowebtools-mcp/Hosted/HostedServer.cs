@@ -1,7 +1,8 @@
 namespace VisioWebTools.Mcp.Hosted;
 
 /// <summary>
-/// The hosted MCP server: streamable HTTP at /mcp (stateless), plus the file endpoints.
+/// The hosted MCP server: streamable HTTP at /mcp (stateless), plus the file endpoints under /files.
+/// <see cref="AddVisioMcpHosting"/> is shared with the Azure Function app, which hosts it in production.
 /// </summary>
 public static class HostedServer
 {
@@ -11,24 +12,30 @@ public static class HostedServer
         "to drop the file into: start there whenever the user wants to work on a file, even one they attached to the chat. " +
         "Results come back as download links; give them to the user.";
 
-    public static async Task RunAsync(string[] args)
+    /// <summary>The hosted server's services: settings from the "Mcp" section, storage, links, tools.</summary>
+    public static IServiceCollection AddVisioMcpHosting(this IServiceCollection services, IConfiguration configuration)
     {
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.Configure<HostedOptions>(builder.Configuration.GetSection("Mcp"));
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddSingleton<Links>();
-        builder.Services.AddSingleton<FileStore>();
-        builder.Services.AddHostedService<FileCleanup>();
-
-        builder.Services
+        services.Configure<HostedOptions>(configuration.GetSection("Mcp"));
+        services.AddHttpContextAccessor();
+        services.AddSingleton<Links>();
+        services.AddSingleton<FileStore>();
+        services
             .AddMcpServer(o => o.ServerInstructions = Instructions)
-            .WithHttpTransport(o => o.Stateless = true)
             .WithTools<HostedTools>()
             .WithTools([UploadWidget.CreateUploadTool()])
             .WithResources([UploadWidget.CreateResource()]);
+        return services;
+    }
+
+    /// <summary>Runs the hosted server on its own (development; production runs in the Azure Function app).</summary>
+    public static async Task RunAsync(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddVisioMcpHosting(builder.Configuration);
+        builder.Services.AddHostedService<FileCleanup>();
 
         var app = builder.Build();
-        app.MapMcp("/mcp");
+        app.Map("/mcp", McpHttpEndpoint.HandleAsync);
         app.MapFileEndpoints();
         app.MapGet("/", () => "VisioWebTools MCP server. Connect an MCP client to /mcp.");
         await app.RunAsync();

@@ -11,7 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
-    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.4.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.30.2" />
   </ItemGroup>
   <ItemGroup>

@@ -14,16 +14,18 @@ namespace VisioWebTools.Mcp.Hosted;
 /// </summary>
 public static class FileEndpoints
 {
-    public static void MapFileEndpoints(this WebApplication app)
+    public static void MapFileEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapMethods("/files/upload/{batch}", ["OPTIONS"], (HttpContext ctx) =>
-        {
-            AllowCors(ctx);
-            return Results.NoContent();
-        });
-        app.MapPut("/files/upload/{batch}", Upload);
-        app.MapGet("/files/upload/{batch}", UploadPage);
-        app.MapGet("/files/{id}/{name}", Download);
+        app.MapMethods("/files/upload/{batch}", ["OPTIONS"], (HttpContext ctx) => Preflight(ctx));
+        app.MapPut("/files/upload/{batch}", (string batch, HttpContext ctx) => Upload(ctx, batch));
+        app.MapGet("/files/upload/{batch}", (string batch, HttpContext ctx) => UploadPage(ctx, batch));
+        app.MapGet("/files/{id}/{name}", (string id, HttpContext ctx) => Download(ctx, id));
+    }
+
+    public static IResult Preflight(HttpContext ctx)
+    {
+        AllowCors(ctx);
+        return Results.NoContent();
     }
 
     /// <summary>The widget runs in a sandboxed iframe of the chat host: its origin is the host's, or "null".</summary>
@@ -35,8 +37,11 @@ public static class FileEndpoints
         ctx.Response.Headers.AccessControlMaxAge = "3600";
     }
 
-    private static async Task<IResult> Upload(string batch, HttpContext ctx, Links links, FileStore store, IOptions<HostedOptions> options)
+    public static async Task<IResult> Upload(HttpContext ctx, string batch)
     {
+        var links = ctx.RequestServices.GetRequiredService<Links>();
+        var store = ctx.RequestServices.GetRequiredService<FileStore>();
+        var options = ctx.RequestServices.GetRequiredService<IOptions<HostedOptions>>();
         AllowCors(ctx);
         var q = ctx.Request.Query;
         if (!Links.IsValidId(batch) || !links.VerifyUpload(batch, q["exp"], q["sig"]))
@@ -91,8 +96,10 @@ public static class FileEndpoints
         return clean.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ? clean : Path.GetFileNameWithoutExtension(clean) + ext;
     }
 
-    private static async Task<IResult> Download(string id, HttpContext ctx, Links links, FileStore store)
+    public static async Task<IResult> Download(HttpContext ctx, string id)
     {
+        var links = ctx.RequestServices.GetRequiredService<Links>();
+        var store = ctx.RequestServices.GetRequiredService<FileStore>();
         var q = ctx.Request.Query;
         if (!Links.IsValidId(id) || !links.VerifyDownload(id, q["exp"], q["sig"]))
             return Results.Text("This download link is not valid or has expired.", statusCode: 403);
@@ -114,8 +121,9 @@ public static class FileEndpoints
     };
 
     /// <summary>A plain page to upload files, for chats that do not show the upload widget.</summary>
-    private static IResult UploadPage(string batch, HttpContext ctx, Links links)
+    public static IResult UploadPage(HttpContext ctx, string batch)
     {
+        var links = ctx.RequestServices.GetRequiredService<Links>();
         var q = ctx.Request.Query;
         if (!Links.IsValidId(batch) || !links.VerifyUpload(batch, q["exp"], q["sig"]))
             return Results.Text("This upload link is not valid or has expired. Ask the assistant for a new one.", statusCode: 403);
