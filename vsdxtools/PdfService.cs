@@ -1,5 +1,5 @@
 ﻿using System.Xml.Linq;
-using PdfSharpCore.Pdf.IO;
+using PdfSharp.Pdf.IO;
 using System.IO.Packaging;
 using System.IO;
 using System.Linq;
@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Xml.XPath;
 using System;
 using System.Globalization;
-using PdfSharpCore.Pdf.Annotations;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
+using PdfSharp.Pdf.Annotations;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
 
 namespace VsdxTools;
 
