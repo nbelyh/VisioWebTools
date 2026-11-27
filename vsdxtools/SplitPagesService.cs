@@ -162,7 +162,7 @@ public class SplitPagesService
             PageInfos = new List<PageInfo>()
         };
 
-        using (Package package = Package.Open(stream))
+        using (Package package = Package.Open(stream, FileMode.Open, FileAccess.Read))
         {
             var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
             Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);

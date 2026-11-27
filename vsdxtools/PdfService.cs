@@ -17,7 +17,7 @@ public class PdfService
 {
     public static byte[] Process(Stream pdfStream, Stream vsdxStream, PdfOptions options)
     {
-        using (Package package = Package.Open(vsdxStream))
+        using (Package package = Package.Open(vsdxStream, FileMode.Open, FileAccess.Read))
         {
             var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
             Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);

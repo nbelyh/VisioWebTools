@@ -18,7 +18,7 @@ public class ExtractMediaService
             {
                 XNamespace nsRel = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
-                using (Package package = Package.Open(stream))
+                using (Package package = Package.Open(stream, FileMode.Open, FileAccess.Read))
                 {
                     var documentRel = package.GetRelationshipsByType("http://schemas.microsoft.com/visio/2010/relationships/document").First();
                     Uri docUri = PackUriHelper.ResolvePartUri(new Uri("/", UriKind.Relative), documentRel.TargetUri);
