@@ -300,7 +300,7 @@ public class JsonExportService
 
     public static string Process(byte[] input, JsonExportOptions options)
     {
-        using (var stream = new MemoryStream(input))
+        using (var stream = VisioParser.CreateExpandableStream(input))
         {
             DocumentInfo documentInfo = ProcessDocument(stream, options);
             if (!options.IncludeEmptyShapes)

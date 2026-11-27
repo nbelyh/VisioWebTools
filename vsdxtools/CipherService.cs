@@ -280,7 +280,7 @@ namespace VsdxTools
 
         public static byte[] Process(byte[] input, CipherOptions options)
         {
-            using (var stream = new MemoryStream(input))
+            using (var stream = VisioParser.CreateExpandableStream(input))
             {
                 ProcessDocument(stream, options);
                 stream.Flush();

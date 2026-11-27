@@ -327,7 +327,7 @@ public class TranslateService
 
     public static byte[] ApplyTranslationJson(byte[] input, TranslateOptions options, string json)
     {
-        using (var stream = new MemoryStream(input))
+        using (var stream = VisioParser.CreateExpandableStream(input))
         {
             var context = new TranslationContext
             {
@@ -345,7 +345,7 @@ public class TranslateService
 
     public static string GetTranslationJson(byte[] input, TranslateOptions options)
     {
-        using (var stream = new MemoryStream(input))
+        using (var stream = VisioParser.CreateExpandableStream(input))
         {
             var context = new TranslationContext
             {

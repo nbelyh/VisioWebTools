@@ -18,6 +18,18 @@ class VisioParser
         }
     }
 
+    /// <summary>
+    /// Copies bytes into a resizable stream. new MemoryStream(byte[]) is fixed-size,
+    /// which fails when a package opened over it grows on save.
+    /// </summary>
+    public static MemoryStream CreateExpandableStream(byte[] input)
+    {
+        var stream = new MemoryStream(input.Length);
+        stream.Write(input, 0, input.Length);
+        stream.Position = 0;
+        return stream;
+    }
+
     private static XmlNamespaceManager CreateVisioXmlNamespaceManager()
     {
         var ns = new XmlNamespaceManager(new NameTable());
