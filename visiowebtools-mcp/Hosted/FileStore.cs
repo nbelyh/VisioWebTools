@@ -15,21 +15,39 @@ public sealed class FileStore
 {
     private readonly BlobContainerClient container;
     private readonly HostedOptions options;
-    private readonly Lazy<Task> created;
+    private volatile bool created;
 
     public FileStore(IOptions<HostedOptions> options)
     {
         this.options = options.Value;
         container = new BlobContainerClient(this.options.StorageConnectionString, this.options.Container);
-        created = new Lazy<Task>(() => container.CreateIfNotExistsAsync());
     }
 
     public TimeSpan Lifetime => options.FileLifetime;
 
+    /// <summary>
+    /// Creates the container on first use. A failure is not remembered: the next call tries again, so a
+    /// passing storage error does not break the store until restart. Concurrent first calls are harmless.
+    /// </summary>
+    private async Task EnsureCreatedAsync(CancellationToken ct)
+    {
+        if (created)
+            return;
+        await container.CreateIfNotExistsAsync(cancellationToken: ct);
+        created = true;
+    }
+
+    /// <summary>Whether something is stored under this id (expired or not): ids are written once.</summary>
+    public async Task<bool> ExistsAsync(string id, CancellationToken ct = default)
+    {
+        await EnsureCreatedAsync(ct);
+        return (await container.GetBlobClient(id).ExistsAsync(ct)).Value;
+    }
+
     /// <summary>Stores a file under a new id. False if the id is taken: each id is written once.</summary>
     public async Task<bool> TryAddAsync(string id, string name, byte[] content, CancellationToken ct = default)
     {
-        await created.Value;
+        await EnsureCreatedAsync(ct);
         try
         {
             await container.GetBlobClient(id).UploadAsync(new BinaryData(content), new BlobUploadOptions
@@ -50,19 +68,24 @@ public sealed class FileStore
     {
         if (!Links.IsValidId(id))
             return null;
-        await created.Value;
+        await EnsureCreatedAsync(ct);
         var blob = container.GetBlobClient(id);
         try
         {
-            var result = await blob.DownloadContentAsync(ct);
-            var details = result.Value.Details;
-            var createdOn = details.CreatedOn;
+            // Check expiry on the properties first, so an expired file is not downloaded for nothing.
+            var properties = (await blob.GetPropertiesAsync(cancellationToken: ct)).Value;
+            var createdOn = properties.CreatedOn;
             if (createdOn + options.FileLifetime < DateTimeOffset.UtcNow)
             {
                 await blob.DeleteIfExistsAsync(cancellationToken: ct);
                 return null;
             }
-            var name = details.Metadata.TryGetValue("name", out var n) ? Uri.UnescapeDataString(n) : id;
+            // Download the version just checked: files are written once, but be exact.
+            var result = await blob.DownloadContentAsync(new BlobDownloadOptions
+            {
+                Conditions = new BlobRequestConditions { IfMatch = properties.ETag },
+            }, ct);
+            var name = properties.Metadata.TryGetValue("name", out var n) ? Uri.UnescapeDataString(n) : id;
             return new StoredFile(id, name, result.Value.Content.ToArray(), createdOn);
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
@@ -74,7 +97,7 @@ public sealed class FileStore
     /// <summary>Deletes expired files. Returns how many.</summary>
     public async Task<int> DeleteExpiredAsync(CancellationToken ct = default)
     {
-        await created.Value;
+        await EnsureCreatedAsync(ct);
         var cutoff = DateTimeOffset.UtcNow - options.FileLifetime;
         var deleted = 0;
         await foreach (var blob in container.GetBlobsAsync(cancellationToken: ct))

@@ -82,7 +82,9 @@ website's API, and deploys with it (Azure Pipelines):
 
 A timer function deletes expired files every 10 minutes. With no settings, the server uses the function app's
 own storage account (`AzureWebJobsStorage`, container `mcp-files`) and derives its link-signing key from that
-connection string, so nothing has to be configured. To run the same layout locally:
+connection string, so nothing has to be configured, as long as `AzureWebJobsStorage` is a connection string.
+If the app uses identity-based storage instead, set `Mcp__StorageConnectionString`: the MCP endpoints then
+answer with an error saying so, while the website's functions keep working. To run the same layout locally:
 `dotnet run --project visiowebtools-mcp -- --http --Mcp:BasePath=/api`.
 
 ## Hosted configuration
@@ -94,7 +96,7 @@ Settings come from the `Mcp` configuration section; as environment variables / a
 | `Mcp__StorageConnectionString` | the function app's `AzureWebJobsStorage`; otherwise `UseDevelopmentStorage=true` (Azurite) | The Azure Storage account for files |
 | `Mcp__Container` | `mcp-files` | Created on first use |
 | `Mcp__SigningKey` | derived from the storage connection string | Base64. Signs upload and download links; set it to make links independent of the storage key |
-| `Mcp__PublicBaseUrl` | the request's address | Set it behind a proxy that changes the host, or with a custom domain |
+| `Mcp__PublicBaseUrl` | `https://` + the app's host name in Azure; the request's address elsewhere | Scheme and host for links, without the base path. Set it for a custom domain or behind a proxy |
 | `Mcp__BasePath` | `/api` in the function app, empty in the dev server | The route prefix links include |
 | `Mcp__FileLifetime` | `01:00:00` | How long files are kept |
 | `Mcp__UploadLinkLifetime` | `00:30:00` | |

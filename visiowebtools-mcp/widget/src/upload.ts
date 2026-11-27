@@ -12,6 +12,8 @@ interface Ticket {
   maxFiles: number;
   maxBytes: number;
   expiresAt: string;
+  /** How long files are kept, for people: "1 hour". */
+  fileLifetime?: string;
 }
 
 /** What the upload link answers. */
@@ -36,7 +38,8 @@ app.ontoolresult = (params) => {
   const t = params.structuredContent as Partial<Ticket> | undefined;
   if (t?.uploadUrl) {
     ticket = t as Ticket;
-    hint.textContent = `Files are kept for 1 hour, then deleted. Up to ${ticket.maxFiles} files, ${Math.round(ticket.maxBytes / 1048576)} MB each.`;
+    const kept = ticket.fileLifetime ? `Files are kept for ${ticket.fileLifetime}, then deleted.` : "Files are kept for a limited time.";
+    hint.textContent = `${kept} Up to ${ticket.maxFiles} files, ${Math.round(ticket.maxBytes / 1048576)} MB each.`;
   } else {
     hint.textContent = "This upload box has no upload link. Ask for a new one.";
   }

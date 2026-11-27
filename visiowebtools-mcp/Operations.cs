@@ -97,11 +97,37 @@ public static class Operations
         }
     }
 
-    /// <summary>A .vsdx is a zip package.</summary>
     public static void RequireVsdx(byte[] bytes)
     {
-        if (bytes.Length < 4 || bytes[0] != 'P' || bytes[1] != 'K')
+        if (!IsZip(bytes))
             throw new McpException("That is not a .vsdx file. Older .vsd files are not supported: save them as .vsdx in Visio first.");
+        if (!IsVsdx(bytes))
+            throw new McpException("That is a zip package, but not a Visio drawing (.vsdx): for example a Word or Excel file.");
+    }
+
+    public static bool IsZip(byte[] bytes) => bytes.Length >= 4 && bytes[0] == 'P' && bytes[1] == 'K';
+
+    /// <summary>
+    /// A Visio drawing: a zip package whose content types declare a Visio document part
+    /// ("application/vnd.ms-visio.drawing.main+xml", or the macro-enabled variant).
+    /// </summary>
+    public static bool IsVsdx(byte[] bytes)
+    {
+        if (!IsZip(bytes))
+            return false;
+        try
+        {
+            using var zip = new System.IO.Compression.ZipArchive(new MemoryStream(bytes, writable: false), System.IO.Compression.ZipArchiveMode.Read);
+            var types = zip.GetEntry("[Content_Types].xml");
+            if (types is null || types.Length > 1024 * 1024)
+                return false;
+            using var reader = new StreamReader(types.Open());
+            return reader.ReadToEnd().Contains("application/vnd.ms-visio.drawing", StringComparison.OrdinalIgnoreCase);
+        }
+        catch (InvalidDataException)
+        {
+            return false;
+        }
     }
 
     public static void RequirePdf(byte[] bytes)

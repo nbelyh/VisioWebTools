@@ -17,6 +17,11 @@ builder.Services.PostConfigure<HostedOptions>(o =>
     // Without a storage account of its own, the MCP server uses the function app's.
     if (builder.Configuration["Mcp:StorageConnectionString"] is null && builder.Configuration["AzureWebJobsStorage"] is { Length: > 0 } jobs)
         o.StorageConnectionString = jobs;
+    // Links must be https on the app's public name. The worker gets requests proxied from the Functions
+    // host, so the request's own scheme and host are not reliable there.
+    if (string.IsNullOrEmpty(o.PublicBaseUrl) && HostedOptions.RunningInAzure
+        && Environment.GetEnvironmentVariable("WEBSITE_HOSTNAME") is { Length: > 0 } host)
+        o.PublicBaseUrl = $"https://{host}";
 });
 
 builder.Build().Run();

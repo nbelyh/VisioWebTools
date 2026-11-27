@@ -15,7 +15,14 @@ public static class HostedServer
     /// <summary>The hosted server's services: settings from the "Mcp" section, storage, links, tools.</summary>
     public static IServiceCollection AddVisioMcpHosting(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<HostedOptions>(configuration.GetSection("Mcp"));
+        services.AddOptions<HostedOptions>()
+            .Bind(configuration.GetSection("Mcp"))
+            // In Azure the emulator cannot work, and links would be signed with a key derived from its
+            // well-known connection string. Checked when the MCP server is first used, so a misconfigured
+            // MCP server fails loudly without taking the rest of a function app down with it.
+            .Validate(o => !(o.UsesDevelopmentStorage && HostedOptions.RunningInAzure),
+                "The MCP server has no storage account: set Mcp__StorageConnectionString (or AzureWebJobsStorage as a " +
+                "connection string) in the app settings. Identity-based storage is not supported.");
         services.AddHttpContextAccessor();
         services.AddSingleton<Links>();
         services.AddSingleton<FileStore>();

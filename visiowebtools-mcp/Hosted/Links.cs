@@ -37,10 +37,17 @@ public sealed partial class Links
     {
         get
         {
+            string root;
             if (!string.IsNullOrEmpty(options.PublicBaseUrl))
-                return options.PublicBaseUrl.TrimEnd('/');
-            var request = http.HttpContext?.Request ?? throw new InvalidOperationException("No request to take the server's address from; set Mcp:PublicBaseUrl.");
-            return $"{request.Scheme}://{request.Host}{request.PathBase}{options.BasePath.TrimEnd('/')}";
+            {
+                root = options.PublicBaseUrl.TrimEnd('/');
+            }
+            else
+            {
+                var request = http.HttpContext?.Request ?? throw new InvalidOperationException("No request to take the server's address from; set Mcp:PublicBaseUrl.");
+                root = $"{request.Scheme}://{request.Host}{request.PathBase}";
+            }
+            return root + options.BasePath.TrimEnd('/');
         }
     }
 

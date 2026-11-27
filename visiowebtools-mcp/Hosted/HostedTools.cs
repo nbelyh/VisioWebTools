@@ -21,7 +21,7 @@ public sealed class HostedTools(FileStore store, Links links, IOptions<HostedOpt
         "Show the user a box in the chat to drop their Visio file (.vsdx) or PDF into. This is the only way a file " +
         "reaches these tools: files attached to the chat do not reach this server, and file contents cannot be passed " +
         "as text. Call it first, ask the user to drop the file into the box, and you are told the file_id once they " +
-        "have. The result also has a browser link and a curl command, for chats that show no box. Files are kept for 1 hour.";
+        "have. The result also has a browser link and a curl command, for chats that show no box. Files are kept for a limited time, given in the result.";
 
     /// <summary>Registered by hand (see <see cref="HostedServer"/>): it carries the widget in its _meta.</summary>
     public CallToolResult UploadFile()
@@ -35,7 +35,7 @@ public sealed class HostedTools(FileStore store, Links links, IOptions<HostedOpt
             $"you are told each file's file_id when it arrives. If the user sees no box, they can open this page in a browser " +
             $"and paste back the file id it shows: {url}\n" +
             $"From a terminal (e.g. Claude Code): curl -sT <file> \"{url}\" prints the file_id as JSON.\n" +
-            $"The link takes up to {o.MaxFilesPerUpload} files of up to {o.MaxFileBytes / 1048576} MB until {expires:u}; files are kept for {o.FileLifetime.TotalMinutes:0} minutes.";
+            $"The link takes up to {o.MaxFilesPerUpload} files of up to {o.MaxFileBytes / 1048576} MB until {expires:u}; files are kept for {o.FileLifetimeText}.";
         return new CallToolResult
         {
             Content = [new TextContentBlock { Text = text }],
@@ -45,6 +45,7 @@ public sealed class HostedTools(FileStore store, Links links, IOptions<HostedOpt
                 maxFiles = o.MaxFilesPerUpload,
                 maxBytes = o.MaxFileBytes,
                 expiresAt = expires,
+                fileLifetime = o.FileLifetimeText,
             }),
         };
     }
@@ -132,7 +133,7 @@ public sealed class HostedTools(FileStore store, Links links, IOptions<HostedOpt
 
     private async Task<StoredFile> Load(string fileId, CancellationToken ct) =>
         await store.GetAsync(fileId?.Trim() ?? "", ct)
-        ?? throw new McpException($"No file with file_id '{fileId}': it was not uploaded, or it expired (files are kept for {options.Value.FileLifetime.TotalMinutes:0} minutes). Call upload_file and ask the user to drop it again.");
+        ?? throw new McpException($"No file with file_id '{fileId}': it was not uploaded, or it expired (files are kept for {options.Value.FileLifetimeText}). Call upload_file and ask the user to drop it again.");
 
     private static string Derive(StoredFile input, string suffix, string ext) =>
         Path.GetFileNameWithoutExtension(input.Name) + suffix + ext;

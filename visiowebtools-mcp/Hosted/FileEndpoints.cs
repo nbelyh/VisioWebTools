@@ -63,13 +63,18 @@ public static class FileEndpoints
 
         var ext = KindOf(content);
         if (ext is null)
-            return Results.Text("Only .vsdx and .pdf files can be uploaded.", statusCode: 415);
+            return Results.Text(Operations.IsZip(content)
+                ? "That is not a Visio drawing (.vsdx): only .vsdx and .pdf files can be uploaded."
+                : "Only .vsdx and .pdf files can be uploaded.", statusCode: 415);
         var name = CleanName(q["name"], ext);
 
-        // A link takes a few files: each lands in the first free slot, written once.
+        // A link takes a few files: each lands in the first free slot, written once. Taken slots are
+        // skipped without sending the file; the conditional write still settles a race for the same slot.
         for (var slot = 0; slot < options.Value.MaxFilesPerUpload; slot++)
         {
             var id = batch + (char)('a' + slot);
+            if (await store.ExistsAsync(id, ctx.RequestAborted))
+                continue;
             if (await store.TryAddAsync(id, name, content, ctx.RequestAborted))
                 return Results.Json(new { fileId = id, name, size = content.Length });
         }
@@ -79,9 +84,9 @@ public static class FileEndpoints
     private static IResult TooLarge(int max) =>
         Results.Text($"The file is over the {max / 1048576} MB limit.", statusCode: 413);
 
-    /// <summary>The kind of file, by its first bytes: a .vsdx is a zip package.</summary>
+    /// <summary>The kind of file, by its content: a .vsdx is a zip package with a Visio document in it.</summary>
     private static string? KindOf(byte[] content) =>
-        content.Length >= 4 && content[0] == 'P' && content[1] == 'K' ? ".vsdx"
+        Operations.IsVsdx(content) ? ".vsdx"
         : content.Length >= 5 && "%PDF-"u8.SequenceEqual(content.AsSpan(0, 5)) ? ".pdf"
         : null;
 
@@ -124,13 +129,17 @@ public static class FileEndpoints
     public static IResult UploadPage(HttpContext ctx, string batch)
     {
         var links = ctx.RequestServices.GetRequiredService<Links>();
+        var options = ctx.RequestServices.GetRequiredService<IOptions<HostedOptions>>();
         var q = ctx.Request.Query;
         if (!Links.IsValidId(batch) || !links.VerifyUpload(batch, q["exp"], q["sig"]))
             return Results.Text("This upload link is not valid or has expired. Ask the assistant for a new one.", statusCode: 403);
         var url = WebUtility.HtmlEncode(links.UploadUrl(batch, DateTimeOffset.FromUnixTimeSeconds(long.Parse(q["exp"]!))));
         ctx.Response.Headers.CacheControl = "no-store";
         ctx.Response.Headers.ContentSecurityPolicy = "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'";
-        return Results.Content(UploadPageHtml.Replace("{{URL}}", url), "text/html; charset=utf-8");
+        var html = UploadPageHtml
+            .Replace("{{URL}}", url)
+            .Replace("{{LIFETIME}}", WebUtility.HtmlEncode(options.Value.FileLifetimeText));
+        return Results.Content(html, "text/html; charset=utf-8");
     }
 
     private const string UploadPageHtml = """
@@ -150,7 +159,7 @@ public static class FileEndpoints
         <div id="drop"><p><strong>Drop a .vsdx or .pdf file here</strong></p>
         <input id="pick" type="file" accept=".vsdx,.pdf" multiple></div>
         <ul id="files"></ul>
-        <p><small>Copy the file id back into the chat. Files are kept for 1 hour, then deleted.</small></p>
+        <p><small>Copy the file id back into the chat. Files are kept for {{LIFETIME}}, then deleted.</small></p>
         <script>
           const url = document.body.dataset.url, list = document.getElementById('files'), drop = document.getElementById('drop');
           async function send(file) {
