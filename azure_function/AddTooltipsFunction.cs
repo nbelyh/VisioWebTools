@@ -58,7 +58,7 @@ namespace VisioWebToolsAzureFunctions
             if (pdf == null || vsdx == null)
             {
                 var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-                errorResponse.WriteString("File(s) not received");
+                await errorResponse.WriteStringAsync("File(s) not received");
                 return errorResponse;
             }
 
@@ -67,7 +67,7 @@ namespace VisioWebToolsAzureFunctions
             var response = req.CreateResponse(System.Net.HttpStatusCode.OK);
             response.Headers.Add("Content-Disposition", "attachment; filename=result.pdf");
             response.Headers.Add("Content-Type", "application/pdf");
-            response.WriteBytes(output);
+            await response.WriteBytesAsync(output);
             return response;
         }
     }
