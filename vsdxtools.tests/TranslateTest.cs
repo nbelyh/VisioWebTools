@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class TranslateTest
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(@"../../../../public/samples/TranslateMe.vsdx")]
     public void TranslateFile(string file)
     {
@@ -35,7 +35,7 @@ public class TranslateTest
         // File.WriteAllBytes(@"../../../../public/samples/_.vsdx", bytes);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(@"../../../../public/samples/ExtractFromMe.vsdx")]
     public void TestApplyTranslation(string folder)
     {

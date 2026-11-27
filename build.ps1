@@ -1,9 +1,9 @@
 # a dev file to build api ocally
 
 # dotnet workload install wasm-tools
-dotnet restore visiowebtools-wasm-net8
+dotnet restore visiowebtools-wasm
 # dotnet test tests --logger trx --results-directory "TestResults"
 dotnet publish --configuration Debug visiowebtools-wasm
 # dotnet publish --configuration Release azure_function
 Remove-Item ./public/AppBundle -Force -Recurse -ErrorAction SilentlyContinue
-Copy-Item visiowebtools-wasm/bin/Debug/net8.0/browser-wasm/AppBundle ./public -Recurse
+Copy-Item visiowebtools-wasm/bin/Debug/net10.0/browser-wasm/AppBundle ./public -Recurse

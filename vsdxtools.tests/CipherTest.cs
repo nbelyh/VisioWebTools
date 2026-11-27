@@ -9,7 +9,7 @@ public class CipherTest
 {
     [DataRow(@"../../../../public/samples/CipherMe.vsdx")]
     [DataRow(@"../../../samples/DocInfo.vsdx")]
-    [DataTestMethod]
+    [TestMethod]
     public void CipherFile(string filePath)
     {
         var input = File.ReadAllBytes(filePath);

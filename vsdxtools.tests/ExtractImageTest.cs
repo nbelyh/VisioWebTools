@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class ExtractIagesTest
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(@"../../../../public/samples/ImageSample.vsdx")]
     public void ExtractImageSampleFile(string file)
     {

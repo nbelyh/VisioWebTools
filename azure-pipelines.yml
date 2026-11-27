@@ -14,6 +14,10 @@ stages:
   jobs:
   - job: Build
     steps:
+    - task: UseDotNet@2
+      inputs:
+        useGlobalJson: true
+
     - task: DotNetCoreCLI@2
       inputs:
         command: publish
@@ -61,5 +65,5 @@ stages:
               appType: functionApp
               appName: 'visiowebtools'
               package: $(System.ArtifactsDirectory)/drop/**/*.zip
-              runtimeStack: DOTNET-ISOLATED|8.0
+              runtimeStack: DOTNET-ISOLATED|10.0
               deploymentMethod: 'auto' # 'auto' | 'zipDeploy' | 'runFromPackage'. Required. Deployment method. Default: auto.

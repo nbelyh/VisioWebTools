@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class SplitFileTest
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(@"../../../../public/samples/SplitMe.vsdx")]
     public void SplitPagesSampleFile(string file)
     {

@@ -22,11 +22,11 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          global-json-file: global.json
       - name: Install wasm workload
-        run: dotnet workload install wasm-tools-net8
+        run: dotnet workload install wasm-tools
       - name: Install dependencies
         run: dotnet restore visiowebtools-wasm
       - name: Test
@@ -40,7 +40,7 @@ jobs:
       - name: Build
         run: dotnet publish --configuration Release visiowebtools-wasm
       - name: Copy AppBundle to public
-        run: cp -r visiowebtools-wasm/bin/Release/net8.0/browser-wasm/AppBundle public
+        run: cp -r visiowebtools-wasm/bin/Release/net10.0/browser-wasm/AppBundle public
       - name: Install, build, and upload your site
         uses: withastro/action@v2
         # with:

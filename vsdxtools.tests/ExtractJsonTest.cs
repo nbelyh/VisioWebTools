@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class ExtractJsonTest
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(@"../../../../public/samples/ExtractFromMe.vsdx")]
     [DataRow(@"../../../samples/Drawing1.vsdx")]
     [DataRow(@"../../../samples/DocInfo.vsdx")]
