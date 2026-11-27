@@ -86,7 +86,9 @@ public class TranslateService
             case TranslationDirection.Set:
                 if (!translatedValues.TryGetValue(shapeValue, out var jsonValue))
                 {
-                    jsonValue = getJsonValue();
+                    // keep the original when the translation has no value for it
+                    // (e.g. an LLM dropped the key) instead of erasing the text
+                    jsonValue = getJsonValue() ?? shapeValue;
                     translatedValues.Add(shapeValue, jsonValue);
                 }
                 setShapeValue(jsonValue);
@@ -331,7 +333,7 @@ public class TranslateService
         {
             var context = new TranslationContext
             {
-                DocumentInfo = JsonSerializer.Deserialize(json, DocumentInfoJsonContext.Context.DocumentInfo),
+                DocumentInfo = JsonSerializer.Deserialize(json, DocumentInfoJsonContext.Context.DocumentInfo) ?? new(),
                 Options = options,
                 Direction = TranslationDirection.Set
             };
