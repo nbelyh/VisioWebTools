@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -11,9 +11,22 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.15" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.4.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.30.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\vsdxtools\VsdxTools.csproj" />
   </ItemGroup>
+
+  <!-- The upload widget (widget/): bundled by npm into one HTML page and embedded. -->
+  <ItemGroup>
+    <WidgetSource Include="widget/src/**;widget/build.mjs;widget/package.json" />
+    <EmbeddedResource Include="widget/dist/upload.html" LogicalName="upload.html" />
+    <Content Remove="widget/**" />
+    <None Remove="widget/**" />
+  </ItemGroup>
+  <Target Name="BuildWidget" BeforeTargets="BeforeBuild;PrepareForBuild" Inputs="@(WidgetSource)" Outputs="widget/dist/upload.html">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="widget" Condition="!Exists('widget/node_modules')" />
+    <Exec Command="npm run build" WorkingDirectory="widget" />
+  </Target>
 </Project>

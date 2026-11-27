@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Drawing;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
 using VsdxTools;
@@ -7,11 +6,10 @@ using VsdxTools;
 namespace VisioWebTools.Mcp;
 
 /// <summary>
-/// MCP tools wrapping the VsdxTools library. All tools work on local file paths,
-/// since this server runs locally next to the MCP client (stdio transport).
+/// The tools of the local server (stdio): they read and write files on the user's computer, by path.
 /// </summary>
 [McpServerToolType]
-public static class VisioTools
+public sealed class LocalTools
 {
     [McpServerTool(Name = "extract_json", ReadOnly = true, Idempotent = true)]
     [Description("Reads a Visio VSDX file and returns its content as JSON: pages, shapes, shape text, fields, shape data (properties), user cells, masters, connections and document properties. Use this to understand or answer questions about a diagram.")]
@@ -25,42 +23,22 @@ public static class VisioTools
         [Description("Include document properties")] bool includeDocumentProperties = true,
         [Description("Include shapes that have no text/data")] bool includeEmptyShapes = false,
         [Description("Include connector shapes and connections")] bool includeConnectors = true)
-    {
-        var options = new JsonExportOptions
-        {
-            IncludeShapeText = includeShapeText,
-            IncludeShapeFields = includeShapeFields,
-            IncludePropertyRows = includePropertyRows,
-            IncludeUserRows = includeUserRows,
-            IncludeMasters = includeMasters,
-            IncludeDocumentProperties = includeDocumentProperties,
-            IncludeEmptyShapes = includeEmptyShapes,
-            IncludeConnectors = includeConnectors,
-        };
-        return JsonExportService.Process(ReadInput(vsdxPath), options);
-    }
+        => Operations.ExtractJson(ReadInput(vsdxPath), includeShapeText, includeShapeFields, includePropertyRows,
+            includeUserRows, includeMasters, includeDocumentProperties, includeEmptyShapes, includeConnectors);
 
     [McpServerTool(Name = "split_pages", Destructive = false)]
     [Description("Splits a multi-page Visio VSDX file into separate single-page files, returned as a ZIP archive.")]
     public static string SplitPages(
         [Description("Absolute path to the input .vsdx file")] string vsdxPath,
         [Description("Path for the output .zip file. Defaults to '<input>-pages.zip' next to the input.")] string? outputPath = null)
-    {
-        using var stream = File.OpenRead(CheckExists(vsdxPath));
-        var bytes = SplitPagesService.SplitPages(stream);
-        return WriteOutput(outputPath ?? Derive(vsdxPath, "-pages", ".zip"), bytes);
-    }
+        => WriteOutput(outputPath ?? Derive(vsdxPath, "-pages", ".zip"), Operations.SplitPages(ReadInput(vsdxPath)));
 
     [McpServerTool(Name = "extract_images", Destructive = false)]
     [Description("Extracts embedded media (images) from a Visio VSDX file into a ZIP archive.")]
     public static string ExtractImages(
         [Description("Absolute path to the input .vsdx file")] string vsdxPath,
         [Description("Path for the output .zip file. Defaults to '<input>-media.zip' next to the input.")] string? outputPath = null)
-    {
-        using var stream = File.OpenRead(CheckExists(vsdxPath));
-        var bytes = ExtractMediaService.ExtractMedia(stream);
-        return WriteOutput(outputPath ?? Derive(vsdxPath, "-media", ".zip"), bytes);
-    }
+        => WriteOutput(outputPath ?? Derive(vsdxPath, "-media", ".zip"), Operations.ExtractImages(ReadInput(vsdxPath)));
 
     [McpServerTool(Name = "add_pdf_tooltips", Destructive = false)]
     [Description("Takes a PDF exported from Visio plus the original VSDX, and adds the Visio shape comments as PDF annotations (tooltips) over the matching shapes.")]
@@ -72,19 +50,8 @@ public static class VisioTools
         [Description("Annotation icon: Note, Comment, Help, Insert, Key, NewParagraph, Paragraph")] string icon = "Note",
         [Description("Horizontal icon position relative to shape (0 = left)")] int x = 0,
         [Description("Vertical icon position relative to shape (0 = top)")] int y = 0)
-    {
-        var options = new PdfOptions
-        {
-            Color = ColorTranslator.FromHtml(color),
-            Icon = icon,
-            HorizontalLocation = x,
-            VerticalLocation = y,
-        };
-        using var pdf = File.OpenRead(CheckExists(pdfPath));
-        using var vsdx = File.OpenRead(CheckExists(vsdxPath));
-        var bytes = PdfService.Process(pdf, vsdx, options);
-        return WriteOutput(outputPath ?? Derive(pdfPath, "-tooltips", ".pdf"), bytes);
-    }
+        => WriteOutput(outputPath ?? Derive(pdfPath, "-tooltips", ".pdf"),
+            Operations.AddPdfTooltips(ReadInput(pdfPath), ReadInput(vsdxPath), color, icon, x, y));
 
     [McpServerTool(Name = "cipher_file", Destructive = false)]
     [Description("Obfuscates (scrambles) the text in a Visio VSDX file so it can be shared safely, e.g. for bug reports, while keeping the diagram structure.")]
@@ -111,12 +78,11 @@ public static class VisioTools
             EnableCipherUserRows = userRows,
             EnableCipherDocumentProperties = documentProperties,
         };
-        var bytes = CipherService.Process(ReadInput(vsdxPath), options);
-        return WriteOutput(outputPath ?? Derive(vsdxPath, "-ciphered", ".vsdx"), bytes);
+        return WriteOutput(outputPath ?? Derive(vsdxPath, "-ciphered", ".vsdx"), Operations.Cipher(ReadInput(vsdxPath), options));
     }
 
     [McpServerTool(Name = "get_translatable_text", ReadOnly = true, Idempotent = true)]
-    [Description("Step 1 of translating a diagram: returns a JSON document with all translatable strings of a VSDX file. Translate the string values in this JSON (keep keys and structure unchanged), then pass it to apply_translation.")]
+    [Description("Step 1 of translating a diagram: returns a JSON document with all translatable strings of a VSDX file. Translate the string values in this JSON (keep keys, structure and {xx0} formatting markers unchanged), then pass it to apply_translation.")]
     public static string GetTranslatableText(
         [Description("Absolute path to the input .vsdx file")] string vsdxPath,
         bool shapeText = true,
@@ -125,12 +91,11 @@ public static class VisioTools
         bool propertyValues = true,
         bool propertyLabels = true,
         bool userRows = false)
-    {
-        return TranslateService.GetTranslationJson(ReadInput(vsdxPath), TranslateOpts(shapeText, shapeFields, pageNames, propertyValues, propertyLabels, userRows));
-    }
+        => Operations.GetTranslatableText(ReadInput(vsdxPath),
+            Operations.TranslateOptions(shapeText, shapeFields, pageNames, propertyValues, propertyLabels, userRows));
 
     [McpServerTool(Name = "apply_translation", Destructive = false)]
-    [Description("Step 2 of translating a diagram: writes translated strings (the JSON returned by get_translatable_text, with values translated) back into a copy of the VSDX file. Use the same option flags as in step 1.")]
+    [Description("Step 2 of translating a diagram: writes translated strings (the JSON returned by get_translatable_text, with values translated) back into a copy of the VSDX file. Strings left out keep their original text. Use the same option flags as in step 1.")]
     public static string ApplyTranslation(
         [Description("Absolute path to the original .vsdx file")] string vsdxPath,
         [Description("The translated JSON, same structure as returned by get_translatable_text")] string translatedJson,
@@ -141,29 +106,17 @@ public static class VisioTools
         bool propertyValues = true,
         bool propertyLabels = true,
         bool userRows = false)
-    {
-        var bytes = TranslateService.ApplyTranslationJson(ReadInput(vsdxPath), TranslateOpts(shapeText, shapeFields, pageNames, propertyValues, propertyLabels, userRows), translatedJson);
-        return WriteOutput(outputPath ?? Derive(vsdxPath, "-translated", ".vsdx"), bytes);
-    }
+        => WriteOutput(outputPath ?? Derive(vsdxPath, "-translated", ".vsdx"),
+            Operations.ApplyTranslation(ReadInput(vsdxPath),
+                Operations.TranslateOptions(shapeText, shapeFields, pageNames, propertyValues, propertyLabels, userRows),
+                translatedJson));
 
-    private static TranslateOptions TranslateOpts(bool shapeText, bool shapeFields, bool pageNames, bool propertyValues, bool propertyLabels, bool userRows) => new()
-    {
-        EnableTranslateShapeText = shapeText,
-        EnableTranslateShapeFields = shapeFields,
-        EnableTranslatePageNames = pageNames,
-        EnableTranslatePropertyValues = propertyValues,
-        EnableTranslatePropertyLabels = propertyLabels,
-        EnableTranslateUserRows = userRows,
-    };
-
-    private static string CheckExists(string path)
+    private static byte[] ReadInput(string path)
     {
         if (!File.Exists(path))
             throw new McpException($"File not found: {path}");
-        return path;
+        return File.ReadAllBytes(path);
     }
-
-    private static byte[] ReadInput(string path) => File.ReadAllBytes(CheckExists(path));
 
     private static string Derive(string input, string suffix, string ext)
     {

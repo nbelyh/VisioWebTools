@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upload a Visio file</title>
+<style>
+  :root { color-scheme: light dark; --fg: #1f2328; --muted: #656d76; --border: #d0d7de; --accent: #0969da; --accent-bg: #ddf4ff; --bg: transparent; --ok: #1a7f37; --err: #cf222e; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #e6edf3; --muted: #8d96a0; --border: #3d444d; --accent: #4493f8; --accent-bg: #0c2d6b; --ok: #3fb950; --err: #f85149; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 8px; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); background: var(--bg); }
+  .drop { border: 2px dashed var(--border); border-radius: 10px; padding: 20px 16px; text-align: center; transition: background .15s, border-color .15s; }
+  .drop.over { border-color: var(--accent); background: var(--accent-bg); }
+  .drop strong { display: block; font-size: 15px; margin-bottom: 4px; }
+  .drop .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  label.button { display: inline-block; margin-top: 6px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+  label.button:hover { border-color: var(--accent); }
+  ul { list-style: none; margin: 10px 0 0; padding: 0; }
+  li { padding: 4px 2px; font-size: 13px; }
+  li.ok::before { content: "✓ "; color: var(--ok); }
+  li.err { color: var(--err); }
+  li.busy::before { content: "… "; color: var(--muted); }
+  code { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="drop" id="drop">
+  <strong>Drop a Visio file here</strong>
+  <span>.vsdx diagrams, or the .pdf exported from one</span><br>
+  <label class="button">Choose a file<input id="pick" type="file" accept=".vsdx,.pdf" multiple hidden></label>
+  <div class="hint" id="hint">Waiting for the server…</div>
+</div>
+<ul id="files"></ul>
+<script type="module">/*SCRIPT*/</script>
+</body>
+</html>
