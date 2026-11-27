@@ -35,8 +35,10 @@ public static class HostedServer
         builder.Services.AddHostedService<FileCleanup>();
 
         var app = builder.Build();
-        app.Map("/mcp", McpHttpEndpoint.HandleAsync);
-        app.MapFileEndpoints();
+        // Under Mcp:BasePath, as in Azure Functions ("/api"), so links and routes agree.
+        var routes = app.MapGroup(builder.Configuration["Mcp:BasePath"] ?? "");
+        routes.Map("/mcp", McpHttpEndpoint.HandleAsync);
+        routes.MapFileEndpoints();
         app.MapGet("/", () => "VisioWebTools MCP server. Connect an MCP client to /mcp.");
         await app.RunAsync();
     }

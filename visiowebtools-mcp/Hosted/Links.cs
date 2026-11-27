@@ -15,19 +15,13 @@ public sealed partial class Links
     private readonly HostedOptions options;
     private readonly IHttpContextAccessor http;
 
-    public Links(IOptions<HostedOptions> options, IHttpContextAccessor http, ILogger<Links> log)
+    public Links(IOptions<HostedOptions> options, IHttpContextAccessor http)
     {
         this.options = options.Value;
         this.http = http;
-        if (string.IsNullOrEmpty(this.options.SigningKey))
-        {
-            log.LogWarning("Mcp:SigningKey is not set: using a random key; links stop working on restart and across instances.");
-            key = RandomNumberGenerator.GetBytes(32);
-        }
-        else
-        {
-            key = Convert.FromBase64String(this.options.SigningKey);
-        }
+        key = string.IsNullOrEmpty(this.options.SigningKey)
+            ? HMACSHA256.HashData(Encoding.UTF8.GetBytes(this.options.StorageConnectionString), "visiowebtools-mcp/links"u8)
+            : Convert.FromBase64String(this.options.SigningKey);
     }
 
     /// <summary>A new random id: 128 bits, base64url.</summary>
@@ -46,7 +40,7 @@ public sealed partial class Links
             if (!string.IsNullOrEmpty(options.PublicBaseUrl))
                 return options.PublicBaseUrl.TrimEnd('/');
             var request = http.HttpContext?.Request ?? throw new InvalidOperationException("No request to take the server's address from; set Mcp:PublicBaseUrl.");
-            return $"{request.Scheme}://{request.Host}{request.PathBase}";
+            return $"{request.Scheme}://{request.Host}{request.PathBase}{options.BasePath.TrimEnd('/')}";
         }
     }
 

@@ -6,14 +6,19 @@ public sealed class HostedOptions
     /// <summary>The server's public address, for links. Defaults to the address of the current request.</summary>
     public string? PublicBaseUrl { get; set; }
 
+    /// <summary>
+    /// Path the endpoints are mapped under, e.g. "/api" in Azure Functions (its route prefix). Links include it.
+    /// </summary>
+    public string BasePath { get; set; } = "";
+
     /// <summary>Azure Storage connection string. Defaults to the local Azurite emulator.</summary>
     public string StorageConnectionString { get; set; } = "UseDevelopmentStorage=true";
 
     public string Container { get; set; } = "mcp-files";
 
     /// <summary>
-    /// Base64 key that signs upload and download links. Set it when more than one instance runs, or links
-    /// made by one instance fail on another (and on restart). If unset, a random key is made at start.
+    /// Base64 key that signs upload and download links. If unset, a key is derived from
+    /// <see cref="StorageConnectionString"/>: secret as long as it is, and the same on every instance.
     /// </summary>
     public string? SigningKey { get; set; }
 

@@ -69,22 +69,36 @@ dotnet run --project visiowebtools-mcp -- --http --urls http://localhost:5080
 claude mcp add --transport http visio-hosted http://localhost:5080/mcp
 ```
 
+## Hosted in production: the Azure Function app
+
+The hosted server runs inside the existing Function app (`azure_function/McpFunctions.cs`), next to the
+website's API, and deploys with it (Azure Pipelines):
+
+| URL | |
+|---|---|
+| `https://visiowebtools.azurewebsites.net/api/mcp` | The MCP endpoint, for Claude: Settings → Connectors → Add custom connector |
+| `/api/files/upload/{batch}` | Uploads (`PUT`), and the upload page for chats without widgets (`GET`) |
+| `/api/files/{id}/{name}` | Result downloads |
+
+A timer function deletes expired files every 10 minutes. With no settings, the server uses the function app's
+own storage account (`AzureWebJobsStorage`, container `mcp-files`) and derives its link-signing key from that
+connection string, so nothing has to be configured. To run the same layout locally:
+`dotnet run --project visiowebtools-mcp -- --http --Mcp:BasePath=/api`.
+
 ## Hosted configuration
 
-Settings come from the `Mcp` configuration section; as environment variables / App Service settings: `Mcp__Name`.
+Settings come from the `Mcp` configuration section; as environment variables / app settings: `Mcp__Name`.
 
 | Setting | Default | |
 |---|---|---|
-| `Mcp__StorageConnectionString` | `UseDevelopmentStorage=true` (Azurite) | The Azure Storage account for files |
+| `Mcp__StorageConnectionString` | the function app's `AzureWebJobsStorage`; otherwise `UseDevelopmentStorage=true` (Azurite) | The Azure Storage account for files |
 | `Mcp__Container` | `mcp-files` | Created on first use |
-| `Mcp__SigningKey` | random per start | Base64, 32 bytes (`openssl rand -base64 32`). **Set it in production**: otherwise links break on restart and across instances |
-| `Mcp__PublicBaseUrl` | the request's address | Set it if the server is behind a proxy that changes the host |
+| `Mcp__SigningKey` | derived from the storage connection string | Base64. Signs upload and download links; set it to make links independent of the storage key |
+| `Mcp__PublicBaseUrl` | the request's address | Set it behind a proxy that changes the host, or with a custom domain |
+| `Mcp__BasePath` | `/api` in the function app, empty in the dev server | The route prefix links include |
 | `Mcp__FileLifetime` | `01:00:00` | How long files are kept |
 | `Mcp__UploadLinkLifetime` | `00:30:00` | |
 | `Mcp__MaxFileBytes` / `Mcp__MaxFilesPerUpload` | 25 MB / 5 | |
 
-Expired files are refused at once and deleted by the server every 10 minutes. As a backstop, add a
-lifecycle management rule on the storage account that deletes blobs in `mcp-files` 1 day after creation
-(Azure's rules count in days).
-
-To connect it in Claude: Settings → Connectors → Add custom connector, URL `https://<host>/mcp`.
+Expired files are refused at once and deleted every 10 minutes. As a backstop, a lifecycle management rule on
+the storage account can delete blobs in `mcp-files` 1 day after creation (Azure's rules count in days).
