@@ -16,7 +16,7 @@ namespace VisioWebToolsAzureFunctions
         }
 
         [Function("ExtractImagesAzureFunction")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequestData req)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", "options", Route = null)] HttpRequestData req)
         {
             log.LogInformation("ExtractImagesAzureFunction");
 

@@ -9,6 +9,9 @@ var builder = FunctionsApplication.CreateBuilder(args);
 // ASP.NET Core integration: the MCP functions work on HttpContext (McpFunctions.cs).
 builder.ConfigureFunctionsWebApplication();
 
+// CORS in code: the app's Azure CORS setting must be off (see CorsMiddleware).
+builder.UseMiddleware<VisioWebToolsAzureFunctions.CorsMiddleware>();
+
 builder.Services.AddVisioMcpHosting(builder.Configuration);
 builder.Services.PostConfigure<HostedOptions>(o =>
 {
